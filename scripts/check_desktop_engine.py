@@ -114,6 +114,26 @@ def main():
                     headers={"Content-Type": "application/json"})
                 with urlopen(req, context=context, timeout=10) as response:
                     assert json.load(response)["device_id"]
+                phone = request(ready, '/api/ops/companion/pair', 'POST', dict(name='Frozen phone',role='viewer',project_ids=[project['id']]))
+                bundle = phone['bundle']
+                redeem = Request(f'https://127.0.0.1:{public_port}/api/team/companion/redeem',data=json.dumps(dict(invite_id=bundle['invite_id'],invite=bundle['invite'])).encode(),headers={'Content-Type':'application/json'})
+                with urlopen(redeem,context=context,timeout=10) as response:
+                    credential = json.load(response)
+                try:
+                    urlopen(redeem,context=context,timeout=10)
+                    raise AssertionError('One-use phone invitation was accepted twice')
+                except HTTPError as error:
+                    assert error.code == 401
+                phone_snapshot = Request(f'https://127.0.0.1:{public_port}/api/team/snapshot',headers={'Authorization':'Bearer '+credential['token']})
+                with urlopen(phone_snapshot,context=context,timeout=10) as response:
+                    shared=json.load(response)
+                    assert len(shared['projects'])==1 and 'root' not in shared['projects'][0]
+                request(ready,'/api/workbench/members/'+phone['member']['id']+'/revoke','POST')
+                try:
+                    urlopen(phone_snapshot,context=context,timeout=10)
+                    raise AssertionError('Revoked phone credential was accepted')
+                except HTTPError as error:
+                    assert error.code == 401
             run = request(ready, "/api/runs", "POST", dict(task="Verify the bundled desktop engine",
                 architecture_id="parallel", preset="general", mode="demo", free_only=True))
             deadline = time.monotonic() + 20
@@ -273,7 +293,7 @@ def main():
             assert help_result.returncode == 0, help_result.stderr
             if mode == "worker": assert "--execution-image" in help_result.stdout
             if mode == "restore": assert "--encrypted" in help_result.stdout and "--preview" in help_result.stdout
-        print("Frozen engine passed: startup, authentication, hardware, graph execution, budgets, context, packages, image validation, QR, project memory, certificates, native PDF calls and reported usage, catalog, GGUF header import, bundled browser driver, evaluations, encrypted backup/preview/restore, persistence, shutdown and worker/coordinator/hub/restore/relay CLI." + (" TLS private ingress passed." if public_port else ""))
+        print("Frozen engine passed: startup, authentication, hardware, graph execution, budgets, context, packages, image validation, QR, project memory, certificates, native PDF calls and reported usage, catalog, GGUF header import, bundled browser driver, evaluations, campaign acceptance, preflight, knowledge, notebook export, audio rejection, encrypted backup/preview/restore, persistence, shutdown and worker/coordinator/hub/restore/relay CLI." + (" TLS private ingress and one-use/revocable phone pairing passed." if public_port else ""))
 
 
 if __name__ == "__main__":

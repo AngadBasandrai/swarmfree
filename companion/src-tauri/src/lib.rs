@@ -1,4 +1,4 @@
-use std::{sync::Arc,time::{Duration,SystemTime,UNIX_EPOCH}};
+use std::{sync::{Arc,atomic::{AtomicU64,Ordering}},time::{Duration,SystemTime,UNIX_EPOCH}};
 use serde::Deserialize;
 use serde_json::{Value,json};
 use sha2::{Digest,Sha256};
@@ -7,9 +7,10 @@ mod paths;
 
 #[derive(Deserialize)]
 struct Bundle {format:String,origin:String,invite_id:String,invite:String,certificate:String,expires_at:f64}
+#[derive(Clone)]
 struct Connection {client:reqwest::Client,origin:String,token:String}
 #[derive(Default)]
-struct Session(Mutex<Option<Connection>>);
+struct Session {connection:Mutex<Option<Connection>>,epoch:AtomicU64}
 
 fn validate(bundle:&Bundle)->Result<reqwest::Url,String>{
  let origin=reqwest::Url::parse(&bundle.origin).map_err(|_|"Invalid HTTPS coordinator origin")?;
@@ -34,23 +35,27 @@ async fn response(response:reqwest::Response)->Result<Value,String>{
 #[tauri::command]
 async fn pair(bundle:Bundle,state:tauri::State<'_,Arc<Session>>)->Result<Value,String>{
  validate(&bundle)?;
+ let epoch=state.epoch.fetch_add(1,Ordering::SeqCst)+1;
+ *state.connection.lock().await=None;
  let cert=reqwest::Certificate::from_pem(bundle.certificate.as_bytes()).map_err(|_|"Invalid trust certificate")?;
- let client=reqwest::Client::builder().https_only(true).no_proxy().redirect(reqwest::redirect::Policy::none()).timeout(Duration::from_secs(30)).add_root_certificate(cert).build().map_err(|_|"Cannot configure TLS")?;
+ let client=reqwest::Client::builder().https_only(true).no_proxy().redirect(reqwest::redirect::Policy::none()).timeout(Duration::from_secs(30)).tls_built_in_root_certs(false).add_root_certificate(cert).build().map_err(|_|"Cannot configure TLS")?;
  let origin=bundle.origin.trim_end_matches('/').to_string();
  let result=response(client.post(format!("{origin}/api/team/companion/redeem")).json(&json!({"invite_id":bundle.invite_id,"invite":bundle.invite})).send().await.map_err(|_|"Cannot reach this trusted HTTPS coordinator")?).await?;
  let token=result.get("token").and_then(Value::as_str).ok_or("Coordinator supplied no scoped credential")?.to_string();
- *state.0.lock().await=Some(Connection{client,origin,token});Ok(result.get("member").cloned().unwrap_or(Value::Null))
+ let mut connection=state.connection.lock().await;
+ if state.epoch.load(Ordering::SeqCst)!=epoch{return Err("Pairing was cancelled or replaced".into());}
+ *connection=Some(Connection{client,origin,token});Ok(result.get("member").cloned().unwrap_or(Value::Null))
 }
 
 #[tauri::command]
-async fn disconnect(state:tauri::State<'_,Arc<Session>>)->Result<(),String>{*state.0.lock().await=None;Ok(())}
+async fn disconnect(state:tauri::State<'_,Arc<Session>>)->Result<(),String>{state.epoch.fetch_add(1,Ordering::SeqCst);*state.connection.lock().await=None;Ok(())}
 
 #[tauri::command]
 async fn remote_request(path:String,method:String,body:Option<Value>,state:tauri::State<'_,Arc<Session>>)->Result<Value,String>{
  if !paths::allowed(&path,&method)||body.as_ref().map(|b|b.to_string().len()).unwrap_or(0)>64000{return Err("Invalid companion request".into());}
- let guard=state.0.lock().await;let connection=guard.as_ref().ok_or("Pair this phone first")?;
+ let connection=state.connection.lock().await.as_ref().cloned().ok_or("Pair this phone first")?;
  let mut request=connection.client.request(method.parse().map_err(|_|"Invalid method")?,format!("{}{}",connection.origin,path)).bearer_auth(&connection.token);
- if let Some(body)=body{request=request.json(&body);}let reply=request.send().await.map_err(|_|"Cannot reach the paired coordinator")?;drop(guard);response(reply).await
+ if let Some(body)=body{request=request.json(&body);}let reply=request.send().await.map_err(|_|"Cannot reach the paired coordinator")?;response(reply).await
 }
 
 #[cfg_attr(mobile,tauri::mobile_entry_point)]
