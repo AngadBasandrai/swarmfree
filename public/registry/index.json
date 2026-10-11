@@ -3,8 +3,8 @@
   "key_id": "swarmfree",
   "payload": {
     "kind": "index",
-    "serial": 1791736092,
-    "expires_at": 1823272092,
+    "serial": 1791736230,
+    "expires_at": 1823272230,
     "packages": [
       {
         "id": "supervisor",
@@ -96,5 +96,5 @@
       }
     ]
   },
-  "signature": "dFM0TEHi1vTuX1vReoZTgi+/nQFE9Ps+ph/8HN68Fj4dYT+BS6DXc347sp9ounJSJ4sBIoI5mcT7qWNXBEFyDQ=="
+  "signature": "dhA3yvOumFvOQvNqgIo6QI8/NE0Nk0ESO8nkYg1JPCVxA9hKm6vjVA/KCN9xNaBrwI3XRqP8jo2nvPDA7rV9CQ=="
 }
