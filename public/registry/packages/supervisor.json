@@ -1,0 +1,119 @@
+{
+  "format": "swarm-json-v1",
+  "key_id": "swarmfree",
+  "payload": {
+    "id": "supervisor",
+    "name": "Supervisor",
+    "version": "0.5.0",
+    "kind": "architecture",
+    "license": "MIT",
+    "permissions": [],
+    "architecture": {
+      "id": "supervisor",
+      "name": "Supervisor",
+      "description": "A planner delegates to two specialists; a synthesizer joins their work.",
+      "nodes": [
+        {
+          "id": "planner",
+          "name": "Planner",
+          "role": "Break down the task",
+          "instructions": "Write a concrete plan and assign useful directions to specialists.",
+          "tools": null,
+          "requires": [],
+          "kind": "agent",
+          "subswarm_id": "",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 0.0,
+          "y": 120.0
+        },
+        {
+          "id": "researcher",
+          "name": "Researcher",
+          "role": "Explore evidence and options",
+          "instructions": "Evaluate facts and options. Do not invent sources or claim to have browsed.",
+          "tools": null,
+          "requires": [],
+          "kind": "agent",
+          "subswarm_id": "",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 280.0,
+          "y": 0.0
+        },
+        {
+          "id": "builder",
+          "name": "Builder",
+          "role": "Develop a practical solution",
+          "instructions": "Produce a concrete solution with assumptions and tradeoffs.",
+          "tools": null,
+          "requires": [],
+          "kind": "agent",
+          "subswarm_id": "",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 280.0,
+          "y": 240.0
+        },
+        {
+          "id": "synthesizer",
+          "name": "Synthesizer",
+          "role": "Join the team's work",
+          "instructions": "Integrate the supplied work into one useful final answer.",
+          "tools": null,
+          "requires": [],
+          "kind": "agent",
+          "subswarm_id": "",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 560.0,
+          "y": 120.0
+        }
+      ],
+      "edges": [
+        {
+          "source": "planner",
+          "target": "researcher"
+        },
+        {
+          "source": "planner",
+          "target": "builder"
+        },
+        {
+          "source": "researcher",
+          "target": "synthesizer"
+        },
+        {
+          "source": "builder",
+          "target": "synthesizer"
+        }
+      ],
+      "builtin": true,
+      "max_rounds": 1,
+      "stop_when_contains": "",
+      "channels": [],
+      "input_schema": {},
+      "output_schema": {}
+    },
+    "examples": [
+      "Run with the offline demo before assigning live models"
+    ],
+    "evaluation": {
+      "status": "deterministic demo validation",
+      "note": "No live-provider quality ranking is claimed"
+    }
+  },
+  "signature": "dvDp1tRKTIeSSg8ZVBJ8HrrrfsZbAnYUtYQTuPVCKSzE6PROsSMA0kLgjHglai+VoJsolK3qMm54mFxcLPcgBw=="
+}

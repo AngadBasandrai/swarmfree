@@ -1,0 +1,98 @@
+{
+  "format": "swarm-json-v1",
+  "key_id": "swarmfree",
+  "payload": {
+    "id": "revision",
+    "name": "Bounded revision",
+    "version": "0.5.0",
+    "kind": "architecture",
+    "license": "MIT",
+    "permissions": [],
+    "architecture": {
+      "id": "revision",
+      "name": "Bounded revision",
+      "description": "Draft, critique and revise for at most three checkpointed rounds.",
+      "nodes": [
+        {
+          "id": "creator",
+          "name": "Creator",
+          "role": "Make a first draft",
+          "instructions": "Produce a substantive first version of the requested work.",
+          "tools": null,
+          "requires": [],
+          "kind": "agent",
+          "subswarm_id": "",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 0.0,
+          "y": 100.0
+        },
+        {
+          "id": "critic",
+          "name": "Critic",
+          "role": "Find specific improvements",
+          "instructions": "Assess the draft and propose specific, justified improvements.",
+          "tools": null,
+          "requires": [],
+          "kind": "agent",
+          "subswarm_id": "",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 280.0,
+          "y": 100.0
+        },
+        {
+          "id": "reviser",
+          "name": "Reviser",
+          "role": "Revise and deliver",
+          "instructions": "Use the original draft and critique to deliver a stronger final version.",
+          "tools": null,
+          "requires": [],
+          "kind": "agent",
+          "subswarm_id": "",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 560.0,
+          "y": 100.0
+        }
+      ],
+      "edges": [
+        {
+          "source": "creator",
+          "target": "critic"
+        },
+        {
+          "source": "creator",
+          "target": "reviser"
+        },
+        {
+          "source": "critic",
+          "target": "reviser"
+        }
+      ],
+      "builtin": true,
+      "max_rounds": 3,
+      "stop_when_contains": "",
+      "channels": [],
+      "input_schema": {},
+      "output_schema": {}
+    },
+    "examples": [
+      "Run with the offline demo before assigning live models"
+    ],
+    "evaluation": {
+      "status": "deterministic demo validation",
+      "note": "No live-provider quality ranking is claimed"
+    }
+  },
+  "signature": "dPOWCWlnL22FiP2wxVOdqn+zlpjsgoT3OKq21gSlY0Rvw/3nBChBhchRCpm1QQCgoawbYlp9CgyxDVlNHVdXCA=="
+}

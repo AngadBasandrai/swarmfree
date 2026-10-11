@@ -1,0 +1,94 @@
+{
+  "format": "swarm-json-v1",
+  "key_id": "swarmfree",
+  "payload": {
+    "id": "pipeline",
+    "name": "Pipeline",
+    "version": "0.5.0",
+    "kind": "architecture",
+    "license": "MIT",
+    "permissions": [],
+    "architecture": {
+      "id": "pipeline",
+      "name": "Pipeline",
+      "description": "Pass work through planning, execution, and review.",
+      "nodes": [
+        {
+          "id": "planner",
+          "name": "Planner",
+          "role": "Plan the approach",
+          "instructions": "Define requirements and a concrete approach.",
+          "tools": null,
+          "requires": [],
+          "kind": "agent",
+          "subswarm_id": "",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 0.0,
+          "y": 100.0
+        },
+        {
+          "id": "builder",
+          "name": "Builder",
+          "role": "Produce the work",
+          "instructions": "Carry out the plan and produce the requested deliverable.",
+          "tools": null,
+          "requires": [],
+          "kind": "agent",
+          "subswarm_id": "",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 280.0,
+          "y": 100.0
+        },
+        {
+          "id": "reviewer",
+          "name": "Reviewer",
+          "role": "Review and finalize",
+          "instructions": "Check the supplied output, fix errors, and return the final deliverable.",
+          "tools": null,
+          "requires": [],
+          "kind": "agent",
+          "subswarm_id": "",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 560.0,
+          "y": 100.0
+        }
+      ],
+      "edges": [
+        {
+          "source": "planner",
+          "target": "builder"
+        },
+        {
+          "source": "builder",
+          "target": "reviewer"
+        }
+      ],
+      "builtin": true,
+      "max_rounds": 1,
+      "stop_when_contains": "",
+      "channels": [],
+      "input_schema": {},
+      "output_schema": {}
+    },
+    "examples": [
+      "Run with the offline demo before assigning live models"
+    ],
+    "evaluation": {
+      "status": "deterministic demo validation",
+      "note": "No live-provider quality ranking is claimed"
+    }
+  },
+  "signature": "96UzWLVJkj5M9Zq9ufVrM46BSZV2I+/tpYcSQbyZslnKP+FZ0dHZgS5PPMBxIUAleoLcWzdDwINWUK1xgkvHAg=="
+}

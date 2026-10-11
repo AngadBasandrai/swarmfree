@@ -1,0 +1,30 @@
+{
+  "format": "swarm-json-v1",
+  "key_id": "swarmfree",
+  "payload": {
+    "id": "mcp-local-example",
+    "name": "Local MCP adapter example",
+    "version": "0.5.0",
+    "kind": "plugin",
+    "license": "MIT",
+    "permissions": [
+      "Run an owner-installed executable",
+      "Invoke explicitly granted MCP tools"
+    ],
+    "extension": {
+      "kind": "mcp",
+      "transport": "stdio",
+      "argv": [
+        "OWNER_INSTALLED_MCP_SERVER"
+      ],
+      "enabled": false
+    },
+    "examples": [
+      "Replace argv with an installed server and review tools in Extensions"
+    ],
+    "evaluation": {
+      "status": "declaration example; executable not bundled"
+    }
+  },
+  "signature": "ZkfFi9bL/4e2Kmzy5Pi6WYQGb76zczpUy2876MBcrGWEu1Mwbe8MUP7DdB5EXdYzoywglotbaXdxrz7m7ELLDg=="
+}

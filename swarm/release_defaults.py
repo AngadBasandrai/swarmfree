@@ -1,0 +1,2 @@
+ENDPOINT = "https://swarms.grafitelab.in/updates/stable.json"
+PUBLIC_KEY = 'dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDdDRERENDlCMjg4NTJGNEIKUldSTEw0VW9tOVRkZk5aMHdLZDRVU0VYcElUODNBVFllMmltTGdYbWhTRE56RTRVZU5wTnoyT2MK'

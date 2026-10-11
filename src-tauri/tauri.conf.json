@@ -1,0 +1,71 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Swarm Workbench",
+  "version": "0.5.0",
+  "identifier": "app.swarmworkbench.desktop",
+  "build": {
+    "beforeBuildCommand": "npm run build:desktop-ui",
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://127.0.0.1:5173",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "Swarm Workbench",
+        "width": 1440,
+        "height": 940,
+        "minWidth": 960,
+        "minHeight": 650,
+        "center": true,
+        "backgroundColor": "#f6f7f3"
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' asset: data: blob:; font-src 'self' data:; connect-src ipc: http://ipc.localhost"
+    }
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDdDRERENDlCMjg4NTJGNEIKUldSTEw0VW9tOVRkZk5aMHdLZDRVU0VYcElUODNBVFllMmltTGdYbWhTRE56RTRVZU5wTnoyT2MK",
+      "requireSignedVersion": true,
+      "endpoints": [
+        "https://swarms.grafitelab.in/updates/stable.json",
+        "https://github.com/AngadBasandrai/swarmfree/releases/latest/download/stable.json"
+      ]
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "shortDescription": "A private multi-model agent swarm workbench",
+    "category": "Productivity",
+    "externalBin": [
+      "binaries/swarm-engine"
+    ],
+    "resources": {
+      "../build/notices/": "notices/",
+      "../LICENSE": "LICENSE",
+      "../docs/": "docs/",
+      "../README.md": "README.md"
+    },
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "windows": {
+      "webviewInstallMode": {
+        "type": "downloadBootstrapper",
+        "silent": true
+      },
+      "nsis": {
+        "installMode": "currentUser",
+        "displayLanguageSelector": false
+      }
+    }
+  }
+}

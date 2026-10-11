@@ -1,0 +1,100 @@
+{
+  "format": "swarm-json-v1",
+  "key_id": "swarmfree",
+  "payload": {
+    "kind": "index",
+    "serial": 1791736092,
+    "expires_at": 1823272092,
+    "packages": [
+      {
+        "id": "supervisor",
+        "name": "Supervisor",
+        "version": "0.5.0",
+        "kind": "architecture",
+        "path": "packages/supervisor.json",
+        "sha256": "e881bcc9951865defd30b734911c1829942fc87ebde97ba8d7dfbeeaa878a85f"
+      },
+      {
+        "id": "pipeline",
+        "name": "Pipeline",
+        "version": "0.5.0",
+        "kind": "architecture",
+        "path": "packages/pipeline.json",
+        "sha256": "aa4d76740afa44fc96eafac2878fdbc49112df37b956562f881d28c98c76fe8d"
+      },
+      {
+        "id": "parallel",
+        "name": "Parallel / join",
+        "version": "0.5.0",
+        "kind": "architecture",
+        "path": "packages/parallel.json",
+        "sha256": "7de2e7134958921cf3bf944852735f5dd77fc371f1e1402b4b24cae84192928f"
+      },
+      {
+        "id": "critic",
+        "name": "Creator / critic",
+        "version": "0.5.0",
+        "kind": "architecture",
+        "path": "packages/critic.json",
+        "sha256": "d582ac685a346cfc45fb9140a890d4a5f9cd6a47022ffc69c1b485e72853ac81"
+      },
+      {
+        "id": "baseline",
+        "name": "Single-agent baseline",
+        "version": "0.5.0",
+        "kind": "architecture",
+        "path": "packages/baseline.json",
+        "sha256": "5b0b33973d1c21893416073eeb5c02c910e07a9b3c922326d21442da4b2d1f8e"
+      },
+      {
+        "id": "handoff",
+        "name": "Specialist handoff",
+        "version": "0.5.0",
+        "kind": "architecture",
+        "path": "packages/handoff.json",
+        "sha256": "efeee83100945a6bb093136051bbd878a07291b11aa5c8566c38ffbe9249dcd6"
+      },
+      {
+        "id": "hierarchy",
+        "name": "Hierarchical team",
+        "version": "0.5.0",
+        "kind": "architecture",
+        "path": "packages/hierarchy.json",
+        "sha256": "233c09a139520bdb598cf0358f7a9fff0f64cea9d1be49112b5d2fe3821efd3a"
+      },
+      {
+        "id": "blackboard",
+        "name": "Shared blackboard",
+        "version": "0.5.0",
+        "kind": "architecture",
+        "path": "packages/blackboard.json",
+        "sha256": "e9d251af94d7d9e8aee762d0d4dc47b6feb75190f55eb204b24de8567e9a7558"
+      },
+      {
+        "id": "ensemble",
+        "name": "Debate / ensemble",
+        "version": "0.5.0",
+        "kind": "architecture",
+        "path": "packages/ensemble.json",
+        "sha256": "6cfc455ef4c1e687180669c33d9927a3d3e6e9872363c2da72c208035362670f"
+      },
+      {
+        "id": "revision",
+        "name": "Bounded revision",
+        "version": "0.5.0",
+        "kind": "architecture",
+        "path": "packages/revision.json",
+        "sha256": "79f33baa143e6f87a101b4457da00adf4da4b53efb5afb619def0d98950413b0"
+      },
+      {
+        "id": "mcp-local-example",
+        "name": "Local MCP adapter example",
+        "version": "0.5.0",
+        "kind": "plugin",
+        "path": "packages/mcp-local-example.json",
+        "sha256": "e79e4c28bb7b0b8e7ea660c236a7392df941cb853a786a48cdace90053b12417"
+      }
+    ]
+  },
+  "signature": "dFM0TEHi1vTuX1vReoZTgi+/nQFE9Ps+ph/8HN68Fj4dYT+BS6DXc347sp9ounJSJ4sBIoI5mcT7qWNXBEFyDQ=="
+}

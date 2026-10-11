@@ -1,0 +1,17 @@
+node_modules/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+dist/
+.swarm/
+*.egg-info/
+.env
+playwright-report/
+test-results/
+*.tsbuildinfo
+swarm/web_dist/
+build/
+src-tauri/target/
+src-tauri/binaries/
+releases/

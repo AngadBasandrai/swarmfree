@@ -1,0 +1,50 @@
+import { test, expect } from '@playwright/test';
+
+test('save scoped project permissions, share memory, benchmark teams, and back up', async ({page}) => {
+  const errors:string[]=[];
+  page.on('pageerror',e=>errors.push(e.message));
+  await page.goto('/');
+  await page.getByRole('button',{name:'Studio',exact:true}).click();
+  await page.getByLabel('Project name').fill('Studio fixture');
+  await page.getByLabel('Project directory').fill(process.cwd());
+  await page.getByRole('button',{name:'Save project permissions'}).click();
+  await expect(page.getByLabel('Studio project')).toContainText('Studio fixture');
+  await page.getByRole('tab',{name:'Memory & sources'}).click();
+  await page.getByLabel('Memory title').fill('Portable context decision');
+  await page.getByLabel('Memory content').fill('Keep completed work when switching models.');
+  await page.getByRole('button',{name:'Save shared note'}).click();
+  await page.getByText('Portable context decision',{exact:false}).click();
+  await expect(page.getByText('Keep completed work when switching models.')).toBeVisible();
+  await page.getByRole('tab',{name:'Swarm lab'}).click();
+  await page.getByLabel('Benchmark task').fill('Compare a small team with one agent');
+  await page.getByRole('button',{name:'Start comparison'}).click();
+  await expect(page.getByRole('button',{name:'Single-agent baseline',exact:true})).toBeVisible();
+  await expect(page.locator('tbody tr')).toHaveCount(3);
+  await expect(page.locator('tbody tr').filter({hasText:'completed'})).toHaveCount(3,{timeout:30000});
+  await page.getByLabel('Score Single-agent baseline').fill('3.5');
+  await page.getByRole('heading',{name:'Compare teams against one agent'}).click();
+  await page.screenshot({path:'test-results/workbench-studio-lab.png',fullPage:true});
+  await page.getByRole('button',{name:'Single-agent baseline',exact:true}).click();
+  await expect(page.locator('.run-title .badge')).toHaveText('completed');
+  await page.getByRole('button',{name:'Branch through selected agent'}).click();
+  await expect(page.locator('.run-title .badge')).toHaveText('completed',{timeout:12000});
+  await expect(page.locator('.dock-agent')).toHaveCount(1);
+  await page.getByRole('button',{name:'Studio',exact:true}).click();
+  await page.getByRole('tab',{name:'Backups & updates'}).click();
+  await page.getByRole('button',{name:'Pause work and create backup'}).click();
+  await expect(page.getByText(/swarm-\d+\.zip/)).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
+test('edit bounded revision and deterministic ensemble controls',async({page})=>{
+  await page.goto('/');
+  await page.getByRole('button',{name:'Architectures',exact:true}).click();
+  await page.getByLabel('Architecture template').selectOption('ensemble');
+  await page.getByLabel('Architecture name').fill('My bounded ensemble');
+  await page.getByLabel('Revision rounds').fill('2');
+  await page.getByRole('button',{name:'Save custom copy'}).click();
+  await expect(page.getByLabel('Architecture template')).toContainText('My bounded ensemble');
+  await expect(page.getByLabel('Revision rounds')).toHaveValue('2');
+  await expect(page.getByLabel('Require tested JSON output')).toBeVisible();
+  await page.screenshot({path:'test-results/workbench-ensemble.png',fullPage:true});
+});

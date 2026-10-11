@@ -1,0 +1,94 @@
+{
+  "format": "swarm-json-v1",
+  "key_id": "swarmfree",
+  "payload": {
+    "id": "handoff",
+    "name": "Specialist handoff",
+    "version": "0.5.0",
+    "kind": "architecture",
+    "license": "MIT",
+    "permissions": [],
+    "architecture": {
+      "id": "handoff",
+      "name": "Specialist handoff",
+      "description": "Triage, specialist work, and final handoff.",
+      "nodes": [
+        {
+          "id": "triage",
+          "name": "Triage",
+          "role": "Classify and scope the task",
+          "instructions": "Identify the specialist work needed and preserve important context.",
+          "tools": null,
+          "requires": [],
+          "kind": "agent",
+          "subswarm_id": "",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 0.0,
+          "y": 100.0
+        },
+        {
+          "id": "specialist",
+          "name": "Specialist",
+          "role": "Resolve the scoped task",
+          "instructions": "Use the triage findings and available tools to solve the problem.",
+          "tools": null,
+          "requires": [],
+          "kind": "agent",
+          "subswarm_id": "",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 280.0,
+          "y": 100.0
+        },
+        {
+          "id": "finisher",
+          "name": "Finisher",
+          "role": "Complete the handoff",
+          "instructions": "Check deliverables and state unfinished work explicitly.",
+          "tools": null,
+          "requires": [],
+          "kind": "agent",
+          "subswarm_id": "",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 560.0,
+          "y": 100.0
+        }
+      ],
+      "edges": [
+        {
+          "source": "triage",
+          "target": "specialist"
+        },
+        {
+          "source": "specialist",
+          "target": "finisher"
+        }
+      ],
+      "builtin": true,
+      "max_rounds": 1,
+      "stop_when_contains": "",
+      "channels": [],
+      "input_schema": {},
+      "output_schema": {}
+    },
+    "examples": [
+      "Run with the offline demo before assigning live models"
+    ],
+    "evaluation": {
+      "status": "deterministic demo validation",
+      "note": "No live-provider quality ranking is claimed"
+    }
+  },
+  "signature": "1uF/vbQ5xcJRKfKZr+bsYrYe0w2GDXJL7VOq2YhjMkKNfaE+J6pDWBO4I6OvJBWUb+o6dzWopnhzbiX5eRE2Bg=="
+}

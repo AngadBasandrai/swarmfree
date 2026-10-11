@@ -1,0 +1,38 @@
+name: Registry and update channel
+on:
+  push:
+    branches: [main, release-channel]
+    paths: ['public/**', '.github/workflows/pages.yml']
+  workflow_dispatch:
+  workflow_run:
+    workflows: ['Desktop artifacts']
+    types: [completed]
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: false
+jobs:
+  publish:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-24.04
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Select verified release channel when available
+        run: |
+          if git show-ref --verify --quiet refs/remotes/origin/release-channel; then
+            git checkout release-channel
+          fi
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+      - uses: actions/deploy-pages@v4
+        id: deployment

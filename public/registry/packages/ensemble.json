@@ -1,0 +1,115 @@
+{
+  "format": "swarm-json-v1",
+  "key_id": "swarmfree",
+  "payload": {
+    "id": "ensemble",
+    "name": "Debate / ensemble",
+    "version": "0.5.0",
+    "kind": "architecture",
+    "license": "MIT",
+    "permissions": [],
+    "architecture": {
+      "id": "ensemble",
+      "name": "Debate / ensemble",
+      "description": "Three independent decisions with critique and synthesis.",
+      "nodes": [
+        {
+          "id": "one",
+          "name": "Perspective A",
+          "role": "Make an independent decision",
+          "instructions": "Return JSON with a string decision and justification.",
+          "tools": null,
+          "requires": [],
+          "kind": "agent",
+          "subswarm_id": "",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 0.0,
+          "y": 0.0
+        },
+        {
+          "id": "two",
+          "name": "Perspective B",
+          "role": "Challenge the default decision",
+          "instructions": "Return JSON with a string decision and justification.",
+          "tools": null,
+          "requires": [],
+          "kind": "agent",
+          "subswarm_id": "",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 0.0,
+          "y": 180.0
+        },
+        {
+          "id": "three",
+          "name": "Perspective C",
+          "role": "Explore alternatives",
+          "instructions": "Return JSON with a string decision and justification.",
+          "tools": null,
+          "requires": [],
+          "kind": "agent",
+          "subswarm_id": "",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 0.0,
+          "y": 360.0
+        },
+        {
+          "id": "vote",
+          "name": "Majority vote",
+          "role": "Count structured decisions",
+          "instructions": "",
+          "tools": null,
+          "requires": [],
+          "kind": "vote",
+          "subswarm_id": "",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 300.0,
+          "y": 180.0
+        }
+      ],
+      "edges": [
+        {
+          "source": "one",
+          "target": "vote"
+        },
+        {
+          "source": "two",
+          "target": "vote"
+        },
+        {
+          "source": "three",
+          "target": "vote"
+        }
+      ],
+      "builtin": true,
+      "max_rounds": 1,
+      "stop_when_contains": "",
+      "channels": [],
+      "input_schema": {},
+      "output_schema": {}
+    },
+    "examples": [
+      "Run with the offline demo before assigning live models"
+    ],
+    "evaluation": {
+      "status": "deterministic demo validation",
+      "note": "No live-provider quality ranking is claimed"
+    }
+  },
+  "signature": "VHwANtYX6ZzrJV3GFTABBbnXIy1hMalcMtzDwMfA5zxGgNzQg/K03duT9NbI0VWXf7L+4vkS6NhrOKbKKwLWCg=="
+}

@@ -1,0 +1,1 @@
+{"main-window":{"identifier":"main-window","description":"Local desktop window with clipboard and external documentation links","local":true,"windows":["main"],"permissions":["core:default","notification:default","clipboard-manager:allow-write-text",{"identifier":"opener:allow-open-url","allow":[{"url":"https://*"}]}]}}

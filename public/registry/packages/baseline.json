@@ -1,0 +1,51 @@
+{
+  "format": "swarm-json-v1",
+  "key_id": "swarmfree",
+  "payload": {
+    "id": "baseline",
+    "name": "Single-agent baseline",
+    "version": "0.5.0",
+    "kind": "architecture",
+    "license": "MIT",
+    "permissions": [],
+    "architecture": {
+      "id": "baseline",
+      "name": "Single-agent baseline",
+      "description": "One agent for comparison with a swarm.",
+      "nodes": [
+        {
+          "id": "worker",
+          "name": "Worker",
+          "role": "Complete the task",
+          "instructions": "Complete the task with the granted tools and available evidence.",
+          "tools": null,
+          "requires": [],
+          "kind": "agent",
+          "subswarm_id": "",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 200.0,
+          "y": 100.0
+        }
+      ],
+      "edges": [],
+      "builtin": true,
+      "max_rounds": 1,
+      "stop_when_contains": "",
+      "channels": [],
+      "input_schema": {},
+      "output_schema": {}
+    },
+    "examples": [
+      "Run with the offline demo before assigning live models"
+    ],
+    "evaluation": {
+      "status": "deterministic demo validation",
+      "note": "No live-provider quality ranking is claimed"
+    }
+  },
+  "signature": "TdMlC728rPgkaEHArzavqJ8W+2kW+wMJxZhicKlKe7Uvjp4IcxvyA0QaKy34bIE8VIizLBgYkywUkUKw5ak/Ag=="
+}

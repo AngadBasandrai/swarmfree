@@ -1,0 +1,110 @@
+name: Desktop artifacts
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+permissions:
+  contents: read
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            target: windows-x86_64
+          - os: macos-latest
+            target: darwin-aarch64
+          - os: macos-15-intel
+            target: darwin-x86_64
+          - os: ubuntu-24.04
+            target: linux-x86_64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+      - name: Linux desktop dependencies
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev patchelf libssl-dev
+      - run: python -m pip install -e '.[dev,desktop]'
+      - run: npm ci
+      - run: python -m playwright install chromium
+      - run: npx playwright install chromium --with-deps
+      - run: python -m pytest -q
+      - run: python scripts/check_native_requests.py
+      - run: npm run build
+      - run: npm run test:ui
+        env:
+          SWARM_TEST_PYTHON: python
+      - name: Provision optional Windows signing certificate
+        if: runner.os == 'Windows'
+        shell: pwsh
+        env:
+          SWARM_WINDOWS_PFX_BASE64: ${{ secrets.SWARM_WINDOWS_PFX_BASE64 }}
+          SWARM_WINDOWS_PFX_PASSWORD: ${{ secrets.SWARM_WINDOWS_PFX_PASSWORD }}
+        run: |
+          if ($env:SWARM_WINDOWS_PFX_BASE64) {
+            $certificatePath = Join-Path $env:RUNNER_TEMP 'swarm-signing.pfx'
+            [IO.File]::WriteAllBytes($certificatePath, [Convert]::FromBase64String($env:SWARM_WINDOWS_PFX_BASE64))
+            try {
+              $certificatePassword = ConvertTo-SecureString $env:SWARM_WINDOWS_PFX_PASSWORD -AsPlainText -Force
+              $signingCertificates = Import-PfxCertificate -FilePath $certificatePath -CertStoreLocation Cert:\CurrentUser\My -Password $certificatePassword
+              $signingCertificate = $signingCertificates | Where-Object HasPrivateKey | Select-Object -First 1
+              if (-not $signingCertificate) { throw 'No signing private key in PFX' }
+              "SWARM_WINDOWS_CERT_THUMBPRINT=$($signingCertificate.Thumbprint)" >> $env:GITHUB_ENV
+            } finally { Remove-Item -LiteralPath $certificatePath -Force }
+          }
+      - run: python scripts/build_desktop.py
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          SWARM_WINDOWS_CERT_THUMBPRINT: ${{ env.SWARM_WINDOWS_CERT_THUMBPRINT || secrets.SWARM_WINDOWS_CERT_THUMBPRINT }}
+      - name: Verify frozen engine and build platform manifest
+        run: python scripts/validate_release_ci.py --target ${{ matrix.target }}
+      - name: Disposable Windows installation acceptance
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $releaseVersion = (Get-Content src-tauri/tauri.conf.json | ConvertFrom-Json).version
+          python scripts/check_windows_install_ci.py "releases/Swarm Workbench_${releaseVersion}_x64-setup.exe"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: swarm-workbench-${{ matrix.target }}
+          path: releases/
+          if-no-files-found: error
+  publish:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: swarm-workbench-*
+          path: build/collected
+      - run: python -m pip install -e '.[dev]'
+      - run: python scripts/publish_release_ci.py
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SWARM_REGISTRY_PRIVATE_KEY: ${{ secrets.SWARM_REGISTRY_PRIVATE_KEY }}
