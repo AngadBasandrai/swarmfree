@@ -6,10 +6,10 @@ A downloadable desktop workbench for persistent agents using your own model prov
 
 ## Downloads
 
-- [Windows installer](<releases/Swarm Workbench_0.5.0_x64-setup.exe>): install for the current user, then launch from the Start menu.
-- [Portable desktop ZIP](releases/Swarm-Workbench_0.5.0_windows-x64_portable.zip): extract the entire folder and open `swarm-workbench.exe`. Keep the companion engine and resources alongside it.
-- [Worker/server ZIP](releases/Swarm-Worker_0.5.0_windows-x64.zip): run the bundled engine's `worker`, `coordinator`, `hub`, `relay`, or `restore` command. [Worker setup](docs/WORKER_QUICKSTART.md), [hub setup](docs/HUB_QUICKSTART.md).
-- [SHA-256 hashes](releases/SHA256SUMS.txt).
+- [Release downloads](https://github.com/AngadBasandrai/swarmfree/releases): select your platform's installer. Windows installs for the current user; launch from the Start menu.
+- Portable desktop ZIP: extract the entire folder and open `swarm-workbench.exe`. Keep the companion engine and resources alongside it.
+- Worker/server ZIP: run the bundled engine's `worker`, `coordinator`, `hub`, `relay`, or `restore` command. [Worker setup](docs/WORKER_QUICKSTART.md), [hub setup](docs/HUB_QUICKSTART.md).
+- Every published release includes `SHA256SUMS.txt`. Source builds write local packages into `releases/`.
 
 Local artifacts are in `releases/`; the public source and release target is [AngadBasandrai/swarmfree](https://github.com/AngadBasandrai/swarmfree). Updater signatures are configured; operating system signing requires separate credentials. The installer provisions Microsoft's WebView2 runtime if missing, which needs internet access. The portable version requires WebView2 already installed. Ollama, model weights, search servers, MCP servers and ACP agents are optional separate installations.
 
