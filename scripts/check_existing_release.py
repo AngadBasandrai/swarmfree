@@ -34,6 +34,8 @@ def verify_existing(root, tag, build_run, acceptance_run):
     if proof['tag'] != tag or proof['source_commit'] != source or proof.get('installation_passed') is not True:
         raise ValueError('Installation proof does not match tagged source')
     binary = root/'build/collected/windows-x86_64'/('Swarm-Workbench_'+tag[1:]+'_x64-setup.exe')
+    for name in ('Swarm-Workbench_'+tag[1:]+'_windows-x64_portable.zip', 'Swarm-Worker_'+tag[1:]+'_windows-x64.zip', 'swarm-engine-windows-x64.exe'):
+        if not (binary.parent/name).is_file(): raise ValueError('Required Windows download is missing: '+name)
     with binary.open('rb') as stream: digest = hashlib.file_digest(stream, 'sha256').hexdigest()
     if proof['sha256'] != digest or proof.get('publisher_signature') is not True:
         raise ValueError('Installer bytes differ from the accepted artifact')
