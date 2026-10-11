@@ -1,0 +1,53 @@
+name: Signed Windows installer acceptance
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing release tag with a draft or public signed Windows installer
+        required: true
+      sha256:
+        description: Expected SHA-256 of the installer
+        required: true
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
+          path: release-source
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: python -m pip install cryptography==50.0.2
+      - name: Download exact signed installer
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: gh release download $env:RELEASE_TAG --repo AngadBasandrai/swarmfree --pattern '*x64-setup.exe*' --dir build/acceptance
+      - name: Verify hash, publisher and signed version
+        shell: pwsh
+        env:
+          RELEASE_TAG: ${{ inputs.tag }}
+          EXPECTED_SHA256: ${{ inputs.sha256 }}
+        run: python scripts/check_release_install_input.py
+      - name: Disposable install, engine and uninstall
+        shell: pwsh
+        run: |
+          $version = (Get-Content release-source/src-tauri/tauri.conf.json | ConvertFrom-Json).version
+          python scripts/check_windows_install_ci.py "build/acceptance/Swarm Workbench_${version}_x64-setup.exe"
+      - name: Record accepted installer
+        shell: pwsh
+        run: |
+          $record = Get-Content build/acceptance/input.json | ConvertFrom-Json
+          $record | Add-Member -NotePropertyName installation_passed -NotePropertyValue $true
+          $record | ConvertTo-Json | Set-Content build/acceptance/accepted.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-install-acceptance
+          path: build/acceptance/accepted.json
+          if-no-files-found: error

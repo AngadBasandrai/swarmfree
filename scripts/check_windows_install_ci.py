@@ -23,7 +23,12 @@ def main():
     with tempfile.TemporaryDirectory(prefix='swarm-install-acceptance-',dir=runner) as folder:
         destination=(Path(folder)/'Swarm Workbench').resolve()
         if not destination.is_relative_to(runner):raise ValueError('Install target escapes the disposable CI directory')
-        subprocess.run([str(installer),'/S','/D='+str(destination)],check=True,timeout=180,creationflags=0x08000000)
+        # NSIS /D must be the final, unquoted parameter, including when it has
+        # spaces. Passing a list makes Python quote it using normal argv rules,
+        # which NSIS does not use for this switch.
+        # https://nsis.sourceforge.io/Docs/Chapter3.html#installerusage
+        command = subprocess.list2cmdline([str(installer), '/S']) + ' /D=' + str(destination)
+        subprocess.run(command, executable=str(installer), check=True, timeout=180, creationflags=0x08000000)
         assert (destination/'swarm-workbench.exe').is_file()
         engine=destination/'swarm-engine.exe'
         assert engine.is_file() and (destination/'LICENSE').is_file()
