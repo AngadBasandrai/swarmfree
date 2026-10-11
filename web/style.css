@@ -95,3 +95,26 @@
 .capability-desk td { overflow-wrap:anywhere; }
 .browser-screenshot { display:block; max-width:100%; border-radius:8px; margin-top:12px; }
 .dock-avatar.awaiting_input { background:#fff0c2; color:#7c5716; }
+/* Command center layouts keep actions beside the work that needs them. */
+.operations .studio-tabs {flex-wrap:wrap;overflow:visible;gap:6px;margin-bottom:22px}
+.ops-scope {display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px}
+.ops-grid {display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:20px}
+.ops-row {display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:16px 0;border-bottom:1px solid var(--line,#e2e5df)}
+.ops-row>div:first-child {flex:1;min-width:200px}
+.operations .studio-card {margin-bottom:20px;overflow-wrap:anywhere}
+.operations .studio-card>button,.operations .ops-record>button {margin:6px 10px 8px 0}
+.operations fieldset {border:1px solid var(--line,#e2e5df);border-radius:12px;padding:16px;margin:16px 0}
+.ops-record {margin-top:24px;padding-top:18px;border-top:1px solid var(--line,#e2e5df)}
+.knowledge-map {display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:24px}
+.knowledge-node {border:1px solid #b4cdbb;border-radius:14px;padding:20px;background:#f4f9f4}
+.knowledge-node.stale {background:#fff8ed;border-color:#d5b277}
+.knowledge-node small {display:block;margin-top:8px}
+.knowledge-node button {margin:6px 10px 0 0}
+.operations table {width:100%;border-collapse:collapse;margin:20px 0}
+.operations th,.operations td {text-align:left;padding:14px;border-bottom:1px solid var(--line,#e2e5df)}
+.notebook-plot {max-width:100%;max-height:650px;object-fit:contain;display:block;margin:12px 0}
+.pairing-qr {max-width:340px;width:100%;display:block;margin:20px 0}
+.tool-panel iframe {width:100%;height:480px;border:1px solid var(--line,#e2e5df);border-radius:12px;background:white}
+.panel-review {padding:18px;background:#fff8ed;border:1px solid #d5b277;border-radius:12px;margin-top:14px}
+.panel-review button {margin-right:12px}
+@media(max-width:1200px){.app-header nav{gap:0}.app-header nav button{padding-left:8px;padding-right:8px}}

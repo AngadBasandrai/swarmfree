@@ -6,6 +6,7 @@ import { isPermissionGranted, requestPermission, sendNotification } from '@tauri
 export const desktop = isTauri();
 
 export function connectDesktop() { return invoke<void>('backend_ready'); }
+export function toolFrameUrl(id:string) { return desktop ? invoke<string>('tool_frame_url',{id}) : Promise.resolve('/api/ops/apps/view/'+id); }
 export function chooseTlsFile(privateKey: boolean) { return invoke<string | null>('choose_tls_file', { privateKey }); }
 export function openAppData() { return invoke<void>('open_app_data'); }
 export function chooseProjectFolder() { return invoke<string | null>('choose_project_folder'); }

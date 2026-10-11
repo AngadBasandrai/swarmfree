@@ -173,6 +173,13 @@ async fn export_json(app: tauri::AppHandle, name: String, value: Value) -> Resul
 }
 
 #[tauri::command]
+async fn tool_frame_url(id: String, state: tauri::State<'_, Arc<Backend>>) -> Result<String, String> {
+    if id.len() != 48 || !id.bytes().all(|c| c.is_ascii_hexdigit() && !c.is_ascii_uppercase()) { return Err("Invalid panel identifier".into()); }
+    let connection = state.connection().await?;
+    Ok(format!("http://127.0.0.1:{}/api/ops/apps/view/{}", connection.port, id))
+}
+
+#[tauri::command]
 async fn choose_tls_file(app: tauri::AppHandle, private_key: bool) -> Result<Option<String>, String> {
     tauri::async_runtime::spawn_blocking(move || {
         app.dialog().file().set_title(if private_key { "Choose TLS private key" } else { "Choose TLS certificate" })
@@ -281,7 +288,7 @@ fn main() {
             app.manage(state);
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![backend_ready, backend_request, export_json, choose_tls_file, open_app_data, choose_project_folder, choose_local_file, export_backup, check_update, install_update])
+        .invoke_handler(tauri::generate_handler![backend_ready, backend_request, export_json, tool_frame_url, choose_tls_file, open_app_data, choose_project_folder, choose_local_file, export_backup, check_update, install_update])
         .build(tauri::generate_context!()).expect("Cannot start Swarm Workbench");
     app.run(|app, event| {
         if let RunEvent::ExitRequested { api, .. } = event {

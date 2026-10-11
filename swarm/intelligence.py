@@ -55,10 +55,12 @@ class Intelligence:
         id = uid("outcome_")
         return self.store.put("outcome", id, dict(id=id, route=route_key(kind,data), task_class=task_class(run,agent),
             run_id=run["id"], agent_id=agent["id"], passed=result["passed"], failures=result["failures"],
-            measured=bool(agent.get("output_schema") or agent.get("validators")) if measured is None else measured,elapsed_ms=elapsed_ms,created_at=time.time()))
+            measured=bool(agent.get("output_schema") or agent.get("validators")) if measured is None else measured,elapsed_ms=elapsed_ms,
+            model_revision=(data.get("model_revision", "") if isinstance(data,dict) else "") or run.get("model_revision", ""),created_at=time.time()))
 
     def rank(self, run, agent, options):
         policy=run.get("routing_policy", "smallest")
+        if policy == "learned" and getattr(self, "adaptive_ops", None): return self.adaptive_ops.rank(run,agent,options)
         if policy == "placement": return options
         outcomes=self.store.all("outcome")
         catalog=self.store.all("catalog")

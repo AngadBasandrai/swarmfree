@@ -70,6 +70,8 @@ class Extensions:
 
     async def mcp(self, config, method, params, project):
         initialization = dict(protocolVersion="2025-11-25", capabilities={}, clientInfo=dict(name="Swarm Workbench", version="0.2.0"))
+        if config.get("apps_enabled"):
+            initialization["capabilities"] = {"extensions": {"io.modelcontextprotocol/ui": {"mimeTypes": ["text/html;profile=mcp-app"]}}}
         if config["transport"] == "stdio":
             async with StdioRPC(config["argv"], project["root"]) as rpc:
                 result = await rpc.send("initialize", initialization)

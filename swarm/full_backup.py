@@ -187,10 +187,12 @@ def restore_full(path,password,target,mapping,reviewed_sha256):
                         else: row["status"]="relink_required"
                     elif kind in {"extension","runtime","automation","team_remote","a2a_endpoint"}: row["enabled"]=False
                     elif kind=="settings" and id=="team_remote": row["enabled"]=False
+                    elif kind=="settings" and id=="voice": row["trusted"]=False
+                    elif kind=="campaign": row["enabled"]=False;row["status"]="paused"
                     elif kind=="egress_review": row["status"]="blocked"
                     elif kind=="team_member": row["enabled"]=False;row.pop("token_hash",None)
                     elif kind=="device": row["approved"]=False;row["execution_approved"]=False
-                    elif kind in {"invite","relay_link","semantic_index","browser_session","browser_action"}:
+                    elif kind in {"invite","relay_link","semantic_index","browser_session","browser_action","companion_invite","tool_panel"}:
                         db.execute("DELETE FROM records WHERE kind=? AND id=?",(kind,id));continue
                     db.execute("UPDATE records SET value=? WHERE kind=? AND id=?",(json.dumps(row),kind,id))
                 db.commit()

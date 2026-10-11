@@ -190,6 +190,9 @@ def install_features(app, root):
 
     @router.post("/stop")
     async def stop_all():
+        if getattr(app.state,"project_ops",None):
+            for campaign in app.state.store.all("campaign"):
+                app.state.store.patch("campaign",campaign["id"],dict(enabled=False,status="paused",note="Stopped by owner"))
         app.state.automation.enabled=False
         app.state.store.put("settings","automation",dict(paused=True))
         await app.state.engine.stop()

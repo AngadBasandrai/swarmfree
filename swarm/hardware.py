@@ -2,6 +2,7 @@ import asyncio
 import os
 import platform
 import psutil
+import time
 import httpx
 from .gpu import extra_gpus
 
@@ -21,6 +22,9 @@ def hardware():
                 name = pynvml.nvmlDeviceGetName(h)
                 gpus.append(dict(id=str(i), name=name.decode() if isinstance(name, bytes) else name,
                     total_gb=round(m.total/GIB, 2), free_gb=round(m.free/GIB, 2), backend="cuda"))
+                for field, fn in (("watts",lambda:pynvml.nvmlDeviceGetPowerUsage(h)/1000),("temperature_c",lambda:pynvml.nvmlDeviceGetTemperature(h,pynvml.NVML_TEMPERATURE_GPU))):
+                    try: gpus[-1][field]=fn()
+                    except Exception: gpus[-1][field]=None
         finally:
             pynvml.nvmlShutdown()
     except Exception:
@@ -34,7 +38,8 @@ def hardware():
     return dict(name=platform.node(), system=platform.system(), machine=platform.machine(),
         cpu=platform.processor() or platform.machine(), cores=psutil.cpu_count(logical=False),
         threads=psutil.cpu_count(), ram_total_gb=round(mem.total/GIB, 2), ram_available_gb=round(mem.available/GIB, 2),
-        gpus=gpus, unified_memory=platform.system() == "Darwin" and platform.machine() == "arm64",
+        gpus=gpus, energy=dict(observed_at=time.time(),watts=sum(g["watts"] for g in gpus) if gpus and all(g.get("watts") is not None for g in gpus) else None,
+            temperature_c=max((g["temperature_c"] for g in gpus if g.get("temperature_c") is not None),default=None)),unified_memory=platform.system() == "Darwin" and platform.machine() == "arm64",
         gpu_detection="platform adapters" if gpus else "unavailable", note="GPU capacity and measured free memory are separate. Driver/runtime support varies. Apple RAM and GPU memory share one pool.")
 
 
