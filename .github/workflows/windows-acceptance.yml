@@ -9,7 +9,8 @@ on:
         description: Expected SHA-256 of the installer
         required: true
 permissions:
-  contents: read
+  # GitHub requires push access to read unpublished draft-release assets.
+  contents: write
 jobs:
   verify:
     runs-on: windows-latest
