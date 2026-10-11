@@ -11,9 +11,17 @@ from urllib.parse import quote, unquote, urlparse
 ROOT=Path(__file__).resolve().parent.parent
 def run(*args,**kwargs): return subprocess.run(args,cwd=ROOT,check=True,**kwargs)
 def main():
-    parser=argparse.ArgumentParser();parser.add_argument('--prepare-only',action='store_true',help='Verify and assemble assets without publishing or changing Git branches');args=parser.parse_args()
+    global ROOT
+    parser=argparse.ArgumentParser();parser.add_argument('--prepare-only',action='store_true',help='Verify and assemble assets without publishing or changing Git branches')
+    parser.add_argument('--workspace');parser.add_argument('--verified-tag');parser.add_argument('--build-run');parser.add_argument('--acceptance-run');args=parser.parse_args()
+    if args.workspace: ROOT=Path(args.workspace).resolve()
     version=json.loads((ROOT/'src-tauri/tauri.conf.json').read_text())['version'];tag='v'+version
-    if not args.prepare_only and os.environ.get('GITHUB_REF')!='refs/tags/'+tag: raise SystemExit('Release tag must match all package versions')
+    provenance=None
+    if args.verified_tag:
+        if args.verified_tag!=tag or not args.build_run or not args.acceptance_run: raise SystemExit('Existing-release evidence and matching tag are required')
+        from check_existing_release import verify_existing
+        provenance=verify_existing(ROOT,tag,args.build_run,args.acceptance_run)
+    elif not args.prepare_only and os.environ.get('GITHUB_REF')!='refs/tags/'+tag: raise SystemExit('Release tag must match all package versions')
     manifests=list((ROOT/'build/collected').glob('*/*.json'));platforms={}
     for path in manifests:
         value=json.loads(path.read_text())
@@ -34,6 +42,7 @@ def main():
     from datetime import datetime,timezone
     manifest=dict(version=version,notes='Swarm Workbench '+version+' — see FEATURES_0_5.md in the package',pub_date=datetime.now(timezone.utc).isoformat(),platforms=platforms)
     (destination/'stable.json').write_text(json.dumps(manifest,indent=2)+'\n')
+    if provenance: (destination/'provenance.json').write_text(json.dumps(provenance,indent=2)+'\n')
     from verify_update_artifact import verify
     key=json.loads((ROOT/'src-tauri/tauri.conf.json').read_text())['plugins']['updater']['pubkey']
     for signature in destination.glob('*.sig'):
@@ -45,8 +54,12 @@ def main():
     if args.prepare_only:
         print('Verified release assets prepared locally: '+str(destination));return
     existing=subprocess.run(['gh','release','view',tag,'--repo','AngadBasandrai/swarmfree'],cwd=ROOT,capture_output=True)
-    if existing.returncode: run('gh','release','create',tag,'--repo','AngadBasandrai/swarmfree','--verify-tag','--title','Swarm Workbench '+version,'--notes-file',str(body))
-    run('gh','release','upload',tag,*[str(p) for p in destination.iterdir() if p.name!='release-notes.md'],'--repo','AngadBasandrai/swarmfree','--clobber')
+    if existing.returncode: run('gh','release','create',tag,'--repo','AngadBasandrai/swarmfree','--verify-tag','--draft','--title','Swarm Workbench '+version+' alpha','--notes-file',str(body))
+    remote=json.loads(subprocess.check_output(['gh','release','view',tag,'--repo','AngadBasandrai/swarmfree','--json','assets'],cwd=ROOT,text=True))
+    known={p['name']:p.get('digest') for p in remote['assets']}
+    uploads=[p for p in destination.iterdir() if p.name!='release-notes.md' and known.get(p.name)!='sha256:'+hashlib.sha256(p.read_bytes()).hexdigest()]
+    if uploads: run('gh','release','upload',tag,*[str(p) for p in uploads],'--repo','AngadBasandrai/swarmfree','--clobber')
+    run('gh','release','edit',tag,'--repo','AngadBasandrai/swarmfree','--draft=false','--latest','--title','Swarm Workbench '+version+' alpha','--notes-file',str(body))
     saved=ROOT/'build/channel-stable.json';shutil.copy2(destination/'stable.json',saved)
     run('git','fetch','origin')
     exists=subprocess.run(['git','show-ref','--verify','--quiet','refs/remotes/origin/release-channel'],cwd=ROOT).returncode==0

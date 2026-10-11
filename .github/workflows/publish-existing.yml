@@ -1,0 +1,61 @@
+name: Publish verified existing packages
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Unchanged source tag for the existing package set
+        required: true
+      build_run:
+        description: Completed Desktop artifacts run with successful non-Windows builds
+        required: true
+      acceptance_run:
+        description: Successful signed Windows installer acceptance run
+        required: true
+permissions:
+  contents: write
+  actions: read
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
+          fetch-depth: 0
+      - uses: actions/checkout@v4
+        with:
+          path: build/release-tools
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: python -m pip install -e '.[dev]'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: swarm-workbench-*
+          run-id: ${{ inputs.build_run }}
+          github-token: ${{ github.token }}
+          path: build/collected
+      - uses: actions/download-artifact@v4
+        with:
+          name: windows-install-acceptance
+          run-id: ${{ inputs.acceptance_run }}
+          github-token: ${{ github.token }}
+          path: build/acceptance
+      - name: Collect the accepted Windows draft assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: gh release download "$RELEASE_TAG" --repo AngadBasandrai/swarmfree --dir build/collected/windows-x86_64
+      - name: Prepare Windows platform entry
+        env:
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: |
+          python build/release-tools/scripts/make_update_manifest.py --base-url "https://github.com/AngadBasandrai/swarmfree/releases/download/$RELEASE_TAG" --target windows-x86_64 --output build/collected/windows-x86_64/windows-x86_64.json "build/collected/windows-x86_64/Swarm-Workbench_${RELEASE_TAG#v}_x64-setup.exe"
+      - name: Verify evidence, publish complete assets and advance channel
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SWARM_REGISTRY_PRIVATE_KEY: ${{ secrets.SWARM_REGISTRY_PRIVATE_KEY }}
+          RELEASE_TAG: ${{ inputs.tag }}
+          BUILD_RUN: ${{ inputs.build_run }}
+          ACCEPTANCE_RUN: ${{ inputs.acceptance_run }}
+        run: python build/release-tools/scripts/publish_release_ci.py --workspace . --verified-tag "$RELEASE_TAG" --build-run "$BUILD_RUN" --acceptance-run "$ACCEPTANCE_RUN"
