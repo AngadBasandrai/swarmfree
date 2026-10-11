@@ -50,7 +50,7 @@ jobs:
         env:
           RELEASE_TAG: ${{ inputs.tag }}
         run: |
-          python build/release-tools/scripts/make_update_manifest.py --base-url "https://github.com/AngadBasandrai/swarmfree/releases/download/$RELEASE_TAG" --target windows-x86_64 --output build/collected/windows-x86_64/windows-x86_64.json "build/collected/windows-x86_64/Swarm-Workbench_${RELEASE_TAG#v}_x64-setup.exe"
+          python build/release-tools/scripts/make_update_manifest.py --config src-tauri/tauri.conf.json --base-url "https://github.com/AngadBasandrai/swarmfree/releases/download/$RELEASE_TAG" --target windows-x86_64 --output build/collected/windows-x86_64/windows-x86_64.json "build/collected/windows-x86_64/Swarm-Workbench_${RELEASE_TAG#v}_x64-setup.exe"
       - name: Verify evidence, publish complete assets and advance channel
         env:
           GH_TOKEN: ${{ github.token }}

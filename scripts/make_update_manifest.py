@@ -13,6 +13,7 @@ def main():
     parser.add_argument("--target", required=True, choices=["windows-x86_64", "darwin-aarch64", "darwin-x86_64", "linux-x86_64", "linux-aarch64"])
     parser.add_argument("artifact", help="Signed setup.exe, .app.tar.gz or .AppImage")
     parser.add_argument("--asset-name", help="Public filename when the host uses a different asset name")
+    parser.add_argument("--config", help="Tauri config from the release source checkout")
     parser.add_argument("--output", default="releases/update-manifest.json")
     args = parser.parse_args()
     url = urlparse(args.base_url)
@@ -25,7 +26,8 @@ def main():
     if not asset_name or Path(asset_name).name != asset_name or '\\' in asset_name or asset_name in {'.', '..'}:
         parser.error("Use a plain public asset filename")
     repo = Path(__file__).resolve().parent.parent
-    version = json.loads((repo/"src-tauri"/"tauri.conf.json").read_text(encoding="utf-8"))["version"]
+    config = Path(args.config) if args.config else repo/"src-tauri"/"tauri.conf.json"
+    version = json.loads(config.read_text(encoding="utf-8"))["version"]
     output = Path(args.output)
     manifest = json.loads(output.read_text(encoding="utf-8")) if output.exists() else {}
     if manifest.get("version") != version: manifest = {"version":version,"platforms":{}}
