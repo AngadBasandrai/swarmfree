@@ -1,0 +1,23 @@
+{
+  "version": "0.5.1",
+  "notes": "Swarm Workbench 0.5.1 \u2014 see FEATURES_0_5.md in the package",
+  "pub_date": "2026-10-11T17:59:31.141521+00:00",
+  "platforms": {
+    "darwin-x86_64": {
+      "url": "https://github.com/AngadBasandrai/swarmfree/releases/download/v0.5.1/Swarm-Workbench_0.5.1_x86_64-apple-darwin.app.tar.gz",
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSTEw0VW9tOVRkZkVkTXU2aTVYaWpaTVdjV1VKb2hjODMrcDRWVGZlUE1PZTFNQjhCVCtneVV3TEZZeStIbDZneXIvMXAwMmJFM0dGaHZ2a21XQmw3U1NMVzRXVEZjR3dFPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkxNzM5NzA4CWZpbGU6U3dhcm0gV29ya2JlbmNoLmFwcC50YXIuZ3oJdmVyc2lvbjowLjUuMQpHcmhmMXFUaFp5ekJQNHZaQTgxYTc2MzdRVC9mYUw0QklHN2t6YmRzOCtGTXIxUk5oYzB2UmFjNzZqbGZicDBWd251TlpqY2xtQnM3VTRiYU5rcExBQT09Cg=="
+    },
+    "windows-x86_64": {
+      "url": "https://github.com/AngadBasandrai/swarmfree/releases/download/v0.5.1/Swarm-Workbench_0.5.1_x64-setup.exe",
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSTEw0VW9tOVRkZk1qcW0ydkZKTXVmN055RTZ4a0ROTUVhUzhPUE9POFZFb2haNHlHU2J3a0lZQ214TjI2OERlajhLb0dzOGtLRG1BZWxoUGdpSnRlTjhPTGQ5VjZuWEFnPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkxNzM4NDU5CWZpbGU6U3dhcm0gV29ya2JlbmNoXzAuNS4xX3g2NC1zZXR1cC5leGUJdmVyc2lvbjowLjUuMQpvSnBETEwrTmY3emhnT05HdFdXYkhRRU84Z1E3SzNqcmtERkhrWUQxZW1tYmYyMWt2dTIzUGtwN3h3aDVwcm5vUGVDMUI3eEc3dDQ3OXFySGRYSGxBQT09Cg=="
+    },
+    "linux-x86_64": {
+      "url": "https://github.com/AngadBasandrai/swarmfree/releases/download/v0.5.1/Swarm-Workbench_0.5.1_amd64.AppImage",
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSTEw0VW9tOVRkZktpamxJekZiOXRQb20wK25KUFQ2OEw3eWN3bnBub3pZR1dZc3I4WWMxMW5IdnlLeWt3OVhSR0VhY0ord3N6NkRMTVYxb0FncUxuSDEzM0pkSGU0OVFVPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkxNzM5MjY1CWZpbGU6U3dhcm0gV29ya2JlbmNoXzAuNS4xX2FtZDY0LkFwcEltYWdlCXZlcnNpb246MC41LjEKMUk0TWxJRVJlSUFDYys3UWhRZXNVK05HT3ZHdHJ6VkVQVGJxcmp5akp3S3c4TmNUTEYwSmNBbnVHN0pBYWVPQjZSbHl0QWtHUFpEL3BjUGFuVTFxQnc9PQo="
+    },
+    "darwin-aarch64": {
+      "url": "https://github.com/AngadBasandrai/swarmfree/releases/download/v0.5.1/Swarm-Workbench_0.5.1_aarch64-apple-darwin.app.tar.gz",
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSTEw0VW9tOVRkZkI2Yk5lT3ErUURtOE9EeEY2VnpYdDZZcnpaUW1oeEZoK0pYQ3dLTzA2QjlmS2l3bmhmeEp6NEwzOFZqa1dDK0dFZXdnTHAxaWc1b0tMOUU2TFU5TlF3PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkxNzM5MDU4CWZpbGU6U3dhcm0gV29ya2JlbmNoLmFwcC50YXIuZ3oJdmVyc2lvbjowLjUuMQpuWXppaGtaTk84RnpXUzNsMThtN1FXM3gvZTBVWVpDM1JLQU5ON0RCV1VGTEx6ODBycWE3Zk9maWpIZkZnZUdqQXBmZUVSRDduTmVVNzAvclNjaVFEQT09Cg=="
+    }
+  }
+}
