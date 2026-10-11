@@ -16,3 +16,5 @@ The user requested all twelve additions on 2026-10-12. Deliver these in the down
 12. Live compatibility workflow suites and sanitized, opt-in export/import of reports.
 
 Acceptance: meaningful backend integration tests; headless desktop workflows; native request boundary checks; frontend/native compilation; frozen-engine and downloadable package validation. Mobile builds require platform SDKs; live model, microphone, GPU and physical phone checks must be reported separately from fixture tests. OS signing and store publishing require publisher credentials and must not be claimed without them.
+
+Implemented all twelve. Source verification: 135 Python tests, 24 headless UI flows, frontend/native builds and native boundaries pass. Windows installer/portable/worker payload and frozen-engine checks pass, including owned HTTPS one-use pairing and revocation. Android and iOS simulator builds pass; Android signatures/native payload and simulator archive permissions are checked. Optional CUDA/Docker/microphone/physical phone/live-model acceptance remains separate. Current evidence is recorded in BUILD_STATUS.md.

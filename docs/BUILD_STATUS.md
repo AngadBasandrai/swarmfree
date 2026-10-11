@@ -1,5 +1,22 @@
 # Alpha build status
 
+12 October 2026 · version 0.6.0 · MIT
+
+All twelve additions are integrated into the downloadable desktop application and the separate native companion. See [FEATURES_0_6.md](FEATURES_0_6.md) and [COMPANION.md](COMPANION.md).
+
+Verified:
+
+- 135 Python tests pass locally. They include campaign dependencies/shared budgets/acceptance, knowledge invalidation/provenance, pinned routing feedback, read-only preflight/shared quota, measured energy, reviewed notebook boundaries, local audio validation, panel grants, scoped phone invitations, adapter receipt/tampering/exact-profile evaluation, and actual Engine/checkpoint reconstruction using a scripted provider fixture.
+- 24 headless Chromium flows pass across the existing/new suite and the two additional voice lifecycle checks. Linux, macOS and Windows source checks passed in [CI](https://github.com/AngadBasandrai/swarmfree/actions/runs/38170187005). Simulated microphone streams test cleanup and queued transcript review; development never activates the host microphone.
+- Desktop TypeScript/Vite and Rust compilation, three native request-boundary checks, dependency consistency, and companion frontend/Rust compilation pass. The phone request-path unit check also passes.
+- Windows 0.6 installer, portable and worker archives were built and inspected without running the installer. ZIP integrity, engine/desktop payload equality, notices and SHA-256 checks pass. The updater signature verifies with the shipped publisher public key. An extracted frozen engine passes with development tools removed from PATH, including the command-center services and persistence.
+- The frozen engine also passes a separate owned HTTPS check for one-use phone invitations, project-scoped snapshots, revocation and denial of owner endpoints on the private listener.
+- Android development APK and iOS simulator compilation passed in [mobile CI](https://github.com/AngadBasandrai/swarmfree/actions/runs/38170187027). Android ZIP/native arm64 payload and its development signing certificate were verified with Android's APK signature verifier. Simulator archives preserve executable permissions. Companion Rust/JavaScript notices are bundled and loaded on demand.
+
+Fixtures verify application behavior. They do not measure live model accuracy, actual CUDA training, real Docker execution, physical camera/microphone/phone behavior, or a user's hardware performance. Those optional runtime/device checks remain external acceptance. The Android package uses a development signing identity; physical iOS distribution requires Apple signing/provisioning. No Play/App Store publication is claimed. No GUI, installer, native dialog, host input or focus automation is used locally.
+
+## Published 0.5.1 validation history
+
 11 October 2026 · version 0.5.1 · MIT
 
 The downloadable application adds the twelve capabilities described in [FEATURES_0_5.md](FEATURES_0_5.md): guided setup and verified downloads, graph design, typed reusable sub-swarms, bounded channels and task claims, opt-in pure response reuse, team credentials, outbound data reviews, failure fixtures, A2A text tasks, experimental Exo placement, signed community packages and public release infrastructure. Previous 0.4 execution, browser, evaluation and recovery capabilities remain included.
