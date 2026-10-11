@@ -6,7 +6,7 @@ Registry: `https://swarms.grafitelab.in/registry/index.json`
 
 Updater: `https://swarms.grafitelab.in/updates/stable.json`
 
-Fallback registry: `https://angadbasandrai.github.io/swarmfree/registry/index.json`. The updater also has a GitHub Releases fallback in Tauri configuration. Owner-entered Studio updater settings select their configured endpoint.
+Fallback registry: `https://angadbasandrai.github.io/swarmfree/registry/index.json`. The default desktop update check also tries the GitHub Releases feed. Owner-entered alternative Studio endpoints use that configured server and public key.
 
 The hosted files are static JSON and signed package declarations. The downloadable desktop application runs its engine locally; Pages does not run inference or hold users' API keys.
 

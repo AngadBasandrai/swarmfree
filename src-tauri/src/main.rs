@@ -228,7 +228,11 @@ fn configured_updater(app: &tauri::AppHandle, endpoint: String, public_key: Stri
     if url.scheme() != "https" || !url.username().is_empty() || url.password().is_some() || public_key.trim().is_empty() {
         return Err("Updates require HTTPS and a trusted public signing key".into());
     }
-    app.updater_builder().pubkey(public_key).endpoints(vec![url]).map_err(|e| e.to_string())?
+    let mut endpoints = vec![url];
+    if endpoint == "https://swarms.grafitelab.in/updates/stable.json" {
+        endpoints.push("https://github.com/AngadBasandrai/swarmfree/releases/latest/download/stable.json".parse().map_err(|_| "Invalid publisher fallback")?);
+    }
+    app.updater_builder().pubkey(public_key).endpoints(endpoints).map_err(|e| e.to_string())?
         .build().map_err(|e| e.to_string())
 }
 

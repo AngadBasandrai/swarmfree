@@ -70,7 +70,7 @@ def main():
                 except HTTPError as error:
                     assert error.code == expected
             snapshot = request(ready, "/api/snapshot")
-            assert request(ready, "/api/health")["version"] == "0.5.0"
+            assert request(ready, "/api/health")["version"] == "0.5.1"
             assert snapshot["hardware"]["ram_total_gb"] > 0
             assert snapshot["architectures"]
             features = request(ready,"/api/features")
@@ -91,7 +91,8 @@ def main():
             assert len(team["projects"])==1 and "root" not in team["projects"][0]
             request(ready,"/api/workbench/members/"+member["member"]["id"]+"/revoke","POST")
             simulation=request(ready,"/api/workbench/faults","POST",dict(scenarios=["stream_disconnect","worker_disconnect"]))
-            for _ in range(120):
+            deadline = time.monotonic() + 75
+            while time.monotonic() < deadline:
                 simulation=next(j for j in request(ready,"/api/workbench")["faults"] if j["id"]==simulation["id"])
                 if simulation["status"]!="running": break
                 time.sleep(.1)

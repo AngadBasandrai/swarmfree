@@ -177,7 +177,7 @@ def create_app(data_dir=None, token=None, vault=None, *, desktop=False):
             async with locked_lifespan(app):
                 yield
 
-    app = FastAPI(title="Swarm Workbench", version="0.5.0", lifespan=lifespan)
+    app = FastAPI(title="Swarm Workbench", version="0.5.1", lifespan=lifespan)
     app.state.owner_token = owner_token
     app.state.backup_active = False
     hosts = ["127.0.0.1", "localhost", "[::1]", "testserver"]
@@ -212,7 +212,7 @@ def create_app(data_dir=None, token=None, vault=None, *, desktop=False):
 
     @app.get("/api/health")
     async def health():
-        return dict(status="ok", version="0.5.0")
+        return dict(status="ok", version="0.5.1")
 
     @app.post("/api/session")
     async def session(form: SessionInput, request: Request):

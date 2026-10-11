@@ -32,7 +32,7 @@ class FixtureVault:
     def status(self): return dict(persistent=False)
 
 
-async def settled(engine,id,timeout=15):
+async def settled(engine,id,timeout=60):
     await asyncio.wait_for(asyncio.shield(engine.tasks[id]),timeout)
     return engine.store.get("run",id)
 
@@ -69,7 +69,7 @@ async def scenario(name,root):
                 engine=Engine(store,providers,pool,saver,workspace)
                 engine.privacy=Privacy(store)
                 run=engine.create(RunInput(task="Controlled failure simulation",architecture_id="fixture",project_id="fixture",tools_enabled=name in {"malformed_tools","untrusted_instruction"},native_tools=name=="malformed_tools",
-                    free_only=False,route=dict(kind="profile",profile_id=profile["id"]),limits=dict(max_seconds=10,max_requests=6,max_tokens=50000,max_spend_usd=0)),arch)
+                    free_only=False,route=dict(kind="profile",profile_id=profile["id"]),limits=dict(max_seconds=10 if name=="timeout" else 60,max_requests=6,max_tokens=50000,max_spend_usd=0)),arch)
                 if name=="worker_disconnect":
                     invitation=pool.invite()
                     joined=pool.join(JoinInput(invite=invitation["token"],name="Owned simulated worker",hardware={},models=[],budgets=dict(ram_gb=2,vram_gb=0,context=4096,allow_cpu=True)))

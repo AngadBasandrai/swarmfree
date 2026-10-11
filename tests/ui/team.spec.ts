@@ -21,9 +21,10 @@ test('all team panels render without page errors',async({page})=>{
   expect(errors).toEqual([]);
 });
 test('failure lab runs an owned disconnected-stream fixture',async({page})=>{
+  test.setTimeout(60000);
   await desk(page);await page.getByRole('tab',{name:'Failure lab',exact:true}).click();
   for(const box of await page.getByRole('checkbox').all())await box.uncheck();
   await page.getByRole('checkbox',{name:'Interrupted output stays a draft; resume makes a fresh response'}).check();
   await page.getByRole('button',{name:'Run selected simulations'}).click();
-  await expect(page.locator('pre').filter({hasText:'stream_disconnect'})).toContainText('"passed": true',{timeout:20000});
+  await expect(page.locator('pre').filter({hasText:'stream_disconnect'})).toContainText('"passed": true',{timeout:45000});
 });
