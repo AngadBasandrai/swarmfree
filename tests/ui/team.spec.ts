@@ -6,6 +6,9 @@ test('guided setup and validated architecture creation work',async({page})=>{
   await page.getByLabel('Team description').fill('Planner, researcher, reviewer and writer in parallel');
   await page.getByRole('button',{name:'Design offline preview'}).click();
   await expect(page.getByLabel('Architecture JSON')).toContainText('planner');
+  await expect(page.locator('.react-flow__node')).toHaveCount(4);
+  await expect(page.locator('.react-flow')).toBeVisible();
+  await page.screenshot({path:'test-results/team-copilot.png',fullPage:true});
   await page.getByRole('button',{name:'Save new architecture'}).click();
   await expect(page.getByText('Saved as a new architecture. Select it when creating a mission.')).toBeVisible();
   const data=await (await page.request.get('/api/snapshot')).json();expect(data.architectures.some((a:any)=>a.id.startsWith('custom_')&&a.nodes.length===4)).toBeTruthy();

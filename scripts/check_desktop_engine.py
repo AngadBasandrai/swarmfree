@@ -84,6 +84,8 @@ def main():
             assert len(architecture["nodes"])==4 and not architecture["builtin"]
             policy=request(ready,"/api/workbench/policies/"+project["id"],"PUT",dict(destinations=["local","private"],file_rules=[],scan_secrets=True))
             assert "cloud" not in policy["destinations"]
+            # The later owned provider fixture is deliberately classified as cloud.
+            request(ready,"/api/workbench/policies/"+project["id"],"PUT",dict(destinations=["local","private","cloud"],file_rules=[],scan_secrets=True))
             member=request(ready,"/api/workbench/members","POST",dict(name="Frozen viewer",role="viewer",project_ids=[project["id"]]))
             team=request(dict(ready,token=member["token"]),"/api/team/snapshot")
             assert len(team["projects"])==1 and "root" not in team["projects"][0]

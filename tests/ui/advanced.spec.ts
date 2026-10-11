@@ -16,9 +16,12 @@ test('review an automation trigger, inspect exact context, and replay one stage'
   await expect(page.locator('.mission-budget')).toHaveCount(1);
   await expect(page.locator('.mission-budget')).toContainText('1/100 requests');
   await page.getByRole('button',{name:'Context',exact:true}).click();
+  await page.route('**/api/agents/*/context',async route=>{await new Promise(resolve=>setTimeout(resolve,400));await route.continue();});
   await page.getByRole('button',{name:'Preview next model context',exact:true}).click();
   await expect(page.getByLabel('Context usage')).toBeVisible();
   await page.getByLabel('Handoff summary').fill('Decision: keep the checklist short. TODO: verify sources.');
+  await expect(page.getByText('Exact portable messages for the next request',{exact:true})).toBeVisible();
+  await expect(page.getByLabel('Handoff summary')).toHaveValue('Decision: keep the checklist short. TODO: verify sources.');
   await page.getByRole('button',{name:'Save handoff summary',exact:true}).click();
   await page.getByRole('button',{name:'Debugger',exact:true}).click();
   await page.locator('.timeline-request').first().click();
