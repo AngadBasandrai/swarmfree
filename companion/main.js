@@ -1,7 +1,7 @@
 import {invoke} from '@tauri-apps/api/core';
 import {scan,Format,cancel} from '@tauri-apps/plugin-barcode-scanner';
 import './style.css';
-const app=document.querySelector('#app');let connected=false,selected='',snapshot,mission,questions=[],artifacts=[],timer,generation=0;
+const app=document.querySelector('#app');let connected=false,selected='',snapshot,mission,questions=[],artifacts=[],timer,generation=0,refreshSequence=0;
 const h=(tag,text,cls)=>{const el=document.createElement(tag);if(text!==undefined)el.textContent=text;if(cls)el.className=cls;return el;};
 const button=(text,fn)=>{const el=h('button',text);el.addEventListener('click',()=>act(fn));return el;};
 const remote=(path,method='GET',body=null)=>invoke('remote_request',{path:'/api/team'+path,method,body});
@@ -22,8 +22,8 @@ function render(){shell();app.append(h('p',snapshot.actor.name+' · '+snapshot.a
  for(const q of questions.filter(q=>q.run_id===selected)){const card=h('section',undefined,'card');card.append(h('h3',q.question));if(snapshot.actor.role==='operator'){const answer=h('textarea');answer.setAttribute('aria-label','Answer agent question');card.append(answer,button('Send answer',async()=>{await remote('/questions/'+q.id+'/answer','POST',{answer:answer.value});await refresh();}));}app.append(card);}
  if(snapshot.actor.role==='reviewer')for(const a of artifacts.filter(a=>a.status==='staged'&&mission.agents.some(n=>n.id===a.agent_id))){const card=h('section',undefined,'card');card.append(h('h3',a.path),h('pre',a.diff||a.content),button('Apply reviewed change',async()=>{await remote('/artifacts/'+a.id+'/apply','POST');await refresh();}));app.append(card);}
 }
-async function refresh(){clearTimeout(timer);if(!connected)return;const current=generation;const next=await remote('/snapshot');const data=selected?await remote('/runs/'+selected):undefined;const qs=await remote('/questions');const changes=next.actor.role==='reviewer'?await remote('/artifacts'):[];if(!connected||current!==generation)return;snapshot=next;mission=data;questions=qs;artifacts=changes;
+async function refresh(){clearTimeout(timer);if(!connected)return;const current=generation,sequence=++refreshSequence,missionId=selected;try{const next=await remote('/snapshot');const data=missionId?await remote('/runs/'+missionId):undefined;const qs=await remote('/questions');const changes=next.actor.role==='reviewer'?await remote('/artifacts'):[];if(!connected||current!==generation||sequence!==refreshSequence||selected!==missionId)return;snapshot=next;mission=data;questions=qs;artifacts=changes;
  // Keep an edited message visible during polling. The owner can explicitly refresh.
- if(!document.querySelector('textarea:focus'))render();timer=setTimeout(()=>act(refresh),4000);}
+ if(!document.querySelector('textarea:focus'))render();}finally{if(connected&&current===generation&&sequence===refreshSequence&&!document.hidden)timer=setTimeout(()=>act(refresh),4000);}}
 document.addEventListener('visibilitychange',()=>{if(document.hidden)clearTimeout(timer);else if(connected)act(refresh);});
 login();

@@ -10,6 +10,22 @@ from .store import uid
 from .isolation import command
 
 
+def adapter_manifest(output):
+    output = Path(output)
+    if not (output/"adapter_config.json").is_file() or not (output/"adapter_model.safetensors").is_file():
+        raise RouteError("Training did not produce a complete LoRA adapter")
+    files = list(output.iterdir())
+    if any(p.is_symlink() or not p.is_file() for p in files) or sum(p.stat().st_size for p in files)>512*1024**2:
+        raise RouteError("Adapter outputs must be ordinary files totaling at most 512 MiB")
+    manifest = {}
+    for p in files:
+        h = hashlib.sha256()
+        with p.open('rb') as f:
+            while chunk:=f.read(1024*1024): h.update(chunk)
+        manifest[p.name] = h.hexdigest()
+    return manifest
+
+
 class DatasetInput(BaseModel):
     project_id: str = Field(max_length=80)
     name: str = Field(min_length=1, max_length=120)
@@ -93,15 +109,7 @@ class Training:
         await command([form.python_executable, "-m", "swarm.training_runner", str(path)], cwd=self.root/id,
             timeout=form.timeout_seconds, limit=200000)
         output = self.root/id/"adapter"
-        if not (output/"adapter_config.json").is_file() or not (output/"adapter_model.safetensors").is_file(): raise RouteError("Training did not produce a complete LoRA adapter")
-        files=list(output.iterdir())
-        if any(p.is_symlink() or not p.is_file() for p in files) or sum(p.stat().st_size for p in files)>512*1024**2: raise RouteError("Adapter outputs must be ordinary files totaling at most 512 MiB")
-        manifest = {}
-        for p in files:
-            h=hashlib.sha256()
-            with p.open('rb') as f:
-                while chunk:=f.read(1024*1024): h.update(chunk)
-            manifest[p.name]=h.hexdigest()
+        manifest = adapter_manifest(output)
         return dict(adapter_directory=str(output), files=manifest, revision="adapter:"+hashlib.sha256(canonical(manifest).encode()).hexdigest(),dataset_sha256=form.reviewed_sha256,
             base_directory=str(Path(form.base_directory).resolve()), status="candidate", note="Load this adapter in a compatible external runtime and run a live evaluation before promotion")
 
@@ -110,6 +118,7 @@ class Training:
         profile = self.store.get("profile", profile_id)
         if not job or job.get("status") != "completed" or not profile: raise RouteError("Select a completed adapter job and a configured serving profile")
         manifest = job["result"]["files"]
+        if adapter_manifest(self.root/id/"adapter") != manifest: raise RouteError("Adapter files changed after training; create and evaluate a new candidate")
         revision = "adapter:"+hashlib.sha256(canonical(manifest).encode()).hexdigest()
         if profile.get("model_revision") != revision: raise RouteError("Pin the serving profile to the displayed adapter revision before evaluation")
         if not evaluation or evaluation.get("status") != "completed" or not evaluation.get("rows"): raise RouteError("Complete a live evaluation of the adapter first")
@@ -119,6 +128,11 @@ class Training:
             calls = [c for c in self.store.all("request") if c.get("run_id") == run["id"]]
             if not calls or any(c.get("model_revision") != revision or c.get("profile_id")!=profile_id for c in calls): raise RouteError("Evaluation did not exclusively use this serving profile and adapter revision")
         old = self.store.get("adapter_active", job["project_id"])
+        cursor = old
+        for _ in range(19):
+            if not cursor: break
+            cursor = cursor.get("previous")
+        if cursor: cursor["previous"] = None
         activation = dict(id=job["project_id"], job_id=id, profile_id=profile_id, revision=revision, previous=old, evaluation_id=evaluation_id, promoted_at=time.time())
         return self.store.put("adapter_active", activation["id"], activation)
 

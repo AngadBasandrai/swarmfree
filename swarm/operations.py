@@ -103,7 +103,11 @@ def install_operations(app):
     async def campaign_review(id:str, milestone:str, form:ReviewInput): return app.state.project_ops.review(id, milestone, form.accepted, form.note)
 
     @router.post("/preflight")
-    async def preflight(form:PreflightInput): return await asyncio.to_thread(app.state.project_ops.preflight, form.mission, form.architecture_ids)
+    async def preflight(form:PreflightInput):
+        from .hardware import inventory
+        local = await inventory(app.state.providers.ollama)
+        local["observed_at"] = time.time()
+        return await asyncio.to_thread(app.state.project_ops.preflight, form.mission, form.architecture_ids, local)
 
     @router.post("/feedback")
     async def feedback(form:FeedbackInput): return app.state.adaptive_ops.feedback(form)

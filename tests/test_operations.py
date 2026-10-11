@@ -14,7 +14,7 @@ from swarm.project_ops import KnowledgeInput, CampaignInput
 from swarm.adaptive_ops import AdaptiveOps
 from swarm.schema import RunInput
 from swarm.notebooks import NotebookInput, Notebooks, digest
-from swarm.training import Training, DatasetInput
+from swarm.training import Training, DatasetInput, TrainingInput
 
 
 @pytest.fixture
@@ -99,6 +99,52 @@ def test_preflight_does_not_make_requests_and_handles_unknown_measurements(clien
     rows=result.json()['comparisons'];assert rows[0]['initial_requests']==1
     assert all(r['serial_seconds'] is None for r in rows)
     assert len(client.state.store.all('request'))==before
+
+
+def test_preflight_reports_shared_quota_without_claiming_requests(client):
+    for name,limit in [('first',10),('second',3)]:
+        result=client.post('/api/profiles',json=dict(provider='google',label=name,api_key='fake-fixture-key-'+name,ephemeral=True,model='fixture',quota_scope='one-project',requests_per_minute=limit,free_eligible=True))
+        assert result.status_code==201,result.text
+    scope=client.state.store.all('profile')[0]['quota_group'];now=time.time()
+    client.state.store.put('quota',scope,dict(requests=[now]*3,cooldown_until=now+20))
+    before=client.state.store.get('quota',scope)
+    result=client.post('/api/ops/preflight',json=dict(mission=dict(task='Check',architecture_id='baseline'),architecture_ids=['baseline'])).json()
+    group=result['quota_groups'][0]
+    assert group['requests_per_minute']==3 and group['remaining_requests']==0 and group['cooldown_seconds']>0
+    assert not any(p['available_now'] for p in result['profiles'])
+    assert client.state.store.get('quota',scope)==before
+
+
+def test_training_receipt_promotion_exact_profile_and_tampering(client,tmp_path,monkeypatch):
+    import hashlib
+    import sys
+    s=client.state.store;p=client.project['id'];training=client.state.training
+    s.put('run','r',dict(id='r',mode='live',task='Ordinary question',project_id=p))
+    s.put('agent','a',dict(id='a',run_id='r',status='done',result={'content':'Ordinary answer'},data_labels=[]))
+    dataset=training.dataset(DatasetInput(project_id=p,name='Reviewed',agent_ids=['a']))
+    base=tmp_path/'weights';base.mkdir();(base/'config.json').write_text('{}');(base/'model.safetensors').write_bytes(b'fixture weights')
+    monkeypatch.setattr('swarm.hardware.hardware',lambda:dict(gpus=[dict(id='0',backend='cuda',free_gb=8)]))
+    s.put('settings','budgets',dict(vram_gb=8))
+    form=TrainingInput(dataset_id=dataset['id'],reviewed_sha256=dataset['sha256'],python_executable=sys.executable,base_directory=str(base),trusted=True)
+    async def command(argv,**kwargs):
+        config=json.loads(__import__('pathlib').Path(argv[-1]).read_text());output=__import__('pathlib').Path(config['output_directory']);output.mkdir()
+        (output/'adapter_config.json').write_text('{}');(output/'adapter_model.safetensors').write_bytes(b'fixture adapter')
+        assert argv[1:3]==['-m','swarm.training_runner'] and config['dataset_path']
+        return ''
+    monkeypatch.setattr('swarm.training.command',command)
+    s.put('training_job','job',dict(id='job',status='running'))
+    result=asyncio.run(training.run('job',form));s.patch('training_job','job',dict(status='completed',result=result))
+    assert result['files']['adapter_model.safetensors']==hashlib.sha256(b'fixture adapter').hexdigest()
+    s.put('profile','serving',dict(id='serving',model_revision=result['revision']))
+    s.put('run','evalrun',dict(id='evalrun',project_id=p,mode='live'))
+    s.put('evaluation_job','eval',dict(id='eval',status='completed',rows=[dict(run_id='evalrun',passed=True)]))
+    s.put('request','call',dict(run_id='evalrun',profile_id='other',model_revision=result['revision']))
+    with pytest.raises(RouteError,match='exclusively'):training.promote('job','eval','serving')
+    s.patch('request','call',dict(profile_id='serving'))
+    assert training.promote('job','eval','serving')['revision']==result['revision']
+    assert training.rollback(p)['rolled_back']
+    (__import__('pathlib').Path(result['adapter_directory'])/'adapter_model.safetensors').write_bytes(b'changed')
+    with pytest.raises(RouteError,match='changed'):training.promote('job','eval','serving')
 
 
 def test_energy_uses_observed_samples_and_blocks_unknown_telemetry(store):

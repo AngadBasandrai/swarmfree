@@ -237,10 +237,10 @@ class ProjectOps:
     def knowledge_list(self, project_id):
         return [dict(k, stale_reasons=self.knowledge_status(k["id"])) for k in self.store.all("knowledge") if k["project_id"] == project_id]
 
-    def preflight(self, form, architecture_ids):
+    def preflight(self, form, architecture_ids, inventory=None):
         from .hardware import hardware, fit_model
         from .composition import resolve
-        hw = hardware(); inv = self.store.get("settings", "last_inventory", {})
+        hw = hardware(); inv = inventory or {}
         comparisons = []
         outcomes = self.store.all("outcome")
         for id in architecture_ids:
@@ -264,9 +264,19 @@ class ProjectOps:
                 timing_samples=len(ms), warnings=warnings))
         catalog = self.engine.intelligence.catalog() if self.engine.intelligence else []
         models = [dict(model=m["model"], estimate_gb=m.get("estimated_ram_gb"), fit=fit_model(dict(name=m["model"], size=int(m.get("download_gb", 0)*1e9)), hw, self.store.get("settings", "budgets"), inv.get("loaded", []))) for m in catalog if m.get("source") == "local" and "embeddings" not in m.get("capabilities", [])][:20]
-        profiles = []
-        for p in self.store.all("profile"):
+        profiles = []; groups = {}; now = time.time()
+        for p in self.engine.providers.public():
+            scope = p["quota_group"]
+            q = self.store.get("quota", scope, {})
+            recent = [t for t in q.get("requests", []) if t > now-60]
+            limit = min(other["requests_per_minute"] for other in self.store.all("profile") if other["quota_group"] == scope)
+            cooldown = max(0, q.get("cooldown_until", 0)-now)
+            groups[scope] = dict(quota_group=scope, requests_per_minute=limit, recent_requests=len(recent),
+                remaining_requests=max(0, limit-len(recent)), cooldown_seconds=round(cooldown, 1),
+                observed=q.get("observed", {}), note="Configured shared limit; upstream account limits may differ")
             profiles.append(dict(id=p["id"], label=p["label"], model=p["model"], available=self.engine.providers.eligible(p,form.free_only),
-                cooldown_seconds=max(0, p.get("cooldown_until", 0)-time.time()), requests_per_minute=p.get("requests_per_minute")))
+                quota_group=scope, available_now=self.engine.providers.eligible(p,form.free_only) and not cooldown and len(recent)<limit,
+                cooldown_seconds=round(cooldown, 1), requests_per_minute=limit))
         return dict(comparisons=comparisons, hardware=dict(ram_available_gb=hw["ram_available_gb"], gpus=hw["gpus"]), models=models, profiles=profiles,
+            quota_groups=list(groups.values()), local_inventory_observed_at=inv.get("observed_at"),
             note="No model requests made. Estimates exclude retries, conditional skips, warm-up, network variation and external tool charges; unknown timing remains unknown.")

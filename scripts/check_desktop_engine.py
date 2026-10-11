@@ -207,6 +207,31 @@ def main():
             finally:
                 fixture.shutdown()
                 fixture.server_close()
+            # Exercise the 0.6 controls in the bundled engine without host peripherals,
+            # external model calls, Docker, or training dependencies.
+            operations = request(ready, '/api/ops')
+            assert not operations['campaigns'] and 'voice' in operations
+            knowledge = request(ready, '/api/ops/knowledge', 'POST', dict(project_id=project['id'], title='Frozen requirement', content='Keep this project portable'))
+            assert knowledge['revision'] == 1
+            preflight = request(ready, '/api/ops/preflight', 'POST', dict(mission=dict(task='Plan', architecture_id='baseline'), architecture_ids=['baseline']))
+            assert preflight['comparisons'][0]['initial_requests'] == 1 and 'quota_groups' in preflight
+            notebook = request(ready, '/api/ops/notebooks', 'POST', dict(project_id=project['id'], title='Frozen notebook', image='python:3.13-slim', cells=[dict(kind='python',content='print(4)')]))
+            assert request(ready, '/api/ops/notebooks/'+notebook['id']+'/export')['nbformat'] == 4
+            try:
+                request(ready, '/api/ops/voice/chunk', 'POST', dict(wav='invalid'))
+                raise AssertionError('Invalid audio accepted')
+            except HTTPError as error:
+                assert error.code == 400
+            campaign = request(ready, '/api/ops/campaigns', 'POST', dict(name='Frozen campaign', mission=dict(task='Plan',architecture_id='baseline',project_id=project['id'],mode='demo'), milestones=[dict(id='plan',title='Plan',task='Produce a plan')]))
+            mission = request(ready, '/api/ops/campaigns/'+campaign['id']+'/launch', 'POST')
+            deadline = time.monotonic()+20
+            while time.monotonic()<deadline:
+                mission = request(ready, '/api/runs/'+mission['id'])
+                if mission['status'] in {'completed','interrupted'}: break
+                time.sleep(.1)
+            assert mission['status']=='completed',mission
+            reviewed = request(ready, '/api/ops/campaigns/'+campaign['id']+'/milestones/plan/review','POST',dict(accepted=True))
+            assert reviewed['milestones'][0]['status']=='accepted'
             backup = request(ready,"/api/backups","POST")
             assert Path(backup["path"]).is_file()
             encrypted = request(ready, "/api/next/backup", "POST", dict(password="Frozen recovery passphrase", project_ids=[]))
@@ -223,6 +248,7 @@ def main():
             assert ready["token"] != first_token
             assert request(ready, "/api/runs/" + run["id"])["status"] == "completed"
             assert request(ready,"/api/features")["memory"][0]["title"] == "Frozen decision"
+            assert request(ready,'/api/ops')['campaigns'][0]['milestones'][0]['status']=='accepted'
             # The parent closing its pipe must also stop the engine.
             process.stdin.close()
             assert process.wait(timeout=12) == 0
