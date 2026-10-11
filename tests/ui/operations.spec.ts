@@ -48,3 +48,38 @@ test('microphone stays off until clicked and invalid audio is rejected',async({p
  await expect(page.getByRole('button',{name:'Send reviewed transcript'})).toBeDisabled();expect(requests).toBe(0);
  await page.getByRole('tab',{name:'Compatibility',exact:true}).click();await expect(page.getByRole('button',{name:'Run live compatibility pack'})).toBeDisabled();
 });
+
+test('microphone setup failure releases its simulated stream',async({page})=>{
+ await page.route('**/api/ops',async route=>{const response=await route.fetch();const body=await response.json();body.voice={trusted:true,argv:['fixture']};await route.fulfill({response,json:body});});
+ await page.addInitScript(()=>{
+  (window as any).__stopped=0;
+  Object.defineProperty(navigator.mediaDevices,'getUserMedia',{value:async()=>({getTracks:()=>[{stop:()=>{(window as any).__stopped++;}}]})});
+  (window as any).AudioContext=class{constructor(){throw new Error('Simulated audio setup failure');}};
+ });
+ await page.goto('/');await page.getByRole('button',{name:'Command center',exact:true}).click();await page.getByRole('tab',{name:'Live voice',exact:true}).click();
+ await page.getByRole('button',{name:'Start microphone'}).click();
+ await expect(page.getByRole('status').filter({hasText:'Simulated audio setup failure'})).toBeVisible();
+ await expect.poll(()=>page.evaluate(()=>(window as any).__stopped)).toBe(1);
+ await expect(page.getByRole('button',{name:'Stop microphone'})).toBeDisabled();
+});
+
+test('queued transcription finishes before a transcript can be reviewed and sent',async({page,request})=>{
+ const created=await request.post('/api/runs',{data:{task:'Voice fixture',architecture_id:'baseline',mode:'demo'}});expect(created.ok()).toBeTruthy();const mission=await created.json();
+ let release:()=>void=()=>{};const gate=new Promise<void>(resolve=>{release=resolve;});let chunk=false;
+ await page.route('**/api/ops',async route=>{const response=await route.fetch();const body=await response.json();body.voice={trusted:true,argv:['fixture']};await route.fulfill({response,json:body});});
+ await page.route('**/api/ops/voice/chunk',async route=>{chunk=true;await gate;await route.fulfill({json:{text:'Simulated local transcript'}});});
+ await page.addInitScript(()=>{
+  const node=()=>({connect:()=>{},disconnect:()=>{}});
+  Object.defineProperty(navigator.mediaDevices,'getUserMedia',{value:async()=>({getTracks:()=>[{stop:()=>{}}]})});
+  (window as any).AudioContext=class{
+   sampleRate=16000;destination=node();async resume(){}async close(){}createMediaStreamSource(){return node();}createGain(){return {...node(),gain:{value:1}};}
+   createScriptProcessor(){const processor={...node(),onaudioprocess:null as any};setTimeout(()=>processor.onaudioprocess?.({inputBuffer:{getChannelData:()=>new Float32Array(1600)}}),50);return processor;}
+  };
+ });
+ await page.goto('/');await page.getByRole('button',{name:'Command center',exact:true}).click();await page.getByRole('tab',{name:'Live voice',exact:true}).click();
+ await page.getByLabel('Voice mission').selectOption(mission.id);await expect(page.getByLabel('Voice agent')).not.toHaveValue('');
+ await page.getByLabel('Voice transcript').fill('An already reviewed sentence');await page.getByRole('button',{name:'Start microphone'}).click();
+ await page.waitForTimeout(150);await page.getByRole('button',{name:'Stop microphone'}).click();
+ await expect.poll(()=>chunk).toBe(true);await expect(page.getByRole('button',{name:'Send reviewed transcript'})).toBeDisabled();
+ release();await expect(page.getByLabel('Voice transcript')).toHaveValue(/Simulated local transcript/);await expect(page.getByRole('button',{name:'Send reviewed transcript'})).toBeEnabled();
+});
