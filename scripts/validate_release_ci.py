@@ -14,6 +14,9 @@ def main():
     binary=ROOT/'src-tauri/target/release/swarm-engine.exe' if args.target.startswith('windows') else next((ROOT/'src-tauri/binaries').glob('swarm-engine-*'))
     subprocess.run([sys.executable,str(ROOT/'scripts/check_desktop_engine.py'),str(binary)],check=True)
     if Path(str(artifacts[0])+'.sig').exists():
+        from verify_update_artifact import verify
+        config=json.loads((ROOT/'src-tauri/tauri.conf.json').read_text())
+        verify(artifacts[0],config['plugins']['updater']['pubkey'])
         subprocess.run([sys.executable,str(ROOT/'scripts/make_update_manifest.py'),'--base-url','https://github.com/AngadBasandrai/swarmfree/releases/download/v'+version,'--target',args.target,'--output',str(release/(args.target+'.json')),str(artifacts[0])],check=True)
     elif __import__('os').environ.get('GITHUB_REF','').startswith('refs/tags/'):
         raise SystemExit('Tagged publication requires a signed updater artifact')

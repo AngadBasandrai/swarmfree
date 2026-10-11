@@ -26,7 +26,9 @@ test('save scoped project permissions, share memory, benchmark teams, and back u
   await page.screenshot({path:'test-results/workbench-studio-lab.png',fullPage:true});
   await page.getByRole('button',{name:'Single-agent baseline',exact:true}).click();
   await expect(page.locator('.run-title .badge')).toHaveText('completed');
+  const originalRun=await page.locator('.run-header .mono').textContent();
   await page.getByRole('button',{name:'Branch through selected agent'}).click();
+  await expect(page.locator('.run-header .mono')).not.toHaveText(originalRun||'');
   await expect(page.locator('.run-title .badge')).toHaveText('completed',{timeout:12000});
   await expect(page.locator('.dock-agent')).toHaveCount(1);
   await page.getByRole('button',{name:'Studio',exact:true}).click();

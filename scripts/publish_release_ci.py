@@ -25,6 +25,9 @@ def main():
     from datetime import datetime,timezone
     manifest=dict(version=version,notes='Swarm Workbench '+version+' — see FEATURES_0_5.md in the package',pub_date=datetime.now(timezone.utc).isoformat(),platforms=platforms)
     (destination/'stable.json').write_text(json.dumps(manifest,indent=2)+'\n')
+    from verify_update_artifact import verify
+    key=json.loads((ROOT/'src-tauri/tauri.conf.json').read_text())['plugins']['updater']['pubkey']
+    for signature in destination.glob('*.sig'): verify(Path(str(signature)[:-4]),key)
     checksum=''.join(hashlib.sha256(f.read_bytes()).hexdigest()+'  '+f.name+'\n' for f in sorted(destination.iterdir()) if f.is_file())
     (destination/'SHA256SUMS.txt').write_text(checksum)
     body=destination/'release-notes.md';body.write_text('Downloadable Swarm Workbench '+version+'. Includes guided setup, reusable sub-swarms, bounded channels, team roles, data destination reviews, response reuse, failure simulations, A2A text tasks, experimental Exo placement and signed community packages.\n\nInstallers carry updater signatures. Operating system signatures depend on separately provisioned certificate credentials. Model weights and optional runtimes are separate downloads.\n\nSee bundled docs/FEATURES_0_5.md and docs/BUILD_STATUS.md for supported scope and validation.\n')
