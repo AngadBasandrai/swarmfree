@@ -40,7 +40,7 @@ jobs:
         shell: pwsh
         run: |
           $version = (Get-Content release-source/src-tauri/tauri.conf.json | ConvertFrom-Json).version
-          python scripts/check_windows_install_ci.py "build/acceptance/Swarm Workbench_${version}_x64-setup.exe"
+          python scripts/check_windows_install_ci.py "build/acceptance/Swarm-Workbench_${version}_x64-setup.exe"
       - name: Record accepted installer
         shell: pwsh
         run: |

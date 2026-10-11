@@ -17,7 +17,7 @@ def main():
     expected = os.environ['EXPECTED_SHA256'].lower()
     if tag != 'v' + version or not re.fullmatch(r'[0-9a-f]{64}', expected):
         raise ValueError('Tag/version or expected hash is invalid')
-    artifact = root / 'build/acceptance' / f'Swarm Workbench_{version}_x64-setup.exe'
+    artifact = root / 'build/acceptance' / f'Swarm-Workbench_{version}_x64-setup.exe'
     with artifact.open('rb') as stream:
         digest = hashlib.file_digest(stream, 'sha256').hexdigest()
     if digest != expected:

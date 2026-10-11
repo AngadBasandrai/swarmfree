@@ -17,7 +17,7 @@ def main():
         from verify_update_artifact import verify
         config=json.loads((ROOT/'src-tauri/tauri.conf.json').read_text())
         verify(artifacts[0],config['plugins']['updater']['pubkey'])
-        subprocess.run([sys.executable,str(ROOT/'scripts/make_update_manifest.py'),'--base-url','https://github.com/AngadBasandrai/swarmfree/releases/download/v'+version,'--target',args.target,'--output',str(release/(args.target+'.json')),str(artifacts[0])],check=True)
+        subprocess.run([sys.executable,str(ROOT/'scripts/make_update_manifest.py'),'--base-url','https://github.com/AngadBasandrai/swarmfree/releases/download/v'+version,'--target',args.target,'--asset-name',artifacts[0].name.replace(' ', '-'),'--output',str(release/(args.target+'.json')),str(artifacts[0])],check=True)
     elif __import__('os').environ.get('GITHUB_REF','').startswith('refs/tags/'):
         raise SystemExit('Tagged publication requires a signed updater artifact')
     print('Frozen engine and platform packaging checks passed')
