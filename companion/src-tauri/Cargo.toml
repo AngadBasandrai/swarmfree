@@ -19,3 +19,8 @@ serde_json = "1"
 reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
 tokio = { version = "1", features = ["sync"] }
 sha2 = "0.10"
+
+# Keep development phone downloads small without claiming production signing.
+[profile.dev]
+debug = 0
+strip = "debuginfo"

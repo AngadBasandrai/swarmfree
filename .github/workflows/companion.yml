@@ -58,8 +58,23 @@ jobs:
         working-directory: companion
       - run: npm run tauri -- ios build --debug --target aarch64-sim --no-sign --ci
         working-directory: companion
+      - name: Archive simulator app with executable permissions
+        working-directory: companion
+        run: |
+          python3 - <<'PY'
+          import json, tarfile
+          from pathlib import Path
+          version = json.loads(Path('src-tauri/tauri.conf.json').read_text())['version']
+          apps = list(Path('src-tauri/gen/apple/build').rglob('*.app'))
+          if len(apps) != 1:
+              raise SystemExit('Expected exactly one simulator app')
+          with tarfile.open('Swarm-Companion_'+version+'_ios-simulator.tar.gz', 'w:gz') as archive:
+              archive.add(apps[0], arcname=apps[0].name)
+              archive.add('../LICENSE', arcname='LICENSE')
+              archive.add('../docs/COMPANION.md', arcname='README.md')
+          PY
       - uses: actions/upload-artifact@v4
         with:
           name: Swarm-Companion-iOS-simulator
-          path: companion/src-tauri/gen/apple/build/**/*.app
+          path: companion/Swarm-Companion_*_ios-simulator.tar.gz
           if-no-files-found: error
