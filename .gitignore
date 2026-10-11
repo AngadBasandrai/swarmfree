@@ -15,3 +15,6 @@ build/
 src-tauri/target/
 src-tauri/binaries/
 releases/
+companion/src-tauri/target/
+companion/src-tauri/gen/
+companion/notices.json

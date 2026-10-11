@@ -243,7 +243,7 @@ def install_nextgen(app,root):
     async def full_backup(form:FullBackupInput):
         from .full_backup import create_full_backup
         active=[*app.state.engine.tasks.values(),*app.state.engine.chat_tasks.values(),*app.state.feature_tasks.values(),*app.state.conversion_tasks.values(),*app.state.download_tasks.values()]
-        if any(not task.done() for task in active) or any(j["status"] in {"queued","leased"} for j in app.state.store.all("job")):
+        if any(not task.done() for task in active) or app.state.voice_lock.locked() or any(j["status"] in {"queued","leased"} for j in app.state.store.all("job")):
             raise RouteError("Pause active missions, chats and background work before taking a consistent full backup")
         app.state.backup_active=True
         previous_automation=app.state.automation.enabled;app.state.automation.enabled=False

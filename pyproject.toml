@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "swarm-workbench"
-version = "0.5.1"
+version = "0.6.0"
 description = "A local-first, distributed multi-model agent workbench"
 requires-python = ">=3.11"
 license = "MIT"
@@ -23,6 +23,7 @@ dependencies = [
 dev = ["pytest==9.1.1", "pytest-asyncio==1.4.0"]
 release = ["build>=1.2,<2"]
 desktop = ["pyinstaller==6.22.3"]
+training = ["torch==2.14.1", "transformers==5.19.0", "peft==0.21.2", "trl==1.15.0", "datasets==5.1.0", "bitsandbytes==0.50.2", "accelerate==1.15.0"]
 
 [project.scripts]
 swarm-workbench = "swarm.cli:main"

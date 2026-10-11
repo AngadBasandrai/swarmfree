@@ -70,7 +70,7 @@ def main():
                 except HTTPError as error:
                     assert error.code == expected
             snapshot = request(ready, "/api/snapshot")
-            assert request(ready, "/api/health")["version"] == "0.5.1"
+            assert request(ready, "/api/health")["version"] == "0.6.0"
             assert snapshot["hardware"]["ram_total_gb"] > 0
             assert snapshot["architectures"]
             features = request(ready,"/api/features")
@@ -114,6 +114,26 @@ def main():
                     headers={"Content-Type": "application/json"})
                 with urlopen(req, context=context, timeout=10) as response:
                     assert json.load(response)["device_id"]
+                phone = request(ready, '/api/ops/companion/pair', 'POST', dict(name='Frozen phone',role='viewer',project_ids=[project['id']]))
+                bundle = phone['bundle']
+                redeem = Request(f'https://127.0.0.1:{public_port}/api/team/companion/redeem',data=json.dumps(dict(invite_id=bundle['invite_id'],invite=bundle['invite'])).encode(),headers={'Content-Type':'application/json'})
+                with urlopen(redeem,context=context,timeout=10) as response:
+                    credential = json.load(response)
+                try:
+                    urlopen(redeem,context=context,timeout=10)
+                    raise AssertionError('One-use phone invitation was accepted twice')
+                except HTTPError as error:
+                    assert error.code == 401
+                phone_snapshot = Request(f'https://127.0.0.1:{public_port}/api/team/snapshot',headers={'Authorization':'Bearer '+credential['token']})
+                with urlopen(phone_snapshot,context=context,timeout=10) as response:
+                    shared=json.load(response)
+                    assert len(shared['projects'])==1 and 'root' not in shared['projects'][0]
+                request(ready,'/api/workbench/members/'+phone['member']['id']+'/revoke','POST')
+                try:
+                    urlopen(phone_snapshot,context=context,timeout=10)
+                    raise AssertionError('Revoked phone credential was accepted')
+                except HTTPError as error:
+                    assert error.code == 401
             run = request(ready, "/api/runs", "POST", dict(task="Verify the bundled desktop engine",
                 architecture_id="parallel", preset="general", mode="demo", free_only=True))
             deadline = time.monotonic() + 20
@@ -207,6 +227,31 @@ def main():
             finally:
                 fixture.shutdown()
                 fixture.server_close()
+            # Exercise the 0.6 controls in the bundled engine without host peripherals,
+            # external model calls, Docker, or training dependencies.
+            operations = request(ready, '/api/ops')
+            assert not operations['campaigns'] and 'voice' in operations
+            knowledge = request(ready, '/api/ops/knowledge', 'POST', dict(project_id=project['id'], title='Frozen requirement', content='Keep this project portable'))
+            assert knowledge['revision'] == 1
+            preflight = request(ready, '/api/ops/preflight', 'POST', dict(mission=dict(task='Plan', architecture_id='baseline'), architecture_ids=['baseline']))
+            assert preflight['comparisons'][0]['initial_requests'] == 1 and 'quota_groups' in preflight
+            notebook = request(ready, '/api/ops/notebooks', 'POST', dict(project_id=project['id'], title='Frozen notebook', image='python:3.13-slim', cells=[dict(kind='python',content='print(4)')]))
+            assert request(ready, '/api/ops/notebooks/'+notebook['id']+'/export')['nbformat'] == 4
+            try:
+                request(ready, '/api/ops/voice/chunk', 'POST', dict(wav='invalid'))
+                raise AssertionError('Invalid audio accepted')
+            except HTTPError as error:
+                assert error.code == 400
+            campaign = request(ready, '/api/ops/campaigns', 'POST', dict(name='Frozen campaign', mission=dict(task='Plan',architecture_id='baseline',project_id=project['id'],mode='demo'), milestones=[dict(id='plan',title='Plan',task='Produce a plan')]))
+            mission = request(ready, '/api/ops/campaigns/'+campaign['id']+'/launch', 'POST')
+            deadline = time.monotonic()+20
+            while time.monotonic()<deadline:
+                mission = request(ready, '/api/runs/'+mission['id'])
+                if mission['status'] in {'completed','interrupted'}: break
+                time.sleep(.1)
+            assert mission['status']=='completed',mission
+            reviewed = request(ready, '/api/ops/campaigns/'+campaign['id']+'/milestones/plan/review','POST',dict(accepted=True))
+            assert reviewed['milestones'][0]['status']=='accepted'
             backup = request(ready,"/api/backups","POST")
             assert Path(backup["path"]).is_file()
             encrypted = request(ready, "/api/next/backup", "POST", dict(password="Frozen recovery passphrase", project_ids=[]))
@@ -223,6 +268,7 @@ def main():
             assert ready["token"] != first_token
             assert request(ready, "/api/runs/" + run["id"])["status"] == "completed"
             assert request(ready,"/api/features")["memory"][0]["title"] == "Frozen decision"
+            assert request(ready,'/api/ops')['campaigns'][0]['milestones'][0]['status']=='accepted'
             # The parent closing its pipe must also stop the engine.
             process.stdin.close()
             assert process.wait(timeout=12) == 0
@@ -247,7 +293,7 @@ def main():
             assert help_result.returncode == 0, help_result.stderr
             if mode == "worker": assert "--execution-image" in help_result.stdout
             if mode == "restore": assert "--encrypted" in help_result.stdout and "--preview" in help_result.stdout
-        print("Frozen engine passed: startup, authentication, hardware, graph execution, budgets, context, packages, image validation, QR, project memory, certificates, native PDF calls and reported usage, catalog, GGUF header import, bundled browser driver, evaluations, encrypted backup/preview/restore, persistence, shutdown and worker/coordinator/hub/restore/relay CLI." + (" TLS private ingress passed." if public_port else ""))
+        print("Frozen engine passed: startup, authentication, hardware, graph execution, budgets, context, packages, image validation, QR, project memory, certificates, native PDF calls and reported usage, catalog, GGUF header import, bundled browser driver, evaluations, campaign acceptance, preflight, knowledge, notebook export, audio rejection, encrypted backup/preview/restore, persistence, shutdown and worker/coordinator/hub/restore/relay CLI." + (" TLS private ingress and one-use/revocable phone pairing passed." if public_port else ""))
 
 
 if __name__ == "__main__":

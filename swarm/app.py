@@ -49,6 +49,13 @@ from .fault_lab import FaultLab
 from .registry import Registry
 from .cluster import Cluster
 from .workbench_next import install_workbench
+from .project_ops import ProjectOps
+from .adaptive_ops import AdaptiveOps
+from .notebooks import Notebooks
+from .training import Training
+from .tool_apps import ToolApps
+from .compatibility import Compatibility
+from .operations import install_operations
 
 
 class SessionInput(BaseModel):
@@ -99,7 +106,7 @@ def create_app(data_dir=None, token=None, vault=None, *, desktop=False):
         if (root/".restore-in-progress").exists(): raise ValueError("Recovery was interrupted; restore a fresh verified directory before starting this workspace")
         store = Store(root / "workbench.sqlite")
         app.state.store = store
-        for kind in ("tuning_job", "conversion_job", "download", "evaluation_job", "index_job", "browser_job", "remote_job","setup_download","fault_job","a2a_stream"):
+        for kind in ("tuning_job", "conversion_job", "download", "evaluation_job", "index_job", "browser_job", "remote_job","setup_download","fault_job","a2a_stream","notebook_job","training_job","compatibility_job"):
             for job in store.all(kind):
                 if job.get("status") in {"running", "starting"}:
                     store.patch(kind, job["id"], dict(status="interrupted"))
@@ -156,10 +163,26 @@ def create_app(data_dir=None, token=None, vault=None, *, desktop=False):
             app.state.evaluations=Evaluations(store,app.state.engine)
             app.state.automation=Automation(store,app.state.engine)
             app.state.automation.enabled=not store.get("settings","automation",{}).get("paused",False)
+            app.state.project_ops=ProjectOps(store,app.state.engine)
+            app.state.project_ops.app=app
+            app.state.adaptive_ops=AdaptiveOps(store)
+            app.state.adaptive_ops.app=app
+            app.state.engine.project_ops=app.state.project_ops
+            app.state.engine.adaptive_ops=app.state.adaptive_ops
+            app.state.intelligence.adaptive_ops=app.state.adaptive_ops
+            app.state.notebooks=Notebooks(store,root)
+            app.state.training=Training(store,root)
+            app.state.tool_apps=ToolApps(store,app.state.extensions)
+            app.state.compatibility=Compatibility(app)
+            app.state.voice_lock=asyncio.Lock()
+            app.state.project_ops.start()
+            app.state.adaptive_ops.start()
             app.state.relay_links=RelayLinks(store,app.state.vault,app.state.pool)
             try:
                 yield
             finally:
+                await app.state.project_ops.stop()
+                await app.state.adaptive_ops.stop()
                 await app.state.automation.stop()
                 await app.state.relay_links.stop()
                 await app.state.engine.stop()
@@ -177,7 +200,7 @@ def create_app(data_dir=None, token=None, vault=None, *, desktop=False):
             async with locked_lifespan(app):
                 yield
 
-    app = FastAPI(title="Swarm Workbench", version="0.5.1", lifespan=lifespan)
+    app = FastAPI(title="Swarm Workbench", version="0.6.0", lifespan=lifespan)
     app.state.owner_token = owner_token
     app.state.backup_active = False
     hosts = ["127.0.0.1", "localhost", "[::1]", "testserver"]
@@ -188,7 +211,7 @@ def create_app(data_dir=None, token=None, vault=None, *, desktop=False):
     @app.middleware("http")
     async def authenticate(request, call_next):
         path = request.url.path
-        if path.startswith("/api/") and not path.startswith(("/api/worker/","/api/team/")) and path not in {"/api/session", "/api/health"}:
+        if path.startswith("/api/") and not path.startswith(("/api/worker/","/api/team/","/api/ops/apps/view/")) and path not in {"/api/session", "/api/health"}:
             cookie = request.cookies.get("swarm_session", "")
             bearer = request.headers.get("authorization", "").removeprefix("Bearer ")
             if not secrets.compare_digest(cookie, owner_token) and not secrets.compare_digest(bearer, owner_token):
@@ -212,7 +235,7 @@ def create_app(data_dir=None, token=None, vault=None, *, desktop=False):
 
     @app.get("/api/health")
     async def health():
-        return dict(status="ok", version="0.5.1")
+        return dict(status="ok", version="0.6.0")
 
     @app.post("/api/session")
     async def session(form: SessionInput, request: Request):
@@ -482,6 +505,7 @@ def create_app(data_dir=None, token=None, vault=None, *, desktop=False):
     install_nextgen(app,root)
     install_team(app)
     install_workbench(app)
+    install_operations(app)
 
     # The desktop window embeds its UI. Its private engine exposes only authenticated APIs.
     if desktop:

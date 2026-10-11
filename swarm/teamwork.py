@@ -102,6 +102,38 @@ class Teamwork:
 
 def install_team(app):
     router=APIRouter(prefix="/api/team")
+    class RedeemInput(BaseModel):
+        invite_id:str=Field(max_length=100)
+        invite:str=Field(min_length=20,max_length=200)
+    class AnswerInput(BaseModel):
+        answer:object=None
+        cancel:bool=False
+    @router.post("/companion/redeem")
+    async def redeem(form:RedeemInput):
+        s=app.state.store
+        with s.lock:
+            row=s.get("companion_invite",form.invite_id)
+            if not row or row["redeemed"] or row["expires_at"]<time.time() or not secrets.compare_digest(row["invite_hash"],token_hash(form.invite)):
+                raise HTTPException(401,"Pairing invitation expired or was already used")
+            member=s.get("team_member",row["member_id"])
+            token=app.state.vault.get(row["id"])
+            if not member or not member["enabled"] or member["expires_at"]<time.time() or not token: raise HTTPException(401,"Pairing credential is unavailable; create a new invitation")
+            s.patch("companion_invite",row["id"],dict(redeemed=True))
+            app.state.vault.delete(row["id"])
+            app.state.team.audit(member["id"],"companion.paired",row["id"])
+            return dict(token=token,member={k:v for k,v in member.items() if k!="token_hash"})
+    @router.get("/questions")
+    async def questions(request:Request):
+        actor=app.state.team.actor(request)
+        runs={r["id"] for r in app.state.store.all("run") if r.get("project_id") in actor["project_ids"]}
+        return [q for q in app.state.store.all("question") if q["run_id"] in runs and q["status"]=="pending"][-50:]
+    @router.post("/questions/{id}/answer")
+    async def answer(id:str,form:AnswerInput,request:Request):
+        team=app.state.team;actor=team.actor(request);question=team.store.get("question",id)
+        if not question: raise HTTPException(404,"Question not found")
+        team.run(actor,question["run_id"],{"operator"})
+        result=app.state.clarifications.answer(id,form.answer,form.cancel)
+        team.audit(actor["id"],"question.answer",id);return result
     @router.get("/snapshot")
     async def snapshot(request:Request):
         team=app.state.team;actor=team.actor(request)

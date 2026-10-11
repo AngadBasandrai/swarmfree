@@ -2,7 +2,7 @@
 
 A downloadable desktop workbench for persistent agents using your own model providers, local Ollama models, linked devices, and opt-in volunteer inference. Each installation measures its own hardware and owns its own workspace. MIT licensed.
 
-**0.5.1 desktop alpha:** a Tauri desktop app with a bundled engine for Windows x64, macOS Apple Silicon/Intel, and Linux x64. End users need no Python, Node.js or Rust. Browser agents use an optional headless Chromium download; the desktop UI uses the operating system's webview. Package validation and supported scope are recorded in [build status](docs/BUILD_STATUS.md), the [0.5 feature guide](docs/FEATURES_0_5.md) and the [research/design plan](docs/SWARM_WORKBENCH_PLAN.md).
+**0.6.0 desktop alpha:** a Tauri desktop app with a bundled engine for Windows x64, macOS Apple Silicon/Intel, and Linux x64. End users need no Python, Node.js or Rust. Browser agents use an optional headless Chromium download; the desktop UI uses the operating system's webview. Package validation and supported scope are recorded in [build status](docs/BUILD_STATUS.md), the [0.6 feature guide](docs/FEATURES_0_6.md) and the [research/design plan](docs/SWARM_WORKBENCH_PLAN.md).
 
 ## Downloads
 
@@ -14,6 +14,10 @@ A downloadable desktop workbench for persistent agents using your own model prov
 Local artifacts are in `releases/`; the public source and release target is [AngadBasandrai/swarmfree](https://github.com/AngadBasandrai/swarmfree). Updater signatures are configured; operating system signing requires separate credentials. The installer provisions Microsoft's WebView2 runtime if missing, which needs internet access. The portable version requires WebView2 already installed. Ollama, model weights, search servers, MCP servers and ACP agents are optional separate installations.
 
 ## Capabilities
+
+- Command center, durable project campaigns, reviewed knowledge revisions, routing feedback and inference-free architecture comparisons.
+- Explicit live voice, restricted MCP Apps panels, isolated/exportable notebooks, optional CUDA LoRA training and live model compatibility packs.
+- Observed GPU power/temperature policies and a separate [native phone companion](docs/COMPANION.md) with scoped HTTPS pairing.
 
 - Task-aware routing and output validation, a dated free-model catalog, managed GGUF runtimes, reported token accounting, local semantic indexing, native function calls and typed work products.
 - Owned headless browser agents, opt-in private Docker execution workers, resource-aware model scheduling, durable agent questions, encrypted full recovery with path remapping and automated team/model/prompt evaluations.
@@ -32,9 +36,9 @@ Local artifacts are in `releases/`; the public source and release target is [Ang
 - Self-hosted volunteer hub with client keys, RPM/day budgets, outbound workers, availability scheduling, contribution hours, battery pause and daily job limits. Public routes require explicit consent for each mission.
 - Swarm lab compares architectures with a single-agent baseline, call/time/token estimates and manual quality scores. Model doctor probes streamed text, JSON and latency.
 - Opt-in MCP stdio/HTTP tools and ACP v1 stdio agents. Per-project and per-agent permissions; visible operations; emergency stop.
-- Paired-database backups, offline integrity-checked restore, schema migrations, single-writer workspace locks, and a configurable signature-verifying native updater. No update channel is preconfigured.
+- Paired-database backups, offline integrity-checked restore, schema migrations, single-writer workspace locks, and a configurable signature-verifying native updater. A signed public release channel is configured, with a GitHub fallback.
 
-The [0.4 feature guide](docs/FEATURES_0_4.md) explains the twelve additions, setup and practical limits; the [0.2 guide](docs/FEATURES_0_2.md) covers the earlier tools. Offline demo responses are explicitly scripted; they are not LLM output. Named checks and external extensions run with your OS permissions unless you explicitly configure the supported container wrapper for checks. OCR/transcription programs are separate trusted installations.
+The [0.6 feature guide](docs/FEATURES_0_6.md) explains the newest additions; the [0.4 guide](docs/FEATURES_0_4.md) explains the earlier additions, setup and practical limits; the [0.2 guide](docs/FEATURES_0_2.md) covers the earlier tools. Offline demo responses are explicitly scripted; they are not LLM output. Named checks and external extensions run with your OS permissions unless you explicitly configure the supported container wrapper for checks. OCR/transcription programs are separate trusted installations.
 
 ## First run
 

@@ -1,0 +1,1 @@
+{"identifier":"companion-main","windows":["main"],"permissions":["core:default","barcode-scanner:allow-scan","barcode-scanner:allow-cancel","barcode-scanner:allow-check-permissions","barcode-scanner:allow-request-permissions"]}

@@ -41,6 +41,8 @@ def check_zip(file, expected, prefix):
         assert archive.read(prefix + "docs/FEATURES_0_3.md")
         assert archive.read(prefix + "docs/FEATURES_0_4.md")
         assert archive.read(prefix + "docs/FEATURES_0_5.md")
+        assert archive.read(prefix + "docs/FEATURES_0_6.md")
+        assert archive.read(prefix + "docs/COMPANION.md")
         frontend = json.loads(archive.read(prefix + "notices/frontend/DEPENDENCIES.json"))
         assert native and frontend
         assert any(package["name"] == "CPython" for package in native)

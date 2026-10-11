@@ -40,7 +40,9 @@ def main():
         if Path(str(artifact)+'.sig').read_text().strip()!=platform['signature']: raise SystemExit('Manifest signature differs from its artifact signature')
         platform['url']='https://github.com/AngadBasandrai/swarmfree/releases/download/'+tag+'/'+quote(name)
     from datetime import datetime,timezone
-    manifest=dict(version=version,notes='Swarm Workbench '+version+' — see FEATURES_0_5.md in the package',pub_date=datetime.now(timezone.utc).isoformat(),platforms=platforms)
+    series=version.rsplit('.',1)[0].replace('.','_')
+    feature_doc='FEATURES_'+series+'.md'
+    manifest=dict(version=version,notes='Swarm Workbench '+version+' — see '+feature_doc+' in the package',pub_date=datetime.now(timezone.utc).isoformat(),platforms=platforms)
     (destination/'stable.json').write_text(json.dumps(manifest,indent=2)+'\n')
     if provenance: (destination/'provenance.json').write_text(json.dumps(provenance,indent=2)+'\n')
     from verify_update_artifact import verify
@@ -50,7 +52,9 @@ def main():
         if 'version:'+version not in comment.split('\t'): raise SystemExit('Signed artifact version differs from the release version')
     checksum=''.join(hashlib.sha256(f.read_bytes()).hexdigest()+'  '+f.name+'\n' for f in sorted(destination.iterdir()) if f.is_file() and f.name not in {'SHA256SUMS.txt','release-notes.md'})
     (destination/'SHA256SUMS.txt').write_text(checksum)
-    body=destination/'release-notes.md';body.write_text('Downloadable Swarm Workbench '+version+'. Includes guided setup, reusable sub-swarms, bounded channels, team roles, data destination reviews, response reuse, failure simulations, A2A text tasks, experimental Exo placement and signed community packages.\n\nInstallers carry updater signatures. Operating system signatures depend on separately provisioned certificate credentials. Model weights and optional runtimes are separate downloads.\n\nSee bundled docs/FEATURES_0_5.md and docs/BUILD_STATUS.md for supported scope and validation.\n')
+    body=destination/'release-notes.md'
+    notes=ROOT/'docs'/('RELEASE_'+series+'.md')
+    body.write_text(notes.read_text(encoding='utf-8') if notes.is_file() else 'Downloadable Swarm Workbench '+version+'.\n\nInstallers carry updater signatures. Operating system signatures depend on separately provisioned certificate credentials. Model weights and optional runtimes are separate downloads.\n\nSee bundled docs/'+feature_doc+' and docs/BUILD_STATUS.md for supported scope and validation.\n',encoding='utf-8')
     if args.prepare_only:
         print('Verified release assets prepared locally: '+str(destination));return
     existing=subprocess.run(['gh','release','view',tag,'--repo','AngadBasandrai/swarmfree'],cwd=ROOT,capture_output=True)

@@ -1,0 +1,80 @@
+name: Mobile companion
+on:
+  workflow_dispatch:
+  push:
+    paths: ['companion/**', '.github/workflows/companion.yml']
+permissions:
+  contents: read
+jobs:
+  android:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools'
+          log-accepted-android-sdk-licenses: false
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android
+      - run: sdkmanager 'platform-tools' 'platforms;android-36' 'build-tools;36.0.0' 'ndk;29.0.14206865'
+      - run: echo "NDK_HOME=$ANDROID_HOME/ndk/29.0.14206865" >> "$GITHUB_ENV"
+      - run: npm ci
+        working-directory: companion
+      - run: npm run build
+        working-directory: companion
+      - run: npm run tauri -- android init --ci
+        working-directory: companion
+      - run: npm run tauri -- android build --debug --target aarch64 --apk --ci
+        working-directory: companion
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Swarm-Companion-Android-development-APK
+          path: companion/src-tauri/gen/android/app/build/outputs/apk/**/*.apk
+          if-no-files-found: error
+  ios:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-ios-sim
+      - run: brew install xcodegen
+      - run: npm ci
+        working-directory: companion
+      - run: npm run build
+        working-directory: companion
+      - run: npm run tauri -- ios init --ci
+        working-directory: companion
+      - run: npm run tauri -- ios build --debug --target aarch64-sim --no-sign --ci
+        working-directory: companion
+      - name: Archive simulator app with executable permissions
+        working-directory: companion
+        run: |
+          python3 - <<'PY'
+          import json, tarfile
+          from pathlib import Path
+          version = json.loads(Path('src-tauri/tauri.conf.json').read_text())['version']
+          apps = list(Path('src-tauri/gen/apple/build').rglob('*.app'))
+          if len(apps) != 1:
+              raise SystemExit('Expected exactly one simulator app')
+          with tarfile.open('Swarm-Companion_'+version+'_ios-simulator.tar.gz', 'w:gz') as archive:
+              archive.add(apps[0], arcname=apps[0].name)
+              archive.add('../LICENSE', arcname='LICENSE')
+              archive.add('../docs/COMPANION.md', arcname='README.md')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Swarm-Companion-iOS-simulator
+          path: companion/Swarm-Companion_*_ios-simulator.tar.gz
+          if-no-files-found: error

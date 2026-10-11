@@ -3,13 +3,14 @@ import { ArrowUpRight, ArrowUp, ArrowRight, Plus, Network, Layers3, SlidersHoriz
 import { api, download, desktop, connectDesktop, copyText } from './api';
 import { Graph, StatusIcon } from './Graph';
 import { PrivateNetwork } from './PrivateNetwork';
+import { Operations } from './Operations';
 import { Studio, AdvancedNodeControls } from './Studio';
 import { RoutingControls } from './CapabilityDesk';
 import { ControlRoom, ContextPanel, ExecutionDebugger, MissionBudgetBar, MissionExtras, NotificationPoller, ProfilePrices, defaultLimits } from './Advanced';
 import type { MissionLimits } from './types';
 import type { Agent, Architecture, Budgets, Profile, Route, Run, Snapshot } from './types';
 
-type Tab = 'workbench' | 'architectures' | 'providers' | 'devices' | 'studio' | 'control';
+type Tab = 'workbench' | 'architectures' | 'providers' | 'devices' | 'studio' | 'control' | 'operations';
 type Action = <T>(fn: () => Promise<T>) => Promise<T | undefined>;
 const emptyRoute: Route = { kind: 'auto' };
 const time = (stamp: number) => new Date(stamp * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -86,7 +87,7 @@ export function App() {
   return <div className="app-shell">
     <NotificationPoller enabled={authenticated}/>
     <header className="app-header"><button className="brand" onClick={newRun} aria-label="Swarm home"><span className="brand-icon"><Network size={21} /></span><b>swarm</b><span>workbench</span><em>ALPHA</em></button>
-      <nav aria-label="Main navigation">{([['workbench', Layers3, 'Workbench'], ['architectures', Network, 'Architectures'], ['providers', KeyRound, 'Providers'], ['devices', Monitor, 'Devices'], ['studio', BookOpen, 'Studio'], ['control', SlidersHorizontal, 'Control room']] as const).map(([id, Icon, label]) => <button key={id} className={tab === id ? 'active' : ''} onClick={() => setTab(id)}><Icon size={16} />{label}</button>)}</nav>
+      <nav aria-label="Main navigation">{([['workbench', Layers3, 'Workbench'], ['operations', Activity, 'Command center'], ['architectures', Network, 'Architectures'], ['providers', KeyRound, 'Providers'], ['devices', Monitor, 'Devices'], ['studio', BookOpen, 'Studio'], ['control', SlidersHorizontal, 'Control room']] as const).map(([id, Icon, label]) => <button key={id} className={tab === id ? 'active' : ''} onClick={() => setTab(id)}><Icon size={16} />{label}</button>)}</nav>
       <span className={`coordinator ${connection ? '' : 'offline'}`}><i />{connection ? 'Coordinator online' : 'Reconnecting'}</span>
     </header>
     <aside className="sidebar"><div className="workspace-label"><span className="workspace-icon"><Layers3 size={17} /></span><div><strong>Your workspace</strong><small>Private coordinator</small></div></div>
@@ -110,6 +111,7 @@ export function App() {
       {tab === 'studio' && <Studio snapshot={s} action={action} refresh={refresh} openRun={id => {void selectRun(id);}} />}
       {tab === 'control' && <ControlRoom snapshot={s} action={action} refresh={refresh} openRun={id=>{void selectRun(id);}}/>}
       {tab === 'devices' && <Devices snapshot={s} action={action} refresh={refresh} />}
+      {tab === 'operations' && <Operations snapshot={s} action={action} refresh={refresh} openRun={id=>{void selectRun(id);}} goTo={setTab}/>}
     </main>
     {tab === 'workbench' && run && currentAgent && <Inspector agent={currentAgent} snapshot={s} run={run} action={action} />}
     {error && <div className="toast" role="alert"><CircleHelp size={18} /><span>{error}</span><button aria-label="Dismiss error" onClick={() => setError('')}><X size={15} /></button></div>}

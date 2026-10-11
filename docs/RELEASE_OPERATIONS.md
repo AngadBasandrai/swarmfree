@@ -12,7 +12,7 @@ npm run test:ui
 .venv/Scripts/python scripts/build_desktop.py
 ```
 
-Build scripts read the version from `src-tauri/tauri.conf.json`; keep that version, Cargo/Python/npm metadata aligned. Windows produces NSIS, portable and worker ZIPs. macOS/Linux produce their platform bundles and an architecture-specific worker ZIP. The manual `.github/workflows/desktop.yml` matrix uploads artifacts and does not automatically publish them. Those remote jobs have not been run here.
+Build scripts read the version from `src-tauri/tauri.conf.json`; keep that version, Cargo/Python/npm metadata aligned. Windows produces NSIS, portable and worker ZIPs. macOS/Linux produce their platform bundles and an architecture-specific worker ZIP. The manual `.github/workflows/desktop.yml` matrix uploads artifacts. Tag-triggered runs publish only after the complete matrix passes. Release notes come from `docs/RELEASE_<major>_<minor>.md` when available.
 
 `--bundle-only` regenerates packages from current compiled binaries, useful after a documentation/resource change. `--package-only` rebuilds ZIPs and hashes from existing artifacts. Neither recompiles stale source. On Windows inspect NSIS contents without executing installation:
 

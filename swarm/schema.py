@@ -161,7 +161,7 @@ class RunInput(BaseModel):
     adaptive: Literal["off", "speed", "quality", "resources"] = "off"
     isolated_worktrees: bool = False
     attachments: list[str] = Field(default_factory=list, max_length=4)
-    routing_policy: Literal["placement", "smallest", "quality"] = "smallest"
+    routing_policy: Literal["placement", "smallest", "quality", "learned"] = "smallest"
     native_tools: bool = False
     validation_attempts: int = Field(default=3, ge=1, le=5)
     reuse_cache: bool = False
