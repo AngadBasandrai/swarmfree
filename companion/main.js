@@ -3,11 +3,13 @@ import {scan,Format,cancel} from '@tauri-apps/plugin-barcode-scanner';
 import './style.css';
 const app=document.querySelector('#app');let connected=false,selected='',snapshot,mission,questions=[],artifacts=[],timer,generation=0,refreshSequence=0;
 const h=(tag,text,cls)=>{const el=document.createElement(tag);if(text!==undefined)el.textContent=text;if(cls)el.className=cls;return el;};
+const licensePanel=h('details');licensePanel.append(h('summary','Open-source notices'));let licenseLoad;
+licensePanel.addEventListener('toggle',()=>{if(licensePanel.open&&!licenseLoad)licenseLoad=import('./notices.json').then(({default:notices})=>licensePanel.append(h('pre',notices.projectLicense+'\n\n'+notices.dependencies.map(p=>p.kind+' · '+p.name+' '+p.version+' · '+p.license+'\n'+p.notices.map(n=>n.text).join('\n')).join('\n\n'))));});
 const button=(text,fn)=>{const el=h('button',text);el.addEventListener('click',()=>act(fn));return el;};
 const remote=(path,method='GET',body=null)=>invoke('remote_request',{path:'/api/team'+path,method,body});
 const alert=h('p','','error');alert.setAttribute('role','alert');
 async function act(fn){try{alert.textContent='';await fn();}catch(e){alert.textContent=String(e);}}
-function shell(){app.replaceChildren(h('h1','Swarm Companion'),alert);}
+function shell(){app.replaceChildren(h('h1','Swarm Companion'),alert,licensePanel);}
 async function preview(text){const bundle=JSON.parse(text);const review=await invoke('inspect_pair',{bundle});shell();app.append(h('h2','Review coordinator'),h('p',review.origin),h('p','Certificate SHA-256: '+review.certificate_sha256),h('p','Verify this origin and certificate with the desktop owner before pairing.'));app.append(button('Pair with this coordinator',async()=>{await invoke('pair',{bundle});connected=true;await refresh();}),button('Cancel pairing',()=>login()));}
 function login(){connected=false;snapshot=undefined;selected='';mission=undefined;questions=[];artifacts=[];generation++;clearTimeout(timer);shell();app.append(h('p','Link a project-scoped invitation from your desktop. Credentials stay in native session memory and are cleared when the application closes.'));
  app.append(button('Scan pairing QR',async()=>{try{const result=await scan({formats:[Format.QRCode],windowed:false});await preview(result.content);}finally{await cancel().catch(()=>{});}}));
