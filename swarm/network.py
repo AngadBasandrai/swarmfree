@@ -31,7 +31,7 @@ class PrivatePool:
             id = uid("d_")
             self.store.put("device", id, dict(id=id, name=form.name, token_hash=digest(token),
                 approved=False, revoked=False, last_seen=time.time(), hardware=form.hardware,
-                models=form.models, budgets=form.budgets.model_dump(),execution=form.execution,execution_approved=False))
+                models=form.models, budgets=form.budgets.model_dump(),execution=form.execution,execution_approved=False,cluster=form.cluster,cluster_approved=False))
             return dict(device_id=id, token=token, status="pending-owner-approval")
 
     def authenticate(self, id, token):
@@ -59,7 +59,7 @@ class PrivatePool:
 
     def heartbeat(self, device, data):
         changes = dict(last_seen=time.time())
-        for key in ("hardware", "models", "budgets", "execution"):
+        for key in ("hardware", "models", "budgets", "execution", "cluster"):
             if key in data:
                 changes[key] = data[key]
         self.store.patch("device", device["id"], changes)
@@ -86,6 +86,8 @@ class PrivatePool:
                     continue
                 if job.get("kind")=="execution" and (not device.get("execution_approved") or not device.get("execution",{}).get("enabled")):
                     self.store.patch("job",job["id"],dict(status="failed",error="Execution permission was withdrawn"));continue
+                if job.get('kind')=='cluster' and (not device.get('cluster_approved') or not device.get('cluster',{}).get('enabled')):
+                    self.store.patch('job',job['id'],dict(status='failed',error='Cluster permission was withdrawn'));continue
                 token = secrets.token_urlsafe(24)
                 self.store.patch("job", job["id"], dict(status="leased", lease_hash=digest(token), lease_until=now+30))
                 return dict(id=job["id"], model=job["model"], messages=job["messages"], lease=token,
@@ -106,6 +108,12 @@ class PrivatePool:
             if not text.startswith(job.get("text", "")):
                 raise ValueError("Streaming results must append to the existing output")
             changes = dict(text=text, lease_until=min(now+30, job["deadline"]))
+            if job.get('kind')=='cluster':
+                if not device.get('cluster_approved') or not device.get('cluster',{}).get('enabled'):raise ValueError('Cluster approval was withdrawn')
+                if data.get('done') and not data.get('error'):
+                    result=data.get('cluster_result')
+                    if not isinstance(result,dict) or len(json.dumps(result))>64000:raise ValueError('Invalid cluster control response')
+                    changes['cluster_result']=result
             if job.get("kind")=="execution":
                 if not device.get("execution_approved") or not device.get("execution",{}).get("enabled"): raise ValueError("Execution approval was withdrawn")
                 if data.get("done") and not data.get("error"):

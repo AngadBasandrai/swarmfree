@@ -144,6 +144,7 @@ class Workspace:
                 paths=[]
                 if tool in {"workspace.read","research.pdf"}: paths=[arguments["path"]]
                 if tool in {"workspace.search","semantic.search"}: paths=[m["path"] for m in result.get("matches",[]) if m.get("kind","file")=="file"]
+                if tool.startswith('mcp.'):paths=result.pop('_source_paths',[])
                 self.privacy.mark(agent["id"],run["project_id"],paths)
                 if tool=="memory.search":
                     self.privacy.inherit(agent["id"],[label for note in result.get("notes",[]) for label in note.get("data_labels",[])])

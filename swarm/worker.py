@@ -63,12 +63,18 @@ async def run(args):
     if not 512 <= budgets["context"] <= 32768:
         raise ValueError("Context must be between 512 and 32768 tokens")
     url = ollama_url()
+    from .private_cluster import ClusterWorker
+    cluster=ClusterWorker(store,root,getattr(args,'cluster_image',None),getattr(args,'cluster_model_root',None),getattr(args,'cluster_address',None),budgets)
+    await cluster.reap(revoked=True)
+    async def cluster_watchdog():
+        while True:
+            await asyncio.sleep(5);await cluster.reap()
 
     async def describe():
         inv = await inventory(url)
         hw = hardware()
         loaded={m["name"] for m in inv["loaded"]}
-        return dict(hardware=hw, models=[dict(m,loaded=m["name"] in loaded) for m in inv["models"] if fit_model(m, hw, budgets, inv["loaded"])["fits"]], budgets=budgets,
+        return dict(hardware=hw, models=[dict(m,loaded=m["name"] in loaded) for m in inv["models"] if fit_model(m, hw, budgets, inv["loaded"])["fits"]]+cluster.models(), budgets=budgets,cluster=cluster.describe(),
                     execution=dict(enabled=bool(getattr(args,"execution_image",None)),image=getattr(args,"execution_image",None)))
 
     def available():
@@ -111,10 +117,12 @@ async def run(args):
         path = base + "/api/worker/" + info["device_id"]
         print("Worker connected. Approve this device in the owner's Devices panel. Ctrl+C stops contribution.", flush=True)
         last_heartbeat = 0
+        watchdog=asyncio.create_task(cluster_watchdog())
         try:
             while True:
                 try:
                     if time.monotonic()-last_heartbeat > 8:
+                        await cluster.reap()
                         description = await describe()
                         if not available(): description["models"] = [];description["execution"]["enabled"]=False
                         r = await client.post(path + "/heartbeat", json=description)
@@ -131,19 +139,30 @@ async def run(args):
                         continue
                     day = time.strftime("%Y-%m-%d", time.gmtime())
                     contribution = store.get("contribution", base, {})
-                    store.put("contribution", base, dict(day=day, count=(contribution.get("count", 0) if contribution.get("day") == day else 0)+1))
+                    if job.get('kind')!='cluster':store.put("contribution", base, dict(day=day, count=(contribution.get("count", 0) if contribution.get("day") == day else 0)+1))
                     print(f"Inference job {job['id']} · {job['model']}", flush=True)
                     text = ""
                     result_url = path + "/jobs/" + job["id"]
                     stream = None
                     usage,native_calls={},[]
                     execution_result=None
+                    cluster_result=None
 
                     async def report(done=False, error=False):
-                        response = await client.post(result_url, json=dict(lease=job["lease"], text=text, done=done, error=error,usage=usage,native_calls=native_calls,execution_result=execution_result))
+                        response = await client.post(result_url, json=dict(lease=job["lease"], text=text, done=done, error=error,usage=usage,native_calls=native_calls,execution_result=execution_result,cluster_result=cluster_result))
                         response.raise_for_status()
 
                     try:
+                        if job.get('kind')=='cluster':
+                            control_task=asyncio.create_task(cluster.handle(job['payload']))
+                            try:
+                                while not control_task.done():
+                                    await asyncio.wait({control_task},timeout=3);await report()
+                                    r=await client.post(path+'/heartbeat',json=await describe());r.raise_for_status()
+                                cluster_result=control_task.result();await report(done=True)
+                            finally:
+                                if not control_task.done():control_task.cancel();await asyncio.gather(control_task,return_exceptions=True)
+                            continue
                         if job.get("kind")=="execution":
                             from .remote_execution import execute_container
                             image=getattr(args,"execution_image",None)
@@ -159,14 +178,18 @@ async def run(args):
                             finally:
                                 if not execution_task.done(): execution_task.cancel();await asyncio.gather(execution_task,return_exceptions=True)
                             continue
+                        if job['model'].startswith('cluster:'):
+                            stream=cluster.infer(job['model'],job['messages'],job.get('max_tokens',1536),usage,job.get('native_tools',[]),native_calls)
+                        else:
+                            stream=None
                         inv = await inventory(url)
                         model = next((m for m in inv["models"] if m["name"] == job["model"]), None)
-                        if not model:
+                        if not model and stream is None:
                             raise RouteError("Model disappeared from this worker")
-                        fit = fit_model(model, hardware(), budgets, inv["loaded"])
-                        if not fit["fits"]:
+                        fit = fit_model(model, hardware(), budgets, inv["loaded"]) if model else dict(fits=True,placement='private cluster')
+                        if not fit["fits"] and stream is None:
                             raise RouteError("Model no longer fits this worker's budget")
-                        stream = ollama_stream(url, job["model"], job["messages"], {**budgets, "max_tokens":job.get("max_tokens",1536),"_usage":usage,"_native_calls":native_calls,"_tools":job.get("native_tools",[])}, fit["placement"])
+                        if stream is None:stream = ollama_stream(url, job["model"], job["messages"], {**budgets, "max_tokens":job.get("max_tokens",1536),"_usage":usage,"_native_calls":native_calls,"_tools":job.get("native_tools",[])}, fit["placement"])
                         iterator = stream.__aiter__()
                         pending = asyncio.create_task(anext(iterator))
                         last_report = 0
@@ -211,6 +234,8 @@ async def run(args):
                     print("Coordinator unavailable; retrying in five seconds.", flush=True)
                     await asyncio.sleep(5)
         finally:
+            watchdog.cancel();await asyncio.gather(watchdog,return_exceptions=True)
+            await cluster.reap(revoked=True)
             store.close()
 
 
@@ -231,6 +256,9 @@ def main():
     parser.add_argument("--hours", help="Contribution window in local hours, e.g. 20-8")
     parser.add_argument("--pause-on-battery", action="store_true")
     parser.add_argument("--execution-image",help="Opt in to private isolated jobs using this already installed Docker image; no host execution fallback")
+    parser.add_argument('--cluster-image',help='Opt in to trusted private vLLM clustering with an installed digest-pinned Linux image')
+    parser.add_argument('--cluster-model-root',help='Directory containing permitted complete local model folders')
+    parser.add_argument('--cluster-address',help='Private IPv4 interface used for distributed inference')
     args = parser.parse_args()
     if not 1 <= args.daily_jobs <= 10000: parser.error("Daily jobs must be between 1 and 10000")
     if args.hours:

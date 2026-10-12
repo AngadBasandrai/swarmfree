@@ -8,7 +8,7 @@ type AgentNode = Node<{ name: string; role: string; status: string; model: strin
 export function StatusIcon({ status, size = 14 }: { status: string; size?: number }) {
   if (status === 'done' || status === 'completed') return <Check size={size} />;
   if (status === 'running' || status === 'chatting') return <LoaderCircle size={size} className="spin" />;
-  if (status === 'failed' || status === 'interrupted') return <AlertCircle size={size} />;
+  if (['failed','interrupted','acceptance_failed','budget_exceeded'].includes(status)) return <AlertCircle size={size} />;
   if (['paused','held','waiting'].includes(status)) return <Pause size={size} />;
   return <Circle size={size} />;
 }
@@ -33,11 +33,11 @@ export function Graph({ architecture, agents = emptyAgents, selected, onSelect, 
   const nodes: AgentNode[] = useMemo(() => architecture.nodes.map(n => {
     const a = agents.find(a => a.node_id === n.id);
     const label = n.kind === 'recursive' ? `Recursive · depth ${n.max_depth ?? 2}${n.recursion_leaf ? ' · base case' : ''}` : kindName(n.kind);
-    return { id: n.id, type: 'agent', position: { x: n.x, y: n.y }, selected: n.id === selected, data: { name: n.name, role: n.role, status: a?.status || 'waiting', kind: n.kind, model: a?.actual_route || (editable || n.kind === 'recursive' || n.kind === 'subswarm' ? label : '') } };
+    return { id: n.id, type: 'agent', position: { x: n.x, y: n.y }, selected: n.id === selected, data: { name: n.name, role: n.role, status: a?.result?.failed?'failed':a?.status || 'waiting', kind: n.kind, model: a?.result?.reused_from?'Reused · '+a.result.reused_from.split(':').pop():a?.actual_route || (editable || n.kind === 'recursive' || n.kind === 'subswarm' ? label : '') } };
   }), [architecture, agents, selected, editable]);
   const [displayNodes, setDisplayNodes, onNodesChange] = useNodesState<AgentNode>(nodes);
   useEffect(() => { setDisplayNodes(nodes); }, [nodes, setDisplayNodes]);
-  const edges = architecture.edges.map(e => ({ ...e, label:e.bindings?.length ? e.bindings.map(b=>b.target_name).join(', ') : undefined, id: e.source + '->' + e.target, type: 'smoothstep', animated: agents.some(a => a.node_id === e.source && a.status === 'running'), style: { stroke: '#59756a', strokeWidth: 1.5 } }));
+  const edges = architecture.edges.map(e => ({ ...e, label:[e.on==='failure'?'Error / timeout':e.on==='always'?'Always':'',...(e.bindings||[]).map(b=>b.target_name)].filter(Boolean).join(' · ')||undefined, id: e.source + '->' + e.target, type: 'smoothstep', animated: agents.some(a => a.node_id === e.source && a.status === 'running'), style: { stroke:e.on==='failure'?'#a55942':e.on==='always'?'#9c8042':'#59756a',strokeDasharray:e.on==='failure'?'6 4':undefined, strokeWidth: 1.5 } }));
   return <ReactFlow key={architecture.id} nodes={displayNodes} onNodesChange={onNodesChange} edges={edges} nodeTypes={nodeTypes} fitView fitViewOptions={{ padding: .2 }} minZoom={.3} maxZoom={1.6} deleteKeyCode={null}
     nodesDraggable={editable} nodesConnectable={editable} elementsSelectable onNodeClick={(_, n) => onSelect?.(n.id)}
     onInit={setFlow} onDragOver={e=>{if(editable){e.preventDefault();e.dataTransfer.dropEffect='copy';}}} onDrop={e=>{if(!editable||!flow)return;e.preventDefault();const value=e.dataTransfer.getData('application/swarm-node');if(value){const p=flow.screenToFlowPosition({x:e.clientX,y:e.clientY});onDropNode?.(value,p.x,p.y);}}}

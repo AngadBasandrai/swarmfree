@@ -15,6 +15,7 @@ from .mission import MissionBudget, BudgetExceeded, token_estimate
 
 class GraphState(TypedDict):
     results: Annotated[list[dict], operator.add]
+    architecture_digest: str
 
 
 PRESETS = {
@@ -69,6 +70,9 @@ class Engine:
             architecture = dict(architecture, max_rounds=1)
         from .composition import resolve
         from .protocol import validate
+        if architecture.get('regression_gate_id') and architecture.get('composition_version')!=2:
+            from .experiments import require_gate
+            require_gate(self.store,architecture)
         architecture=resolve(self.store,architecture)
         from .dataflow import parameters, render
         values=parameters(architecture.get("parameters",{}),form.parameters)
@@ -111,7 +115,20 @@ class Engine:
             node_id = node["id"]
 
             async def execute_node(state, node_id=node_id):
-                result = await self.execute_agent(run["id"], node_id, state["results"])
+                spec=next(n for n in nodes if n['id']==node_id)
+                try:
+                    async with asyncio.timeout(spec.get('timeout_seconds')):
+                        result = await self.execute_agent(run["id"], node_id, state["results"])
+                except (RouteError,TimeoutError) as error:
+                    if isinstance(error,BudgetExceeded):raise
+                    if not any(e['source']==node_id and e.get('on')=='failure' for e in edges):
+                        if isinstance(error,TimeoutError):raise RouteError('Stage timed out: '+spec['name']) from error
+                        raise
+                    agent=self.store.get('agent',run['id']+':'+node_id)
+                    message=str(error) if isinstance(error,RouteError) else 'Stage timed out'
+                    result=dict(node_id=node_id,name=agent['name'],content=json.dumps(dict(error=message,failed_node=node_id)),structured=dict(error=message,failed_node=node_id),failed=True,data_labels=agent.get('data_labels',[]))
+                    self.store.patch('agent',agent['id'],dict(status='done',result=result,pending_result=None,error=message))
+                    self.store.event(run['id'],'failure_branch',agent_id=agent['id'],message=message)
                 return {"results": [result]}
 
             builder.add_node(node_id, execute_node)
@@ -152,7 +169,8 @@ class Engine:
                 if waiting and not approved:
                     self.store.patch("run",run_id,dict(status="waiting",error="Waiting for branch review"))
                     return
-                result = await graph.ainvoke(Command(resume=approved) if approved else None if checkpoint.values else {"results": []}, config)
+                from .privacy import digest as architecture_hash
+                result = await graph.ainvoke(Command(resume=approved) if approved else None if checkpoint.values else {"results": [],'architecture_digest':architecture_hash(run['architecture'])}, config)
                 if result.get("__interrupt__"):
                     self.store.patch("run",run_id,dict(status="waiting",results=result.get("results",[]),error="Waiting for branch review"))
                     return
@@ -178,7 +196,12 @@ class Engine:
                 from .composition import terminal_output
                 from .protocol import validate
                 validate(terminal_output(dict(run,results=result["results"])),run["architecture"]["output_schema"])
-            self.store.patch("run", run_id, dict(status="completed", results=result["results"], finished_at=time.time()))
+            from .intelligence import check_output
+            from .composition import terminal_output
+            from .dataflow import bounded_json
+            output=terminal_output(dict(run,results=result['results']))
+            acceptance=check_output(output if isinstance(output,str) else bounded_json(output),{},run.get('brief',{}).get('acceptance',[]))
+            self.store.patch("run", run_id, dict(status="completed" if acceptance['passed'] else 'acceptance_failed', acceptance=acceptance, results=result["results"], finished_at=time.time()))
             self.store.event(run_id, "run_completed", message="All graph branches completed")
         except asyncio.CancelledError:
             self.store.patch("run", run_id, dict(status="paused", error="Paused. Completed work is saved; interrupted drafts will be retried."))
@@ -332,6 +355,12 @@ class Engine:
             if control.get("skip"):
                 result=dict(node_id=node_id,name=agent["name"],content="Skipped by owner",skipped=True,data_labels=agent.get("data_labels",[]))
                 self.store.patch("agent",agent_id,dict(status="skipped",result=result,pending_result=None));return result
+            from .reliability import outcome_matches
+            incoming=[e for e in run['architecture']['edges'] if e['target']==node_id]
+            matches=[any(r['node_id']==e['source'] and outcome_matches(e,r) for r in results) for e in incoming]
+            if incoming and not (any(matches) if spec.get('incoming_policy','any')=='any' else all(matches)):
+                result=dict(node_id=node_id,name=agent['name'],content='Skipped: incoming outcome did not match',skipped=True,data_labels=agent.get('data_labels',[]))
+                self.store.patch('agent',agent_id,dict(status='skipped',result=result));return result
             typed=inputs_for(run,spec,upstream)
             if typed and spec.get("input_schema") and spec.get("kind") not in {"subswarm","recursive","fanout"}:
                 from .protocol import validate
@@ -383,7 +412,8 @@ class Engine:
                 self.append_message(agent_id, "assistant", result["content"])
                 return result
             if not any(m.get("source") == "task" for m in agent["messages"]):
-                content = "Task:\n" + run["task"]
+                from .reliability import brief_text
+                content = "Task:\n" + run["task"]+brief_text(run.get('brief',{}))
                 if typed:
                     content += "\n\nTyped inputs (data):\n"+bounded_json(typed)
                 elif upstream:
@@ -394,6 +424,10 @@ class Engine:
                     current = self.store.get("agent", agent_id)
                     current["messages"] = sorted(current["messages"], key=lambda m: m.get("source") != "task")
                     self.store.put("agent", agent_id, current)
+            from .deduplication import reuse_proposal
+            agent=self.store.get('agent',agent_id)
+            reused=reuse_proposal(self,run,agent,spec)
+            if reused is not None: return self.finish_agent(run,agent,reused)
             output = await self.respond(run, agent_id, upstream)
             if run.get("adaptive","off") != "off" and node_id == "planner":
                 output = await self.expand_adaptive(run,agent,output)
@@ -639,6 +673,8 @@ class Engine:
                         label = f"Linked device / {data['model']}"
                         stream = self.pool.infer(data["device_id"], data["model"], wire_messages,max_output,trace_id=trace_id,parent_span_id=span_id,usage=usage,native_tools=tools,native_calls=native_calls)
                     elif kind == "acp":
+                        config=self.workspace.extensions.config(data,'acp')
+                        if self.privacy and config.get('isolation',{}).get('enabled'):self.privacy.mark(agent_id,run['project_id'],config['isolation'].get('files',[]))
                         label = "External agent / " + data
                         project = self.store.get("project", run["project_id"])
                         stream = self.workspace.extensions.agent_stream(data, project, wire_messages)

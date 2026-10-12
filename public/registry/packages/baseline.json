@@ -4,7 +4,7 @@
   "payload": {
     "id": "baseline",
     "name": "Single-agent baseline",
-    "version": "0.7.0",
+    "version": "0.8.0",
     "kind": "architecture",
     "license": "MIT",
     "permissions": [],
@@ -33,6 +33,8 @@
           "detect_repetition": false,
           "request_budget": null,
           "token_budget": null,
+          "timeout_seconds": null,
+          "incoming_policy": "any",
           "preferred_route": {},
           "parameter_values": {},
           "inputs_from_mission": {},
@@ -54,7 +56,8 @@
       "input_schema": {},
       "output_schema": {},
       "parameters": {},
-      "output_ports": []
+      "output_ports": [],
+      "regression_gate_id": ""
     },
     "examples": [
       "Connect a provider, local model, or paired device before running this architecture"
@@ -64,5 +67,5 @@
       "note": "No live-provider quality ranking is claimed"
     }
   },
-  "signature": "jHyZ0zaF9ILWrrDZc8W8e1QrUH+i/lADo+/FrUNykf11IrBwpHHNKMUZV9tLYzgPlzxl/FrFw3j83pcVwCYdDw=="
+  "signature": "oPfacUPbMSvGEMNQ8iOF7Eb86aH0zXO/kgn+KnL3d6fSEOE/4AOccGSxpE21apakc4CXN55NpT+ir7y3vBL4CA=="
 }

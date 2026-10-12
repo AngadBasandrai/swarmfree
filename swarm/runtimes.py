@@ -88,6 +88,11 @@ class Runtimes:
         await self.release_others(id)
         info=inspect_gguf(row["path"])
         server=Path(row["server_path"])
+        if row.get('managed_install_id'):
+            from .runtime_install import RuntimeInstaller
+            installed=self.store.get('runtime_install',row['managed_install_id'])
+            if not installed or installed.get('status')!='installed':raise RouteError('Pinned runtime installation is unavailable')
+            await asyncio.to_thread(RuntimeInstaller(self.store,self.root,self).verify,installed)
         if info["modified_ns"]!=row["modified_ns"] or info["identity"]!=row["identity"] or server.stat().st_mtime_ns!=row["server_modified_ns"] or server.stat().st_size!=row["server_size"]:
             raise RouteError("Model or runtime executable changed; import and review it again")
         budgets=self.store.get("settings","budgets")

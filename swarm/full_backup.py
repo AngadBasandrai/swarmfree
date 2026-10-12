@@ -38,6 +38,7 @@ def eligible_files(root):
     for directory,dirs,files in os.walk(root,followlinks=False):
         dirs[:]=[d for d in dirs if d.casefold() not in BLOCKED and not d.casefold().startswith(".env") and not (Path(directory)/d).is_symlink()]
         for name in files:
+            if (Path(directory)/name).is_symlink():continue
             inspected+=1
             if inspected>10000: raise RouteError("Project file scan exceeds the backup limit")
             relative=(Path(directory)/name).relative_to(root).as_posix()

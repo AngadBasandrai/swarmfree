@@ -51,6 +51,8 @@ class Workshop:
     def save(self,data,actor='owner'):
         value=Architecture.model_validate(data).model_dump()
         resolve(self.store,value)
+        from .experiments import require_gate
+        require_gate(self.store,value)
         with self.store.transaction():
             old=self.store.get('architecture',value['id'])
             if old and old.get('builtin'): raise RouteError("Save a custom copy of a built-in architecture")

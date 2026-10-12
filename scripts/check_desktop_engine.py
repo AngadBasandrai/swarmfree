@@ -86,7 +86,7 @@ def main():
                 raise AssertionError('Frozen engine accepted the removed execution mode')
             except HTTPError as error:
                 assert error.code==422
-            assert request(ready, "/api/health")["version"] == "0.7.0"
+            assert request(ready, "/api/health")["version"] == "0.8.0"
             assert snapshot["hardware"]["ram_total_gb"] > 0
             assert snapshot["architectures"]
             features = request(ready,"/api/features")

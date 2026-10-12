@@ -1,5 +1,7 @@
 # Build and release status
 
+The 0.8.0 implementation candidate adds all twelve mission-quality and managed-system capabilities described in [QUALITY_AND_SYSTEMS.md](QUALITY_AND_SYSTEMS.md). Local checks have passed 225 Python tests (one Windows symlink-permission test skipped), the existing 40 headless UI flows plus the new graph-diagnostics flow, and three native request-boundary checks. Cross-platform package and disposable Docker acceptance are being verified before the public channel advances. The verified 0.7.0 release below remains the current published baseline until that evidence is recorded.
+
 12 October 2026 · version 0.7.0 · MIT
 
 [Swarm Workbench 0.7.0 is published](https://github.com/AngadBasandrai/swarmfree/releases/tag/v0.7.0) for Windows x64, macOS Apple silicon/Intel, and Linux x64. Its immutable source is `150c11ca0efd7b688330ab99407e4db8740d472a`.

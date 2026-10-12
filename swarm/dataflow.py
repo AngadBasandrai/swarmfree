@@ -40,6 +40,9 @@ def inputs_for(run,spec,upstream):
     values={name:select(run.get('inputs',{}),path) for name,path in spec.get('inputs_from_mission',{}).items()}
     for edge in run['architecture']['edges']:
         if edge['target']!=spec['id']: continue
+        from .reliability import outcome_matches
+        source=next((r for r in upstream if r['node_id']==edge['source']),None)
+        if source is not None and not outcome_matches(edge,source): continue
         for binding in edge.get('bindings',[]):
             source=next((r for r in upstream if r['node_id']==edge['source']),None)
             if source is None: raise RouteError("A required typed input has no upstream result")

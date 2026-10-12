@@ -19,7 +19,7 @@ def token_hash(token): return hashlib.sha256(token.encode()).hexdigest()
 
 class MemberInput(BaseModel):
     name:str=Field(min_length=1,max_length=80)
-    role:Literal["viewer","operator","reviewer","architect"]="viewer"
+    role:Literal["viewer","operator","reviewer","architect","sync"]="viewer"
     project_ids:list[str]=Field(min_length=1,max_length=40)
     days:int=Field(default=30,ge=1,le=365)
 

@@ -73,12 +73,15 @@ class Extensions:
         if config.get("apps_enabled"):
             initialization["capabilities"] = {"extensions": {"io.modelcontextprotocol/ui": {"mimeTypes": ["text/html;profile=mcp-app"]}}}
         if config["transport"] == "stdio":
-            async with StdioRPC(config["argv"], project["root"]) as rpc:
+            from .extension_isolation import rpc_for
+            async with rpc_for(config,project,self.vault) as rpc:
                 result = await rpc.send("initialize", initialization)
                 if result.get("protocolVersion") not in {"2025-11-25", "2025-06-18", "2024-11-05"}:
                     raise RouteError("MCP server requires an unsupported protocol revision")
                 await rpc.send("notifications/initialized", notify=True)
-                return await rpc.send(method, params)
+                result=await rpc.send(method, params)
+                if method=='tools/call' and config.get('isolation',{}).get('enabled'):result['_source_paths']=rpc.source_paths
+                return result
         validate_base_url(config["url"])
         headers = {"Accept": "application/json, text/event-stream"}
         key = self.vault.get("extension_" + config["id"])
@@ -131,11 +134,12 @@ class Extensions:
 
     async def agent_stream(self, id, project, messages):
         config = self.config(id, "acp")
-        async with StdioRPC(config["argv"], project["root"]) as rpc:
+        from .extension_isolation import rpc_for
+        async with rpc_for(config,project,self.vault) as rpc:
             initialized = await rpc.send("initialize", dict(protocolVersion=1, clientCapabilities={}, clientInfo=dict(name="Swarm Workbench", version="0.2.0")))
             if initialized.get("protocolVersion") != 1:
                 raise RouteError("ACP agent requires an unsupported protocol revision")
-            session = await rpc.send("session/new", dict(cwd=project["root"], mcpServers=[]))
+            session = await rpc.send("session/new", dict(cwd='/workspace' if config.get('isolation',{}).get('enabled') else project["root"], mcpServers=[]))
             chunks = asyncio.Queue()
             def receive(notification):
                 update = notification.get("params", {}).get("update", {})

@@ -65,10 +65,25 @@ def main():
     if uploads: run('gh','release','upload',tag,*[str(p) for p in uploads],'--repo','AngadBasandrai/swarmfree','--clobber')
     run('gh','release','edit',tag,'--repo','AngadBasandrai/swarmfree','--draft=false','--latest','--title','Swarm Workbench '+version+' alpha','--notes-file',str(body))
     saved=ROOT/'build/channel-stable.json';shutil.copy2(destination/'stable.json',saved)
+    # Preserve the registry from the verified tag before switching to an older
+    # channel branch. Its package bytes must match its signed index.
+    registry=ROOT/'build/channel-registry'
+    from swarm.registry import verify as verify_registry
+    from swarm.registry_defaults import PUBLISHER_KEYS
+    source=ROOT/'public/registry'
+    index=verify_registry(json.loads((source/'index.json').read_text()),PUBLISHER_KEYS)
+    for item in index['packages']:
+        path=(source/item['path']).resolve()
+        if not path.is_relative_to(source.resolve()) or not path.is_file():raise SystemExit('Registry package escapes the source directory or is missing')
+        if hashlib.sha256(path.read_bytes()).hexdigest()!=item['sha256']:raise SystemExit('Registry package differs from the signed index')
+        package=verify_registry(json.loads(path.read_text()),PUBLISHER_KEYS)
+        if package['version']!=version or item['version']!=version:raise SystemExit('Registry package version differs from the verified release tag')
+    shutil.copytree(source,registry,dirs_exist_ok=True)
     run('git','fetch','origin')
     exists=subprocess.run(['git','show-ref','--verify','--quiet','refs/remotes/origin/release-channel'],cwd=ROOT).returncode==0
     run('git','checkout','-B','release-channel','origin/release-channel' if exists else 'origin/main')
     target=ROOT/'public/updates';target.mkdir(parents=True,exist_ok=True);shutil.copy2(saved,target/'stable.json')
+    shutil.copytree(registry,ROOT/'public/registry',dirs_exist_ok=True)
     run(sys.executable,str(ROOT/'scripts/sign_registry_ci.py'))
     run('git','config','user.name','github-actions[bot]');run('git','config','user.email','41898282+github-actions[bot]@users.noreply.github.com')
     run('git','add','public');run('git','commit','-m','Publish verified '+tag+' update channel');run('git','push','origin','HEAD:release-channel')

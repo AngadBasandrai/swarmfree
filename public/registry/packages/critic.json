@@ -4,7 +4,7 @@
   "payload": {
     "id": "critic",
     "name": "Creator / critic",
-    "version": "0.7.0",
+    "version": "0.8.0",
     "kind": "architecture",
     "license": "MIT",
     "permissions": [],
@@ -33,6 +33,8 @@
           "detect_repetition": false,
           "request_budget": null,
           "token_budget": null,
+          "timeout_seconds": null,
+          "incoming_policy": "any",
           "preferred_route": {},
           "parameter_values": {},
           "inputs_from_mission": {},
@@ -63,6 +65,8 @@
           "detect_repetition": false,
           "request_budget": null,
           "token_budget": null,
+          "timeout_seconds": null,
+          "incoming_policy": "any",
           "preferred_route": {},
           "parameter_values": {},
           "inputs_from_mission": {},
@@ -93,6 +97,8 @@
           "detect_repetition": false,
           "request_budget": null,
           "token_budget": null,
+          "timeout_seconds": null,
+          "incoming_policy": "any",
           "preferred_route": {},
           "parameter_values": {},
           "inputs_from_mission": {},
@@ -109,16 +115,19 @@
         {
           "source": "creator",
           "target": "critic",
+          "on": "success",
           "bindings": []
         },
         {
           "source": "creator",
           "target": "reviser",
+          "on": "success",
           "bindings": []
         },
         {
           "source": "critic",
           "target": "reviser",
+          "on": "success",
           "bindings": []
         }
       ],
@@ -130,7 +139,8 @@
       "input_schema": {},
       "output_schema": {},
       "parameters": {},
-      "output_ports": []
+      "output_ports": [],
+      "regression_gate_id": ""
     },
     "examples": [
       "Connect a provider, local model, or paired device before running this architecture"
@@ -140,5 +150,5 @@
       "note": "No live-provider quality ranking is claimed"
     }
   },
-  "signature": "fhNRzgGPsPxNiJWDUZBFtz2mugGejSy+qH6K3OQ7DPYV7dvxYzyXsfIF3Wht6TTgMxcDP8rh/c4IoQHUl0QHAg=="
+  "signature": "p4wvdxqCp4WKdKfaSwMqG2JOlIkOH13Pycd3mc6DJDYeBctyyZLZQRlPCsgKeWf5a+eWo/hywXGIU/Jn0NJMCQ=="
 }

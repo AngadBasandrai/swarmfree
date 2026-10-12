@@ -4,7 +4,7 @@
   "payload": {
     "id": "hierarchy",
     "name": "Hierarchical team",
-    "version": "0.7.0",
+    "version": "0.8.0",
     "kind": "architecture",
     "license": "MIT",
     "permissions": [],
@@ -33,6 +33,8 @@
           "detect_repetition": false,
           "request_budget": null,
           "token_budget": null,
+          "timeout_seconds": null,
+          "incoming_policy": "any",
           "preferred_route": {},
           "parameter_values": {},
           "inputs_from_mission": {},
@@ -63,6 +65,8 @@
           "detect_repetition": false,
           "request_budget": null,
           "token_budget": null,
+          "timeout_seconds": null,
+          "incoming_policy": "any",
           "preferred_route": {},
           "parameter_values": {},
           "inputs_from_mission": {},
@@ -79,6 +83,7 @@
         {
           "source": "lead",
           "target": "reviewer",
+          "on": "success",
           "bindings": []
         }
       ],
@@ -90,7 +95,8 @@
       "input_schema": {},
       "output_schema": {},
       "parameters": {},
-      "output_ports": []
+      "output_ports": [],
+      "regression_gate_id": ""
     },
     "examples": [
       "Connect a provider, local model, or paired device before running this architecture"
@@ -100,5 +106,5 @@
       "note": "No live-provider quality ranking is claimed"
     }
   },
-  "signature": "AXO4u8tHXHfLzm0ReK63HY9Y2QNV54lpCtQxPafN3FatG48iXAr6Q6RZLEzVR0d6tw7eNYNTrFO7MNX8Gh+1Dg=="
+  "signature": "9lBFmmwy59giMERBGgve/Ouv721Qul7gPSztZXjieBnXETssgY4hNJqhUDTyFP+Lo2gQ4vB8WrVzJ3rTrPtIDw=="
 }

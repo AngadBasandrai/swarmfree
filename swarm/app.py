@@ -84,6 +84,7 @@ class WorkerResult(BaseModel):
     usage: dict = Field(default_factory=dict)
     native_calls: list[dict] = Field(default_factory=list,max_length=8)
     execution_result: dict | None = None
+    cluster_result: dict | None = None
 
 
 class Heartbeat(BaseModel):
@@ -91,6 +92,7 @@ class Heartbeat(BaseModel):
     models: list[dict] = Field(default_factory=list, max_length=100)
     budgets: BudgetInput
     execution: dict = Field(default_factory=dict)
+    cluster: dict = Field(default_factory=dict)
 
 
 def create_app(data_dir=None, token=None, vault=None, *, desktop=False):
@@ -106,9 +108,9 @@ def create_app(data_dir=None, token=None, vault=None, *, desktop=False):
         if (root/".restore-in-progress").exists(): raise ValueError("Recovery was interrupted; restore a fresh verified directory before starting this workspace")
         store = Store(root / "workbench.sqlite")
         app.state.store = store
-        for kind in ("tuning_job", "conversion_job", "download", "evaluation_job", "index_job", "browser_job", "remote_job","setup_download","fault_job","a2a_stream","notebook_job","training_job","compatibility_job"):
+        for kind in ("tuning_job", "conversion_job", "download", "evaluation_job", "index_job", "browser_job", "remote_job","setup_download","fault_job","a2a_stream","notebook_job","training_job","compatibility_job","experiment","runtime_install","private_cluster","cluster_preview"):
             for job in store.all(kind):
-                if job.get("status") in {"running", "starting"}:
+                if job.get("status") in {"running", "starting"} or (kind in {'experiment','runtime_install','private_cluster','cluster_preview'} and job.get('status') in {'ready','downloading'}):
                     store.patch(kind, job["id"], dict(status="interrupted"))
         for template in TEMPLATES:
             existing = store.get("architecture", template["id"])
@@ -203,7 +205,7 @@ def create_app(data_dir=None, token=None, vault=None, *, desktop=False):
             async with locked_lifespan(app):
                 yield
 
-    app = FastAPI(title="Swarm Workbench", version="0.7.0", lifespan=lifespan)
+    app = FastAPI(title="Swarm Workbench", version="0.8.0", lifespan=lifespan)
     app.state.owner_token = owner_token
     app.state.backup_active = False
     hosts = ["127.0.0.1", "localhost", "[::1]", "testserver"]
@@ -238,7 +240,7 @@ def create_app(data_dir=None, token=None, vault=None, *, desktop=False):
 
     @app.get("/api/health")
     async def health():
-        return dict(status="ok", version="0.7.0")
+        return dict(status="ok", version="0.8.0")
 
     @app.post("/api/session")
     async def session(form: SessionInput, request: Request):
@@ -520,6 +522,8 @@ def create_app(data_dir=None, token=None, vault=None, *, desktop=False):
     install_execution_control(app)
     install_workbench(app)
     install_operations(app)
+    from .quality_api import install as install_quality
+    install_quality(app,root)
 
     # The desktop window embeds its UI. Its private engine exposes only authenticated APIs.
     if desktop:

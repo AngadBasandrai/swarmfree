@@ -21,6 +21,8 @@ class AgentSpec(BaseModel):
     detect_repetition: bool = False
     request_budget: int | None = Field(default=None, ge=0, le=10000)
     token_budget: int | None = Field(default=None, ge=0, le=10000000)
+    timeout_seconds: int | None = Field(default=None, ge=1, le=3600)
+    incoming_policy: Literal['all','any'] = 'any'
     preferred_route: dict = Field(default_factory=dict)
     parameter_values: dict = Field(default_factory=dict)
     inputs_from_mission: dict[str, str] = Field(default_factory=dict)
@@ -67,6 +69,7 @@ class FieldBinding(BaseModel):
 class Edge(BaseModel):
     source: str
     target: str
+    on: Literal['success','failure','always'] = 'success'
     bindings: list[FieldBinding] = Field(default_factory=list, max_length=24)
 
 
@@ -104,6 +107,7 @@ class Architecture(BaseModel):
     output_schema: dict = Field(default_factory=dict)
     parameters: dict = Field(default_factory=dict)
     output_ports: list[OutputPort] = Field(default_factory=list, max_length=16)
+    regression_gate_id: str = Field(default='', max_length=80)
 
     @model_validator(mode="after")
     def validate_graph(self):
@@ -204,6 +208,20 @@ class MissionLimits(BaseModel):
     max_spend_usd: float | None = Field(default=0, ge=0, le=10000, allow_inf_nan=False)
 
 
+class MissionBrief(BaseModel):
+    objective: str = Field(default='', max_length=4000)
+    deliverables: list[str] = Field(default_factory=list, max_length=12)
+    constraints: list[str] = Field(default_factory=list, max_length=16)
+    prohibited_actions: list[str] = Field(default_factory=list, max_length=16)
+    acceptance: list[dict] = Field(default_factory=list, max_length=10)
+
+    @model_validator(mode='after')
+    def valid_brief(self):
+        if any(not isinstance(s,str) or not s.strip() or len(s)>1000 for s in [*self.deliverables,*self.constraints,*self.prohibited_actions]): raise ValueError('Brief entries need 1–1,000 characters')
+        AgentSpec(id='brief',name='Brief',role='Check',validators=self.acceptance)
+        return self
+
+
 class RunInput(BaseModel):
     task: str = Field(min_length=1, max_length=24000)
     architecture_id: str
@@ -231,6 +249,8 @@ class RunInput(BaseModel):
     model_revision: str = Field(default="",max_length=200)
     inputs: dict = Field(default_factory=dict)
     parameters: dict = Field(default_factory=dict)
+    brief: MissionBrief = Field(default_factory=MissionBrief)
+    deduplicate_tasks: bool = False
 
     @model_validator(mode="after")
     def bounded_inputs(self):
@@ -258,3 +278,4 @@ class JoinInput(BaseModel):
     models: list[dict] = Field(default_factory=list, max_length=100)
     budgets: BudgetInput
     execution: dict = Field(default_factory=dict)
+    cluster: dict = Field(default_factory=dict)
