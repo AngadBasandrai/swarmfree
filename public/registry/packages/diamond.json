@@ -1,0 +1,132 @@
+{
+  "format": "swarm-json-v1",
+  "key_id": "swarmfree",
+  "payload": {
+    "id": "diamond",
+    "name": "Diamond comparison",
+    "version": "0.6.5",
+    "kind": "architecture",
+    "license": "MIT",
+    "permissions": [],
+    "architecture": {
+      "id": "diamond",
+      "name": "Diamond comparison",
+      "description": "Plan once, build two alternative solutions, compare, and deliver the best approach.",
+      "category": "decision",
+      "nodes": [
+        {
+          "id": "plan",
+          "name": "Planner",
+          "role": "Define the comparison criteria",
+          "instructions": "Define requirements and two distinct approaches worth comparing.",
+          "tools": null,
+          "requires": [],
+          "kind": "agent",
+          "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 0.0,
+          "y": 100.0
+        },
+        {
+          "id": "simple",
+          "name": "Simple approach",
+          "role": "Develop the simplest viable solution",
+          "instructions": "Develop a simple solution against the supplied requirements.",
+          "tools": null,
+          "requires": [],
+          "kind": "agent",
+          "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 280.0,
+          "y": 0.0
+        },
+        {
+          "id": "robust",
+          "name": "Robust approach",
+          "role": "Develop a resilient alternative",
+          "instructions": "Develop a resilient alternative against the supplied requirements.",
+          "tools": null,
+          "requires": [],
+          "kind": "agent",
+          "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 280.0,
+          "y": 220.0
+        },
+        {
+          "id": "compare",
+          "name": "Comparator",
+          "role": "Compare concrete outcomes",
+          "instructions": "Compare both solutions against the original criteria and produce the final deliverable.",
+          "tools": null,
+          "requires": [],
+          "kind": "agent",
+          "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 560.0,
+          "y": 100.0
+        }
+      ],
+      "edges": [
+        {
+          "source": "plan",
+          "target": "simple"
+        },
+        {
+          "source": "plan",
+          "target": "robust"
+        },
+        {
+          "source": "simple",
+          "target": "compare"
+        },
+        {
+          "source": "robust",
+          "target": "compare"
+        }
+      ],
+      "builtin": true,
+      "max_rounds": 1,
+      "stop_when_contains": "",
+      "channels": [],
+      "input_schema": {},
+      "output_schema": {}
+    },
+    "examples": [
+      "Connect a provider, local model, or paired device before running this architecture"
+    ],
+    "evaluation": {
+      "status": "deterministic provider-fixture validation",
+      "note": "No live-provider quality ranking is claimed"
+    }
+  },
+  "signature": "7yPV7UJcangqIdnRy9FbAVSzmLWxpXFDpIQfdUXF1SB4nkHnyy0VqKP3KANNq1oz2+TUeBxbopN7iUzUBsMwAQ=="
+}

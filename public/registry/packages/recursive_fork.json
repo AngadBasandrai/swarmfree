@@ -1,0 +1,152 @@
+{
+  "format": "swarm-json-v1",
+  "key_id": "swarmfree",
+  "payload": {
+    "id": "recursive_fork",
+    "name": "Recursive fork / join",
+    "version": "0.6.5",
+    "kind": "architecture",
+    "license": "MIT",
+    "permissions": [],
+    "architecture": {
+      "id": "recursive_fork",
+      "name": "Recursive fork / join",
+      "description": "Two scoped branches call this team and join. One nested level by default keeps the tree small.",
+      "category": "recursive",
+      "nodes": [
+        {
+          "id": "left_task",
+          "name": "First task planner",
+          "role": "Scope the first branch",
+          "instructions": "Choose the first distinct part of this task that can be solved independently. Output only its task; prefix BASE_CASE when directly solvable.",
+          "tools": null,
+          "requires": [],
+          "kind": "agent",
+          "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 0.0,
+          "y": 0.0
+        },
+        {
+          "id": "right_task",
+          "name": "Second task planner",
+          "role": "Scope the second branch",
+          "instructions": "Choose a second distinct independent part of this task. Output only its task; prefix BASE_CASE when directly solvable.",
+          "tools": null,
+          "requires": [],
+          "kind": "agent",
+          "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 0.0,
+          "y": 240.0
+        },
+        {
+          "id": "left",
+          "name": "First recursive branch",
+          "role": "Solve the first branch",
+          "instructions": "At the base case solve this branch directly, with granted tools and evidence. Do not delegate again.",
+          "tools": null,
+          "requires": [],
+          "kind": "recursive",
+          "subswarm_id": "self",
+          "max_depth": 1,
+          "task_source": "left_task",
+          "recursion_stop_contains": "BASE_CASE",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 280.0,
+          "y": 0.0
+        },
+        {
+          "id": "right",
+          "name": "Second recursive branch",
+          "role": "Solve the second branch",
+          "instructions": "At the base case solve this branch directly, with granted tools and evidence. Do not delegate again.",
+          "tools": null,
+          "requires": [],
+          "kind": "recursive",
+          "subswarm_id": "self",
+          "max_depth": 1,
+          "task_source": "right_task",
+          "recursion_stop_contains": "BASE_CASE",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 280.0,
+          "y": 240.0
+        },
+        {
+          "id": "join",
+          "name": "Joiner",
+          "role": "Combine the branch results",
+          "instructions": "Combine both actual branch results into the requested deliverable. Identify gaps and conflicts.",
+          "tools": null,
+          "requires": [],
+          "kind": "agent",
+          "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 560.0,
+          "y": 120.0
+        }
+      ],
+      "edges": [
+        {
+          "source": "left_task",
+          "target": "left"
+        },
+        {
+          "source": "right_task",
+          "target": "right"
+        },
+        {
+          "source": "left",
+          "target": "join"
+        },
+        {
+          "source": "right",
+          "target": "join"
+        }
+      ],
+      "builtin": true,
+      "max_rounds": 1,
+      "stop_when_contains": "",
+      "channels": [],
+      "input_schema": {},
+      "output_schema": {}
+    },
+    "examples": [
+      "Connect a provider, local model, or paired device before running this architecture"
+    ],
+    "evaluation": {
+      "status": "deterministic provider-fixture validation",
+      "note": "No live-provider quality ranking is claimed"
+    }
+  },
+  "signature": "fqfgPf2rmhfTH3vhNHl4WIACRpEbAyxe7lpS8BLfrpZXmpXir+7Xhu2pZyqfiLjngY5bz7ZkrYCczVfiNvpMAg=="
+}

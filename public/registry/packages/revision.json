@@ -4,7 +4,7 @@
   "payload": {
     "id": "revision",
     "name": "Bounded revision",
-    "version": "0.6.4",
+    "version": "0.6.5",
     "kind": "architecture",
     "license": "MIT",
     "permissions": [],
@@ -12,6 +12,7 @@
       "id": "revision",
       "name": "Bounded revision",
       "description": "Draft, critique and revise for at most three checkpointed rounds.",
+      "category": "general",
       "nodes": [
         {
           "id": "creator",
@@ -22,6 +23,9 @@
           "requires": [],
           "kind": "agent",
           "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
           "input_schema": {},
           "message_budget": 8,
           "run_if": {},
@@ -39,6 +43,9 @@
           "requires": [],
           "kind": "agent",
           "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
           "input_schema": {},
           "message_budget": 8,
           "run_if": {},
@@ -56,6 +63,9 @@
           "requires": [],
           "kind": "agent",
           "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
           "input_schema": {},
           "message_budget": 8,
           "run_if": {},
@@ -94,5 +104,5 @@
       "note": "No live-provider quality ranking is claimed"
     }
   },
-  "signature": "OqVBu+v87EdadlBF+emHlB5bIXIi5TdN5vNIMybD4ursH+AJLqU5bUvutCoJSMt6E5LHO9yd978tuI1h1ndTBQ=="
+  "signature": "RMQ6U3jAYAw7UWZpHp9HA+mC3kDzTQ8EiIoH0U1iJvN3x+2JYknddtOpF6lDVK197xrJKHbeMgDjg4xG9/EMBQ=="
 }

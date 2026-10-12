@@ -4,7 +4,7 @@
   "payload": {
     "id": "critic",
     "name": "Creator / critic",
-    "version": "0.6.4",
+    "version": "0.6.5",
     "kind": "architecture",
     "license": "MIT",
     "permissions": [],
@@ -12,6 +12,7 @@
       "id": "critic",
       "name": "Creator / critic",
       "description": "Draft, critique, then revise with the critique in context.",
+      "category": "general",
       "nodes": [
         {
           "id": "creator",
@@ -22,6 +23,9 @@
           "requires": [],
           "kind": "agent",
           "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
           "input_schema": {},
           "message_budget": 8,
           "run_if": {},
@@ -39,6 +43,9 @@
           "requires": [],
           "kind": "agent",
           "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
           "input_schema": {},
           "message_budget": 8,
           "run_if": {},
@@ -56,6 +63,9 @@
           "requires": [],
           "kind": "agent",
           "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
           "input_schema": {},
           "message_budget": 8,
           "run_if": {},
@@ -94,5 +104,5 @@
       "note": "No live-provider quality ranking is claimed"
     }
   },
-  "signature": "vyCjWyUvYI05LcPFlWq4tUL45iDNt3BCXvgh2mJJ4fkVqkEzAzYQKaE8Zk/r5E4BKnhQ1iwAMFjzfYyZpOUkBQ=="
+  "signature": "GRR9CslcOIQ2rE6SJsLtGXUVfqAVAkIlTqZSHhTSv9yrtAbrxvyaDSUjwD0mMU9YHE0T+ZBKX4C0Q40kc5f5Cg=="
 }

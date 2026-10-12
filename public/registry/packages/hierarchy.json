@@ -4,7 +4,7 @@
   "payload": {
     "id": "hierarchy",
     "name": "Hierarchical team",
-    "version": "0.6.4",
+    "version": "0.6.5",
     "kind": "architecture",
     "license": "MIT",
     "permissions": [],
@@ -12,6 +12,7 @@
       "id": "hierarchy",
       "name": "Hierarchical team",
       "description": "A lead can create capped specialist subtasks through agent.delegate.",
+      "category": "general",
       "nodes": [
         {
           "id": "lead",
@@ -22,6 +23,9 @@
           "requires": [],
           "kind": "agent",
           "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
           "input_schema": {},
           "message_budget": 8,
           "run_if": {},
@@ -39,6 +43,9 @@
           "requires": [],
           "kind": "agent",
           "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
           "input_schema": {},
           "message_budget": 8,
           "run_if": {},
@@ -69,5 +76,5 @@
       "note": "No live-provider quality ranking is claimed"
     }
   },
-  "signature": "VYut+j/THEziySXEoeeHRXFoRthxGJhLn5U5cY9xjE0aJYwPFiApTfKTFVbOVcfxRi3HQ1zmQsYtwzDBspsuAw=="
+  "signature": "EGJu3x724PO2f/pmvI/36e2ISOTDbcl+Kv9U1reMW0NPPsmmfkbFCNbZKGbIOTZxg/qM4i3JXV7Mm1KLeVyPDA=="
 }

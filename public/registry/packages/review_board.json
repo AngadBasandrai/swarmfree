@@ -1,0 +1,160 @@
+{
+  "format": "swarm-json-v1",
+  "key_id": "swarmfree",
+  "payload": {
+    "id": "review_board",
+    "name": "Specialist review board",
+    "version": "0.6.5",
+    "kind": "architecture",
+    "license": "MIT",
+    "permissions": [],
+    "architecture": {
+      "id": "review_board",
+      "name": "Specialist review board",
+      "description": "A draft receives parallel quality, feasibility and safety reviews before revision.",
+      "category": "decision",
+      "nodes": [
+        {
+          "id": "draft",
+          "name": "Drafter",
+          "role": "Create the deliverable",
+          "instructions": "Produce a substantive first version.",
+          "tools": null,
+          "requires": [],
+          "kind": "agent",
+          "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 0.0,
+          "y": 180.0
+        },
+        {
+          "id": "quality",
+          "name": "Quality reviewer",
+          "role": "Check accuracy and completeness",
+          "instructions": "Find concrete errors and missing requirements in the draft.",
+          "tools": null,
+          "requires": [],
+          "kind": "agent",
+          "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 280.0,
+          "y": 0.0
+        },
+        {
+          "id": "feasibility",
+          "name": "Feasibility reviewer",
+          "role": "Check practical feasibility",
+          "instructions": "Assess implementation effort, resources and operational constraints.",
+          "tools": null,
+          "requires": [],
+          "kind": "agent",
+          "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 280.0,
+          "y": 180.0
+        },
+        {
+          "id": "safety",
+          "name": "Risk reviewer",
+          "role": "Check harmful failure modes",
+          "instructions": "Assess realistic privacy, security and user-impact risks relevant to this task.",
+          "tools": null,
+          "requires": [],
+          "kind": "agent",
+          "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 280.0,
+          "y": 360.0
+        },
+        {
+          "id": "revise",
+          "name": "Editor",
+          "role": "Integrate the reviews",
+          "instructions": "Revise the draft using all supplied reviews and explain unresolved conflicts.",
+          "tools": null,
+          "requires": [],
+          "kind": "agent",
+          "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 560.0,
+          "y": 180.0
+        }
+      ],
+      "edges": [
+        {
+          "source": "draft",
+          "target": "quality"
+        },
+        {
+          "source": "draft",
+          "target": "feasibility"
+        },
+        {
+          "source": "draft",
+          "target": "safety"
+        },
+        {
+          "source": "quality",
+          "target": "revise"
+        },
+        {
+          "source": "feasibility",
+          "target": "revise"
+        },
+        {
+          "source": "safety",
+          "target": "revise"
+        }
+      ],
+      "builtin": true,
+      "max_rounds": 1,
+      "stop_when_contains": "",
+      "channels": [],
+      "input_schema": {},
+      "output_schema": {}
+    },
+    "examples": [
+      "Connect a provider, local model, or paired device before running this architecture"
+    ],
+    "evaluation": {
+      "status": "deterministic provider-fixture validation",
+      "note": "No live-provider quality ranking is claimed"
+    }
+  },
+  "signature": "RkPs8ijcc7IwCFH0ZhLRkcDYy6cPZCHeehh3zCqnggp0DFlAiQv9tfhD4MyZst1wVCG3orIlxyAox5shHbVmBA=="
+}

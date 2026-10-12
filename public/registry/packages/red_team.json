@@ -1,0 +1,128 @@
+{
+  "format": "swarm-json-v1",
+  "key_id": "swarmfree",
+  "payload": {
+    "id": "red_team",
+    "name": "Red team / blue team",
+    "version": "0.6.5",
+    "kind": "architecture",
+    "license": "MIT",
+    "permissions": [],
+    "architecture": {
+      "id": "red_team",
+      "name": "Red team / blue team",
+      "description": "Develop a solution, challenge its failure modes, then harden and review it.",
+      "category": "decision",
+      "nodes": [
+        {
+          "id": "blue",
+          "name": "Builder",
+          "role": "Develop a defensible solution",
+          "instructions": "Produce a concrete solution with explicit assumptions and boundaries.",
+          "tools": null,
+          "requires": [],
+          "kind": "agent",
+          "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 0.0,
+          "y": 100.0
+        },
+        {
+          "id": "red",
+          "name": "Red team",
+          "role": "Stress-test the design",
+          "instructions": "Challenge the supplied design with realistic failure cases and evidence.",
+          "tools": null,
+          "requires": [],
+          "kind": "agent",
+          "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 280.0,
+          "y": 100.0
+        },
+        {
+          "id": "harden",
+          "name": "Hardener",
+          "role": "Address the identified failures",
+          "instructions": "Revise the design to address the supplied failures, preserving useful tradeoffs.",
+          "tools": null,
+          "requires": [],
+          "kind": "agent",
+          "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 560.0,
+          "y": 100.0
+        },
+        {
+          "id": "review",
+          "name": "Final reviewer",
+          "role": "Assess residual risk",
+          "instructions": "Review the revised solution and state residual risks and validation steps.",
+          "tools": null,
+          "requires": [],
+          "kind": "agent",
+          "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 840.0,
+          "y": 100.0
+        }
+      ],
+      "edges": [
+        {
+          "source": "blue",
+          "target": "red"
+        },
+        {
+          "source": "red",
+          "target": "harden"
+        },
+        {
+          "source": "harden",
+          "target": "review"
+        }
+      ],
+      "builtin": true,
+      "max_rounds": 1,
+      "stop_when_contains": "",
+      "channels": [],
+      "input_schema": {},
+      "output_schema": {}
+    },
+    "examples": [
+      "Connect a provider, local model, or paired device before running this architecture"
+    ],
+    "evaluation": {
+      "status": "deterministic provider-fixture validation",
+      "note": "No live-provider quality ranking is claimed"
+    }
+  },
+  "signature": "78ti3UYJ+xIZlpAg0ZiINQ4BxDouW16JlovBSYse3h5lmfvXqFETyKhHScZuBtUOblgB76IhennQRqFUlvLWCw=="
+}

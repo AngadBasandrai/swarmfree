@@ -4,7 +4,7 @@
   "payload": {
     "id": "baseline",
     "name": "Single-agent baseline",
-    "version": "0.6.4",
+    "version": "0.6.5",
     "kind": "architecture",
     "license": "MIT",
     "permissions": [],
@@ -12,6 +12,7 @@
       "id": "baseline",
       "name": "Single-agent baseline",
       "description": "One agent for comparison with a swarm.",
+      "category": "general",
       "nodes": [
         {
           "id": "worker",
@@ -22,6 +23,9 @@
           "requires": [],
           "kind": "agent",
           "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
           "input_schema": {},
           "message_budget": 8,
           "run_if": {},
@@ -47,5 +51,5 @@
       "note": "No live-provider quality ranking is claimed"
     }
   },
-  "signature": "aTmfFLjuDXtCAIGsd32rwNyLWyDyl3k55DjLm1CbwnsmHZLWPwy03ZewNCA8Lzdfn3spIGFL0uWbOECWVB0HBw=="
+  "signature": "wDZbnfdUmAWYZXO0uPsJ4dPw1gpre4LkSN6GehEZGhUYovYCyWh3ur9B7/o3Uo88OhG6upz9Mup5l88/aRY6DA=="
 }

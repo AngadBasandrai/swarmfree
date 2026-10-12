@@ -1,0 +1,128 @@
+{
+  "format": "swarm-json-v1",
+  "key_id": "swarmfree",
+  "payload": {
+    "id": "jury",
+    "name": "Debate with a judge",
+    "version": "0.6.5",
+    "kind": "architecture",
+    "license": "MIT",
+    "permissions": [],
+    "architecture": {
+      "id": "jury",
+      "name": "Debate with a judge",
+      "description": "Two advocates develop opposing cases, cross-examine them, and submit to a judge.",
+      "category": "decision",
+      "nodes": [
+        {
+          "id": "for",
+          "name": "Advocate",
+          "role": "Develop the strongest supporting case",
+          "instructions": "Develop a grounded supporting case. State assumptions explicitly.",
+          "tools": null,
+          "requires": [],
+          "kind": "agent",
+          "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 0.0,
+          "y": 0.0
+        },
+        {
+          "id": "against",
+          "name": "Challenger",
+          "role": "Develop the strongest opposing case",
+          "instructions": "Develop a grounded opposing case and useful alternatives.",
+          "tools": null,
+          "requires": [],
+          "kind": "agent",
+          "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 0.0,
+          "y": 220.0
+        },
+        {
+          "id": "cross",
+          "name": "Cross-examiner",
+          "role": "Test both cases",
+          "instructions": "Identify unsupported claims and decisive evidence in both supplied cases.",
+          "tools": null,
+          "requires": [],
+          "kind": "agent",
+          "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 280.0,
+          "y": 110.0
+        },
+        {
+          "id": "judge",
+          "name": "Judge",
+          "role": "Make a reasoned decision",
+          "instructions": "Assess the two cases and cross-examination. Explain the decision and remaining uncertainty.",
+          "tools": null,
+          "requires": [],
+          "kind": "agent",
+          "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 560.0,
+          "y": 110.0
+        }
+      ],
+      "edges": [
+        {
+          "source": "for",
+          "target": "cross"
+        },
+        {
+          "source": "against",
+          "target": "cross"
+        },
+        {
+          "source": "cross",
+          "target": "judge"
+        }
+      ],
+      "builtin": true,
+      "max_rounds": 1,
+      "stop_when_contains": "",
+      "channels": [],
+      "input_schema": {},
+      "output_schema": {}
+    },
+    "examples": [
+      "Connect a provider, local model, or paired device before running this architecture"
+    ],
+    "evaluation": {
+      "status": "deterministic provider-fixture validation",
+      "note": "No live-provider quality ranking is claimed"
+    }
+  },
+  "signature": "HMOgPYBzQrAfPlaRgaEhWGG6kSjOKKjSF2gMXkU3yMY4p92ydHCsxp1Cqcgd2HyLG/zKuDdzvXqH4z7MI7ciDg=="
+}

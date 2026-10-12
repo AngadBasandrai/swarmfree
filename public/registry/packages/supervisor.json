@@ -4,7 +4,7 @@
   "payload": {
     "id": "supervisor",
     "name": "Supervisor",
-    "version": "0.6.4",
+    "version": "0.6.5",
     "kind": "architecture",
     "license": "MIT",
     "permissions": [],
@@ -12,6 +12,7 @@
       "id": "supervisor",
       "name": "Supervisor",
       "description": "A planner delegates to two specialists; a synthesizer joins their work.",
+      "category": "general",
       "nodes": [
         {
           "id": "planner",
@@ -22,6 +23,9 @@
           "requires": [],
           "kind": "agent",
           "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
           "input_schema": {},
           "message_budget": 8,
           "run_if": {},
@@ -39,6 +43,9 @@
           "requires": [],
           "kind": "agent",
           "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
           "input_schema": {},
           "message_budget": 8,
           "run_if": {},
@@ -56,6 +63,9 @@
           "requires": [],
           "kind": "agent",
           "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
           "input_schema": {},
           "message_budget": 8,
           "run_if": {},
@@ -73,6 +83,9 @@
           "requires": [],
           "kind": "agent",
           "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
           "input_schema": {},
           "message_budget": 8,
           "run_if": {},
@@ -115,5 +128,5 @@
       "note": "No live-provider quality ranking is claimed"
     }
   },
-  "signature": "9kRwnDjieza/ctX7Aocsp3TFsRTy3vejOFEDBahcmY7XrU+fMQ1DEyxVXzLGqgCENZlAwazrx2YVOq2XhgvJAg=="
+  "signature": "wGXVNtQ095j97/eDVVgvLIMBdIA++hGNSWjb4LW/QItOkrOKncsgcghaJYCvFwMQMSxe+jmq1tKB6tINAlLHCA=="
 }
