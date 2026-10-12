@@ -4,7 +4,7 @@
   "payload": {
     "id": "map_reduce",
     "name": "Map / reduce",
-    "version": "0.6.5",
+    "version": "0.7.0",
     "kind": "architecture",
     "license": "MIT",
     "permissions": [],
@@ -25,7 +25,17 @@
           "subswarm_id": "",
           "max_depth": 2,
           "task_source": "",
+          "task_path": "",
+          "tasks_path": "tasks",
+          "max_fanout": 2,
           "recursion_stop_contains": "",
+          "break_before": false,
+          "detect_repetition": false,
+          "request_budget": null,
+          "token_budget": null,
+          "preferred_route": {},
+          "parameter_values": {},
+          "inputs_from_mission": {},
           "input_schema": {},
           "message_budget": 8,
           "run_if": {},
@@ -45,7 +55,17 @@
           "subswarm_id": "",
           "max_depth": 2,
           "task_source": "",
+          "task_path": "",
+          "tasks_path": "tasks",
+          "max_fanout": 2,
           "recursion_stop_contains": "",
+          "break_before": false,
+          "detect_repetition": false,
+          "request_budget": null,
+          "token_budget": null,
+          "preferred_route": {},
+          "parameter_values": {},
+          "inputs_from_mission": {},
           "input_schema": {},
           "message_budget": 8,
           "run_if": {},
@@ -65,7 +85,17 @@
           "subswarm_id": "",
           "max_depth": 2,
           "task_source": "",
+          "task_path": "",
+          "tasks_path": "tasks",
+          "max_fanout": 2,
           "recursion_stop_contains": "",
+          "break_before": false,
+          "detect_repetition": false,
+          "request_budget": null,
+          "token_budget": null,
+          "preferred_route": {},
+          "parameter_values": {},
+          "inputs_from_mission": {},
           "input_schema": {},
           "message_budget": 8,
           "run_if": {},
@@ -85,7 +115,17 @@
           "subswarm_id": "",
           "max_depth": 2,
           "task_source": "",
+          "task_path": "",
+          "tasks_path": "tasks",
+          "max_fanout": 2,
           "recursion_stop_contains": "",
+          "break_before": false,
+          "detect_repetition": false,
+          "request_budget": null,
+          "token_budget": null,
+          "preferred_route": {},
+          "parameter_values": {},
+          "inputs_from_mission": {},
           "input_schema": {},
           "message_budget": 8,
           "run_if": {},
@@ -105,7 +145,17 @@
           "subswarm_id": "",
           "max_depth": 2,
           "task_source": "",
+          "task_path": "",
+          "tasks_path": "tasks",
+          "max_fanout": 2,
           "recursion_stop_contains": "",
+          "break_before": false,
+          "detect_repetition": false,
+          "request_budget": null,
+          "token_budget": null,
+          "preferred_route": {},
+          "parameter_values": {},
+          "inputs_from_mission": {},
           "input_schema": {},
           "message_budget": 8,
           "run_if": {},
@@ -118,35 +168,44 @@
       "edges": [
         {
           "source": "scope",
-          "target": "facts"
+          "target": "facts",
+          "bindings": []
         },
         {
           "source": "scope",
-          "target": "options"
+          "target": "options",
+          "bindings": []
         },
         {
           "source": "scope",
-          "target": "risks"
+          "target": "risks",
+          "bindings": []
         },
         {
           "source": "facts",
-          "target": "reduce"
+          "target": "reduce",
+          "bindings": []
         },
         {
           "source": "options",
-          "target": "reduce"
+          "target": "reduce",
+          "bindings": []
         },
         {
           "source": "risks",
-          "target": "reduce"
+          "target": "reduce",
+          "bindings": []
         }
       ],
       "builtin": true,
+      "revision": null,
       "max_rounds": 1,
       "stop_when_contains": "",
       "channels": [],
       "input_schema": {},
-      "output_schema": {}
+      "output_schema": {},
+      "parameters": {},
+      "output_ports": []
     },
     "examples": [
       "Connect a provider, local model, or paired device before running this architecture"
@@ -156,5 +215,5 @@
       "note": "No live-provider quality ranking is claimed"
     }
   },
-  "signature": "JKvmYWu/otZk69SkiOT01Y+tSMONTSb8xwqV5clFpGLlSuP16QiEPCYTZLFPLOn5TDxOoXj07XFETnhc8Y5qAg=="
+  "signature": "dmvsNu67+9CYcvo0TnirKK36Hj1TYo045eYMHYnTo5rFCYIBn+7rpRZZp2/3y3oi5Rk5rWCnQOYxaFva/4pVAg=="
 }

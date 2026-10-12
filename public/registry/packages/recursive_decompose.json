@@ -4,7 +4,7 @@
   "payload": {
     "id": "recursive_decompose",
     "name": "Recursive decomposition",
-    "version": "0.6.5",
+    "version": "0.7.0",
     "kind": "architecture",
     "license": "MIT",
     "permissions": [],
@@ -25,7 +25,17 @@
           "subswarm_id": "",
           "max_depth": 2,
           "task_source": "",
+          "task_path": "",
+          "tasks_path": "tasks",
+          "max_fanout": 2,
           "recursion_stop_contains": "",
+          "break_before": false,
+          "detect_repetition": false,
+          "request_budget": null,
+          "token_budget": null,
+          "preferred_route": {},
+          "parameter_values": {},
+          "inputs_from_mission": {},
           "input_schema": {},
           "message_budget": 8,
           "run_if": {},
@@ -45,7 +55,17 @@
           "subswarm_id": "self",
           "max_depth": 2,
           "task_source": "scope",
+          "task_path": "",
+          "tasks_path": "tasks",
+          "max_fanout": 2,
           "recursion_stop_contains": "BASE_CASE",
+          "break_before": false,
+          "detect_repetition": false,
+          "request_budget": null,
+          "token_budget": null,
+          "preferred_route": {},
+          "parameter_values": {},
+          "inputs_from_mission": {},
           "input_schema": {},
           "message_budget": 8,
           "run_if": {},
@@ -65,7 +85,17 @@
           "subswarm_id": "",
           "max_depth": 2,
           "task_source": "",
+          "task_path": "",
+          "tasks_path": "tasks",
+          "max_fanout": 2,
           "recursion_stop_contains": "",
+          "break_before": false,
+          "detect_repetition": false,
+          "request_budget": null,
+          "token_budget": null,
+          "preferred_route": {},
+          "parameter_values": {},
+          "inputs_from_mission": {},
           "input_schema": {},
           "message_budget": 8,
           "run_if": {},
@@ -78,23 +108,29 @@
       "edges": [
         {
           "source": "scope",
-          "target": "recurse"
+          "target": "recurse",
+          "bindings": []
         },
         {
           "source": "scope",
-          "target": "combine"
+          "target": "combine",
+          "bindings": []
         },
         {
           "source": "recurse",
-          "target": "combine"
+          "target": "combine",
+          "bindings": []
         }
       ],
       "builtin": true,
+      "revision": null,
       "max_rounds": 1,
       "stop_when_contains": "",
       "channels": [],
       "input_schema": {},
-      "output_schema": {}
+      "output_schema": {},
+      "parameters": {},
+      "output_ports": []
     },
     "examples": [
       "Connect a provider, local model, or paired device before running this architecture"
@@ -104,5 +140,5 @@
       "note": "No live-provider quality ranking is claimed"
     }
   },
-  "signature": "gLQUPTbaOzHk3Y5dWQh7H6YajG/JpAAH4tk77enuTo/VBxX+i/BVFXKVdnD+iNShGv1mULWvNoffs0EW6uU/Bg=="
+  "signature": "QwkCgZSkQGaUW31fFPsUgU/ERP4xuSZBuzUGyn1YimCOCt5g/sDHK1YkZWMXwIftE8o1dDPnRsFMGtzJboA7DQ=="
 }
