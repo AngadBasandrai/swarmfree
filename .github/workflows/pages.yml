@@ -30,6 +30,8 @@ jobs:
           if git show-ref --verify --quiet refs/remotes/origin/release-channel; then
             git checkout release-channel
           fi
+      - name: Include the download page from main
+        run: git restore --source=origin/main -- public/index.html
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
