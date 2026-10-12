@@ -155,6 +155,8 @@ def create_app(data_dir=None, token=None, vault=None, *, desktop=False):
             app.state.workspace.privacy=app.state.privacy
             app.state.workspace.mailboxes=app.state.mailboxes
             app.state.team=Teamwork(store,app.state.vault,app.state.engine,app.state.workspace)
+            from .architecture_workbench import Workshop
+            app.state.architectures=Workshop(store)
             app.state.onboarding=Onboarding(store,app.state.providers,app.state.intelligence,root)
             app.state.a2a=A2A(store,app.state.vault,app.state.privacy)
             app.state.workspace.a2a=app.state.a2a
@@ -201,7 +203,7 @@ def create_app(data_dir=None, token=None, vault=None, *, desktop=False):
             async with locked_lifespan(app):
                 yield
 
-    app = FastAPI(title="Swarm Workbench", version="0.6.5", lifespan=lifespan)
+    app = FastAPI(title="Swarm Workbench", version="0.7.0", lifespan=lifespan)
     app.state.owner_token = owner_token
     app.state.backup_active = False
     hosts = ["127.0.0.1", "localhost", "[::1]", "testserver"]
@@ -236,7 +238,7 @@ def create_app(data_dir=None, token=None, vault=None, *, desktop=False):
 
     @app.get("/api/health")
     async def health():
-        return dict(status="ok", version="0.6.5")
+        return dict(status="ok", version="0.7.0")
 
     @app.post("/api/session")
     async def session(form: SessionInput, request: Request):
@@ -307,7 +309,7 @@ def create_app(data_dir=None, token=None, vault=None, *, desktop=False):
             raise HTTPException(400, "Save a copy with a new ID to customize a built-in template")
         from .composition import resolve
         resolve(app.state.store, form.model_dump())
-        return app.state.store.put("architecture", form.id, dict(form.model_dump(), builtin=False))
+        return app.state.architectures.save(dict(form.model_dump(), builtin=False))
 
     @app.post("/api/architectures/preview")
     async def preview_architecture(form: Architecture):
@@ -353,7 +355,7 @@ def create_app(data_dir=None, token=None, vault=None, *, desktop=False):
         run = app.state.store.get("run", id)
         if not run:
             raise HTTPException(404, "Run not found")
-        if run["status"] not in {"paused", "interrupted", "queued","budget_exceeded"}:
+        if run["status"] not in {"paused", "interrupted", "queued","budget_exceeded","waiting"}:
             raise HTTPException(400, "Only paused or interrupted runs can resume")
         app.state.engine.start(id)
         return dict(status="running")
@@ -512,6 +514,10 @@ def create_app(data_dir=None, token=None, vault=None, *, desktop=False):
     install_advanced(app, root)
     install_nextgen(app,root)
     install_team(app)
+    from .architecture_workbench import install as install_architecture_workbench
+    from .execution_control import install as install_execution_control
+    install_architecture_workbench(app)
+    install_execution_control(app)
     install_workbench(app)
     install_operations(app)
 

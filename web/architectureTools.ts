@@ -22,19 +22,28 @@ export function graphErrors(arch: Architecture): string[] {
     if (!/^[a-zA-Z][a-zA-Z0-9_-]{0,47}$/.test(node.id) || !node.name.trim() || !node.role.trim()) errors.push('Each node needs a valid ID, name and role.');
     if (!Number.isFinite(node.x) || !Number.isFinite(node.y)) errors.push('Node positions must be finite numbers.');
     if (node.kind === 'subswarm' && !node.subswarm_id) errors.push(`${node.name}: choose a child team.`);
-    if (node.kind === 'recursive' && (!Number.isInteger(node.max_depth ?? 2) || (node.max_depth ?? 2) < 1 || (node.max_depth ?? 2) > 4)) errors.push(`${node.name}: recursion depth must be 1–4.`);
+    if (['recursive','fanout'].includes(node.kind||'') && (!Number.isInteger(node.max_depth ?? 2) || (node.max_depth ?? 2) < 1 || (node.max_depth ?? 2) > 4)) errors.push(`${node.name}: recursion depth must be 1–4.`);
     const upstream = ancestors(arch, node.id);
     if (upstream.has(node.id)) errors.push('A connection creates a dependency cycle. Use a recursive team node or revision rounds.');
     if (node.task_source && !upstream.has(node.task_source)) errors.push(`${node.name}: the task source must be upstream.`);
     if (node.run_if?.source && !upstream.has(node.run_if.source)) errors.push(`${node.name}: the condition must inspect an upstream node.`);
   }
   const pairs = new Set<string>();
+  const boundNames=new Set<string>();
   for (const edge of arch.edges) {
     if (!ids.has(edge.source) || !ids.has(edge.target)) errors.push('A connection refers to a missing node.');
     const pair = edge.source + '->' + edge.target;
     if (pairs.has(pair)) errors.push('A connection is duplicated.');
     pairs.add(pair);
+    for(const binding of edge.bindings||[]){
+      if(!/^[A-Za-z][A-Za-z0-9_]{0,95}$/.test(binding.target_name))errors.push('Typed inputs need a valid field name.');
+      if(binding.source_path&& !/^[A-Za-z0-9_-]+(?:\.[A-Za-z0-9_-]+)*$/.test(binding.source_path))errors.push('Output selectors use dot-separated field names or array indexes.');
+      const key=edge.target+':'+binding.target_name;
+      if(boundNames.has(key))errors.push('An input field can have only one connection binding.');
+      boundNames.add(key);
+    }
   }
+  if(arch.output_ports?.some(p=>!ids.has(p.source)))errors.push('A named output refers to a missing node.');
   if (!Number.isInteger(arch.max_rounds ?? 1) || (arch.max_rounds ?? 1) < 1 || (arch.max_rounds ?? 1) > 5) errors.push('Revision rounds must be 1–5.');
   return [...new Set(errors)];
 }
@@ -64,4 +73,4 @@ export function autoLayout(arch: Architecture): Architecture {
 }
 
 export const categories = ['all', 'general', 'coding', 'research', 'decision', 'recursive', 'custom'];
-export const kindName = (kind?: string) => ({ vote: 'Vote', subswarm: 'Child team', recursive: 'Recursive team' }[kind || ''] || 'Model agent');
+export const kindName = (kind?: string) => ({ vote: 'Vote', subswarm: 'Child team', recursive: 'Recursive team',fanout:'Dynamic fanout',router:'Model router',condition:'Condition',join:'Join' }[kind || ''] || 'Model agent');

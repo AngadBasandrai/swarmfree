@@ -86,7 +86,7 @@ def main():
                 raise AssertionError('Frozen engine accepted the removed execution mode')
             except HTTPError as error:
                 assert error.code==422
-            assert request(ready, "/api/health")["version"] == "0.6.5"
+            assert request(ready, "/api/health")["version"] == "0.7.0"
             assert snapshot["hardware"]["ram_total_gb"] > 0
             assert snapshot["architectures"]
             features = request(ready,"/api/features")
@@ -175,6 +175,39 @@ def main():
             leaf = request(ready, "/api/runs/" + child["children"][0]["id"])
             assert leaf["depth"] == 2 and not leaf["children"]
             assert leaf["agents"][1]["recursion"]["reason"] == "depth limit"
+            # Architecture workshop: durable gate, revision ledger, shared draft and real fanout.
+            held_arch = request(ready, '/api/architectures', 'POST', dict(id='frozen_gate',name='Frozen gate',
+                nodes=[dict(id='worker',name='Worker',role='Work',break_before=True)],edges=[]))
+            assert held_arch['revision']==1
+            held = request(ready, '/api/runs','POST',dict(task='Review frozen inputs',architecture_id=held_arch['id'],free_only=False,route=fixture_route))
+            deadline=time.monotonic()+20
+            while time.monotonic()<deadline:
+                held=request(ready,'/api/runs/'+held['id'])
+                if held['status']=='waiting':break
+                time.sleep(.1)
+            assert held['status']=='waiting'
+            controls=request(ready,'/api/execution-control/tree/'+held['id']);assert len(controls['gates'])==1
+            request(ready,'/api/execution-control/agents/'+held['agents'][0]['id'],'POST',dict(action='approve'))
+            deadline=time.monotonic()+20
+            while time.monotonic()<deadline:
+                held=request(ready,'/api/runs/'+held['id'])
+                if held['status']=='completed':break
+                time.sleep(.1)
+            assert held['status']=='completed'
+            versions=request(ready,'/api/architecture-workbench/versions/'+held_arch['id']);assert versions[0]['number']==1
+            shared=request(ready,'/api/architecture-workbench/sessions','POST',dict(project_id=project['id'],architecture=held_arch))
+            shared['draft']['description']='Reviewed shared change'
+            edited=request(ready,'/api/architecture-workbench/sessions/'+shared['id']+'/edits','POST',dict(base_revision=0,architecture=shared['draft']))
+            assert edited['revision']==1
+            fanout=request(ready,'/api/architectures','POST',dict(id='frozen_fanout',name='Frozen fanout',nodes=[dict(id='dispatch',name='Dispatch',role='Run child work',kind='fanout',subswarm_id='baseline',max_fanout=2,request_budget=2)],edges=[]))
+            fan=request(ready,'/api/runs','POST',dict(task='Run frozen child teams',architecture_id=fanout['id'],inputs=dict(tasks=['First scoped task','Second scoped task']),free_only=False,route=fixture_route))
+            deadline=time.monotonic()+25
+            while time.monotonic()<deadline:
+                fan=request(ready,'/api/runs/'+fan['id'])
+                if fan['status'] in {'completed','interrupted','budget_exceeded'}:break
+                time.sleep(.1)
+            assert fan['status']=='completed' and len(fan['children'])==2
+            assert request(ready,'/api/execution-control/tree/'+fan['id'])['runs'][0]['agents'][0]['request_budget']['used_requests']==2
             # Frozen 0.4 dependencies and model registration, without downloading weights.
             assert len(request(ready, "/api/next/catalog")) >= 6
             assert request(ready, "/api/next/browser/status")["driver_available"]

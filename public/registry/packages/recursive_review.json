@@ -4,7 +4,7 @@
   "payload": {
     "id": "recursive_review",
     "name": "Recursive critique and repair",
-    "version": "0.6.5",
+    "version": "0.7.0",
     "kind": "architecture",
     "license": "MIT",
     "permissions": [],
@@ -25,7 +25,17 @@
           "subswarm_id": "",
           "max_depth": 2,
           "task_source": "",
+          "task_path": "",
+          "tasks_path": "tasks",
+          "max_fanout": 2,
           "recursion_stop_contains": "",
+          "break_before": false,
+          "detect_repetition": false,
+          "request_budget": null,
+          "token_budget": null,
+          "preferred_route": {},
+          "parameter_values": {},
+          "inputs_from_mission": {},
           "input_schema": {},
           "message_budget": 8,
           "run_if": {},
@@ -45,7 +55,17 @@
           "subswarm_id": "",
           "max_depth": 2,
           "task_source": "",
+          "task_path": "",
+          "tasks_path": "tasks",
+          "max_fanout": 2,
           "recursion_stop_contains": "",
+          "break_before": false,
+          "detect_repetition": false,
+          "request_budget": null,
+          "token_budget": null,
+          "preferred_route": {},
+          "parameter_values": {},
+          "inputs_from_mission": {},
           "input_schema": {},
           "message_budget": 8,
           "run_if": {},
@@ -65,7 +85,17 @@
           "subswarm_id": "self",
           "max_depth": 2,
           "task_source": "review",
+          "task_path": "",
+          "tasks_path": "tasks",
+          "max_fanout": 2,
           "recursion_stop_contains": "APPROVED",
+          "break_before": false,
+          "detect_repetition": false,
+          "request_budget": null,
+          "token_budget": null,
+          "preferred_route": {},
+          "parameter_values": {},
+          "inputs_from_mission": {},
           "input_schema": {},
           "message_budget": 8,
           "run_if": {},
@@ -85,7 +115,17 @@
           "subswarm_id": "",
           "max_depth": 2,
           "task_source": "",
+          "task_path": "",
+          "tasks_path": "tasks",
+          "max_fanout": 2,
           "recursion_stop_contains": "",
+          "break_before": false,
+          "detect_repetition": false,
+          "request_budget": null,
+          "token_budget": null,
+          "preferred_route": {},
+          "parameter_values": {},
+          "inputs_from_mission": {},
           "input_schema": {},
           "message_budget": 8,
           "run_if": {},
@@ -98,23 +138,29 @@
       "edges": [
         {
           "source": "draft",
-          "target": "review"
+          "target": "review",
+          "bindings": []
         },
         {
           "source": "review",
-          "target": "repair"
+          "target": "repair",
+          "bindings": []
         },
         {
           "source": "repair",
-          "target": "deliver"
+          "target": "deliver",
+          "bindings": []
         }
       ],
       "builtin": true,
+      "revision": null,
       "max_rounds": 1,
       "stop_when_contains": "",
       "channels": [],
       "input_schema": {},
-      "output_schema": {}
+      "output_schema": {},
+      "parameters": {},
+      "output_ports": []
     },
     "examples": [
       "Connect a provider, local model, or paired device before running this architecture"
@@ -124,5 +170,5 @@
       "note": "No live-provider quality ranking is claimed"
     }
   },
-  "signature": "86cyIe2j/fIDakTltWUvBt/BgzsJBlVBEUO7+WM4M5c7oh7GMs84Cy1FW7k+a/uSRmQC2JYJl5v0gKPhRmq4Cg=="
+  "signature": "L7c/bBx4deN0kStTQtwg/vZCLRKB22tNBblLD3aaoG8hd0LwYPpK7Xpq0sGafDVi0AbqHRfgk4EHFNyLMdyiBQ=="
 }

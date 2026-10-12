@@ -9,11 +9,21 @@ class AgentSpec(BaseModel):
     instructions: str = Field(default="", max_length=12000)
     tools: list[str] | None = Field(default=None, max_length=40)
     requires: list[Literal["json", "vision"]] = Field(default_factory=list)
-    kind: Literal["agent", "vote", "subswarm", "recursive"] = "agent"
+    kind: Literal["agent", "vote", "subswarm", "recursive", "fanout", "router", "condition", "join"] = "agent"
     subswarm_id: str = Field(default="",max_length=80)
     max_depth: int = Field(default=2, ge=1, le=4)
     task_source: str = Field(default="", max_length=48)
+    task_path: str = Field(default="", max_length=300)
+    tasks_path: str = Field(default="tasks", max_length=300)
+    max_fanout: int = Field(default=2, ge=1, le=8)
     recursion_stop_contains: str = Field(default="", max_length=120)
+    break_before: bool = False
+    detect_repetition: bool = False
+    request_budget: int | None = Field(default=None, ge=0, le=10000)
+    token_budget: int | None = Field(default=None, ge=0, le=10000000)
+    preferred_route: dict = Field(default_factory=dict)
+    parameter_values: dict = Field(default_factory=dict)
+    inputs_from_mission: dict[str, str] = Field(default_factory=dict)
     input_schema: dict = Field(default_factory=dict)
     message_budget: int = Field(default=8,ge=0,le=50)
     run_if: dict[str, str] = Field(default_factory=dict)
@@ -28,7 +38,13 @@ class AgentSpec(BaseModel):
         if self.output_schema: validate_schema(self.output_schema)
         if self.input_schema: validate_schema(self.input_schema)
         if self.kind=="subswarm" and not self.subswarm_id: raise ValueError("Choose a sub-swarm architecture")
-        if self.kind=="recursive" and not self.subswarm_id: self.subswarm_id="self"
+        if self.kind in {"recursive","fanout"} and not self.subswarm_id: self.subswarm_id="self"
+        from .dataflow import check_path, bounded_json
+        for path in [self.task_path,self.tasks_path,*self.inputs_from_mission.values()]: check_path(path)
+        bounded_json(self.parameter_values)
+        if self.preferred_route:
+            if set(self.preferred_route)-set(Route.model_fields): raise ValueError("Model preferences contain only route IDs, never credentials")
+            self.preferred_route=Route.model_validate(self.preferred_route).model_dump()
         for rule in self.validators:
             if rule.get("kind") not in {"contains","excludes","json","min_length"}: raise ValueError("Unknown output validator")
             if rule.get("kind")=="json": validate_schema(rule.get("schema",{"type":"object"}))
@@ -37,9 +53,33 @@ class AgentSpec(BaseModel):
         return self
 
 
+class FieldBinding(BaseModel):
+    source_path: str = Field(default="", max_length=300)
+    target_name: str = Field(pattern=r"^[a-zA-Z][a-zA-Z0-9_]{0,95}$")
+
+    @model_validator(mode="after")
+    def valid_path(self):
+        from .dataflow import check_path
+        check_path(self.source_path)
+        return self
+
+
 class Edge(BaseModel):
     source: str
     target: str
+    bindings: list[FieldBinding] = Field(default_factory=list, max_length=24)
+
+
+class OutputPort(BaseModel):
+    name: str = Field(pattern=r"^[a-zA-Z][a-zA-Z0-9_-]{0,47}$")
+    source: str
+    path: str = Field(default="", max_length=300)
+
+    @model_validator(mode="after")
+    def valid_path(self):
+        from .dataflow import check_path
+        check_path(self.path)
+        return self
 
 
 class MessageChannel(BaseModel):
@@ -56,11 +96,14 @@ class Architecture(BaseModel):
     nodes: list[AgentSpec] = Field(min_length=1, max_length=16)
     edges: list[Edge] = Field(default_factory=list, max_length=120)
     builtin: bool = False
+    revision: int | None = Field(default=None, ge=0)
     max_rounds: int = Field(default=1, ge=1, le=5)
     stop_when_contains: str = Field(default="", max_length=120)
     channels: list[MessageChannel] = Field(default_factory=list,max_length=12)
     input_schema: dict = Field(default_factory=dict)
     output_schema: dict = Field(default_factory=dict)
+    parameters: dict = Field(default_factory=dict)
+    output_ports: list[OutputPort] = Field(default_factory=list, max_length=16)
 
     @model_validator(mode="after")
     def validate_graph(self):
@@ -72,17 +115,27 @@ class Architecture(BaseModel):
         from .protocol import validate_schema
         if self.input_schema: validate_schema(self.input_schema)
         if self.output_schema: validate_schema(self.output_schema)
+        if self.parameters: validate_schema(self.parameters)
+        if len({p.name for p in self.output_ports})!=len(self.output_ports) or any(p.source not in ids for p in self.output_ports): raise ValueError("Named outputs need unique names and existing nodes")
         if len({c.id for c in self.channels})!=len(self.channels): raise ValueError("Channel IDs must be unique")
         if any(len(set(c.members))!=len(c.members) or not set(c.members)<=set(ids) for c in self.channels): raise ValueError("Channels reference unique members of this architecture")
         adjacency = {i: [] for i in ids}
         degree = {i: 0 for i in ids}
         pairs = set()
+        bound_names = set()
         for e in self.edges:
             if e.source not in adjacency or e.target not in adjacency:
                 raise ValueError("An edge references an unknown agent")
             if (e.source, e.target) in pairs:
                 raise ValueError("Duplicate connections are not allowed")
             pairs.add((e.source, e.target))
+            for binding in e.bindings:
+                target_node=next(n for n in self.nodes if n.id==e.target)
+                if target_node.kind in {"subswarm","recursive","fanout"} and binding.target_name in {"task","upstream"}:
+                    raise ValueError("task and upstream are reserved child inputs; choose a task source instead")
+                key=(e.target,binding.target_name)
+                if key in bound_names: raise ValueError("An input field can have only one binding")
+                bound_names.add(key)
             adjacency[e.source].append(e.target)
             degree[e.target] += 1
         queue = [i for i, d in degree.items() if d == 0]
@@ -97,8 +150,11 @@ class Architecture(BaseModel):
         if visited != len(ids):
             raise ValueError("Use max_rounds for bounded revision loops; raw dependency cycles are not allowed")
         for node in self.nodes:
-            if node.run_if and (set(node.run_if) != {"source", "contains"} or node.run_if["source"] not in ids):
+            if node.run_if and (not {"source","contains"}<=set(node.run_if) or set(node.run_if)-{"source","contains","path"} or node.run_if["source"] not in ids):
                 raise ValueError("A condition needs source and contains fields referencing an upstream node")
+            if node.run_if:
+                from .dataflow import check_path
+                check_path(node.run_if.get("path",""))
             if node.run_if or node.task_source:
                 pending, seen = [node.id], set()
                 while pending:
@@ -174,11 +230,13 @@ class RunInput(BaseModel):
     reuse_cache: bool = False
     model_revision: str = Field(default="",max_length=200)
     inputs: dict = Field(default_factory=dict)
+    parameters: dict = Field(default_factory=dict)
 
     @model_validator(mode="after")
     def bounded_inputs(self):
         import json
         if len(json.dumps(self.inputs,allow_nan=False).encode())>64000: raise ValueError("Typed mission inputs exceed 64 KB")
+        if len(json.dumps(self.parameters,allow_nan=False).encode())>64000: raise ValueError("Mission parameters exceed 64 KB")
         return self
 
 

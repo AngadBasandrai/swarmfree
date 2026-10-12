@@ -45,7 +45,7 @@ export async function api<T>(path: string, method = 'GET', body?: unknown): Prom
   return data as T;
 }
 function errorDetail(detail: unknown, status: number) {
-  return typeof detail === 'string' ? detail : Array.isArray(detail) ? detail.map((e: { msg: string }) => e.msg).join('; ') : `Request failed (${status})`;
+  return typeof detail === 'string' ? detail : Array.isArray(detail) ? detail.map((e: { msg: string }) => e.msg).join('; ') : detail && typeof detail === 'object' ? JSON.stringify(detail) : `Request failed (${status})`;
 }
 function showError(error: unknown) { window.dispatchEvent(new CustomEvent('swarm:error', { detail: error instanceof Error ? error.message : String(error) })); }
 

@@ -29,9 +29,9 @@ test('browse categories and edit connections with undo, redo and duplication', a
   await expect(page.getByLabel('Agent name', { exact: true })).toHaveValue('Reviewer copy');
   await expect(page.locator('.react-flow__edge')).toHaveCount(5);
   await page.getByRole('button', { name: 'Remove agent', exact: true }).click();
-  await expect(page.locator('.architecture-agent-list > button')).toHaveCount(3);
+  await expect(page.locator('.architecture-agent-list .team-selection-row > button')).toHaveCount(3);
   await page.getByRole('button', { name: 'Undo', exact: true }).click();
-  await expect(page.locator('.architecture-agent-list > button')).toHaveCount(4);
+  await expect(page.locator('.architecture-agent-list .team-selection-row > button')).toHaveCount(4);
   await page.getByRole('button', { name: 'Auto layout', exact: true }).click();
   await page.getByLabel('Architecture name').fill('Edited pipeline');
   await page.getByRole('button', { name: 'Save custom copy' }).click();

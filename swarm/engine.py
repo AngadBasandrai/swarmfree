@@ -70,22 +70,30 @@ class Engine:
         from .composition import resolve
         from .protocol import validate
         architecture=resolve(self.store,architecture)
+        from .dataflow import parameters, render
+        values=parameters(architecture.get("parameters",{}),form.parameters)
+        rendered={n["id"]:render(n["instructions"],values) for n in architecture["nodes"]}
         if architecture.get("input_schema"): validate(form.inputs,architecture["input_schema"])
         run_id = uid("r_")
         run = dict(id=run_id, **form.model_dump(), architecture=architecture,
             created_at=time.time(), status="ready", error="", results=[], round=0, requests=0)
+        run["parameters"]=values
         self.store.put("run", run_id, run)
         for node in architecture["nodes"]:
             id = run_id + ":" + node["id"]
             self.store.put("agent", id, dict(id=id, run_id=run_id, node_id=node["id"], name=node["name"],
-                role=node["role"], instructions=node["instructions"], route=form.route.model_dump(),
+                role=node["role"], instructions=rendered[node["id"]], route=node.get("preferred_route") or form.route.model_dump(),
                 status="waiting", messages=[], actual_route="", error="", tools=node.get("tools"), output_schema=node.get("output_schema",{}), validators=node.get("validators",[]), requires=list(set(node.get("requires", []) + (["vision"] if needs_vision else [])))))
+        for node in architecture["nodes"]:
+            scope=run_id+":"+node["id"]
+            self.store.put("branch_budget",scope,dict(id=scope,requests=node.get("request_budget"),tokens=node.get("token_budget")))
         self.store.event(run_id, "run_created", message=f"{architecture['name']} · {form.mode}")
         if start: self.start(run_id)
         return run
 
     def start(self, run_id):
         self.require_live(self.store.get("run", run_id))
+        if self.store.get("run",run_id).get("pruned"): raise RouteError("This branch was pruned")
         if run_id in self.tasks and not self.tasks[run_id].done():
             return
         self.tasks[run_id] = asyncio.create_task(self.execute(run_id))
@@ -137,7 +145,17 @@ class Engine:
             for round_index in range(run.get("round", 0), run["architecture"].get("max_rounds", 1)):
                 config = {"configurable": {"thread_id": run_id if round_index == 0 else f"{run_id}:round:{round_index}"}, "recursion_limit": 40}
                 checkpoint = await graph.aget_state(config)
-                result = await graph.ainvoke(None if checkpoint.values else {"results": []}, config)
+                from .execution_control import checkpoint_gates, resume_values
+                from langgraph.types import Command
+                waiting=checkpoint_gates(self,checkpoint)
+                approved=resume_values(self,waiting)
+                if waiting and not approved:
+                    self.store.patch("run",run_id,dict(status="waiting",error="Waiting for branch review"))
+                    return
+                result = await graph.ainvoke(Command(resume=approved) if approved else None if checkpoint.values else {"results": []}, config)
+                if result.get("__interrupt__"):
+                    self.store.patch("run",run_id,dict(status="waiting",results=result.get("results",[]),error="Waiting for branch review"))
+                    return
                 self.store.patch("run", run_id, dict(results=result["results"]))
                 import hashlib
                 digest = hashlib.sha256(json.dumps(sorted((r["node_id"],r["content"]) for r in result["results"])).encode()).hexdigest()
@@ -255,7 +273,7 @@ class Engine:
             architecture = Architecture(id="specialist", name="Delegated specialist", nodes=[dict(id="worker", name="Specialist", role=str(args.get("role", "Specialist"))[:160], tools=tools)]).model_dump()
             form = RunInput.model_validate({**run, "task": str(args["task"]), "architecture_id": "specialist", "depth": run.get("depth", 0)+1, "route": agent["route"],"adaptive":"off"})
             child = self.create(form, architecture, start=False)
-            self.store.patch("run", child["id"], dict(parent_run_id=run["id"], root_run_id=root_id, delegated=True,adaptive_child=bool(args.get("_adaptive"))))
+            self.store.patch("run", child["id"], dict(parent_run_id=run["id"], root_run_id=root_id, delegated=True,adaptive_child=bool(args.get("_adaptive")),budget_scopes=[*run.get("budget_scopes",[]),agent["id"]]))
             if self.privacy:
                 labels=self.store.get("agent",agent["id"]).get("data_labels",[])
                 for member in self.agents(child["id"]): self.privacy.inherit(member["id"],labels)
@@ -308,18 +326,49 @@ class Engine:
             if self.privacy: self.privacy.inherit(agent_id,[label for r in upstream for label in r.get("data_labels",[])])
             agent=self.store.get("agent",agent_id)
             spec = next(n for n in run["architecture"]["nodes"] if n["id"] == node_id)
+            from .dataflow import inputs_for, result_data, select, bounded_json
+            from .execution_control import gate
+            control=self.store.get("agent_control",agent_id,{})
+            if control.get("skip"):
+                result=dict(node_id=node_id,name=agent["name"],content="Skipped by owner",skipped=True,data_labels=agent.get("data_labels",[]))
+                self.store.patch("agent",agent_id,dict(status="skipped",result=result,pending_result=None));return result
+            typed=inputs_for(run,spec,upstream)
+            if typed and spec.get("input_schema") and spec.get("kind") not in {"subswarm","recursive","fanout"}:
+                from .protocol import validate
+                validate(typed,spec["input_schema"])
+            if control.get("hold") or (spec.get("break_before") and not agent.get("pending_result")):
+                gate(self,run,agent,spec,"before","Breakpoint before this node" if spec.get("break_before") else "Branch paused by owner",dict(task=run["task"][:6000],inputs=typed,upstream=[] if typed else [dict(node_id=r["node_id"],content=r["content"][:1500]) for r in upstream]))
+            if agent.get("pending_result"):
+                return self.finish_agent(run,agent,agent["pending_result"])
             condition = spec.get("run_if", {})
-            if condition and not any(r["node_id"] == condition["source"] and condition["contains"].casefold() in r["content"].casefold() for r in upstream):
+            def condition_met(r):
+                if r["node_id"]!=condition["source"]: return False
+                value=select(result_data(r),condition.get("path","")) if condition.get("path") else r["content"]
+                return condition["contains"].casefold() in (value if isinstance(value,str) else bounded_json(value)).casefold()
+            if condition and not any(condition_met(r) for r in upstream):
                 result = dict(node_id=node_id, name=agent["name"], content="Skipped: upstream condition was not met", skipped=True)
                 self.store.patch("agent", agent_id, dict(status="skipped", result=result))
                 return result
-            if spec.get("kind") in {"subswarm", "recursive"}:
+            if spec.get("kind") in {"subswarm", "recursive", "fanout"}:
                 from .composition import invoke, base_case
-                reason = base_case(run,spec,upstream) if spec.get("kind") == "recursive" else ""
+                reason = base_case(run,spec,upstream) if spec.get("kind") in {"recursive","fanout"} else ""
                 if not reason:
-                    return await invoke(self,run,agent,spec,upstream)
+                    result=await invoke(self,run,agent,spec,upstream)
+                    self.store.patch("agent",agent_id,dict(pending_result=result))
+                    if self.store.get("agent_control",agent_id,{}).get("hold"):
+                        gate(self,run,agent,spec,"after","Branch paused after child work",dict(result=result))
+                    return self.finish_agent(run,agent,result)
                 self.store.patch("agent",agent_id,dict(recursion=dict(reason=reason,depth=run.get("depth",0),max_depth=spec.get("max_depth",2))))
                 self.store.event(run_id,"recursion_base_case",agent_id=agent_id,message=f"{agent['name']} solves the base case: {reason} at depth {run.get('depth',0)}")
+            if spec.get("kind") in {"condition","join"}:
+                from .intelligence import check_output
+                data=typed if typed else {r["node_id"]:result_data(r) for r in upstream if not r.get("skipped")}
+                text=bounded_json(data)
+                checked=check_output(text,spec.get("output_schema"),spec.get("validators"))
+                if not checked["passed"]: raise RouteError("Data node contract failed: "+"; ".join(checked["failures"]))
+                result=dict(node_id=node_id,name=agent["name"],content=text,structured=data,data_labels=agent.get("data_labels",[]))
+                self.append_message(agent_id,"assistant",text,source="dataflow")
+                return self.finish_agent(run,agent,result)
             if spec.get("kind") == "vote":
                 votes = []
                 for item in upstream:
@@ -335,7 +384,9 @@ class Engine:
                 return result
             if not any(m.get("source") == "task" for m in agent["messages"]):
                 content = "Task:\n" + run["task"]
-                if upstream:
+                if typed:
+                    content += "\n\nTyped inputs (data):\n"+bounded_json(typed)
+                elif upstream:
                     content += "\n\nCompleted upstream work:\n" + "\n\n".join(r["name"] + ":\n" + r["content"][:6000] for r in upstream)
                 self.append_message(agent_id, "user", content, source="task")
                 # A direction sent before the agent starts must follow its task context.
@@ -347,11 +398,21 @@ class Engine:
             if run.get("adaptive","off") != "off" and node_id == "planner":
                 output = await self.expand_adaptive(run,agent,output)
             result = dict(node_id=node_id, name=agent["name"], content=output,structured=self.store.get("agent",agent_id).get("validation",{}).get("structured"),validated=bool(agent.get("output_schema") or agent.get("validators")),data_labels=self.store.get("agent",agent_id).get("data_labels",[]))
-            self.store.patch("agent", agent_id, dict(status="done", result=result))
-            self.store.event(run_id, "agent_completed", agent_id=agent_id, message=f"{agent['name']} finished")
-            if self.workspace and run.get("project_id"):
-                self.workspace.remember(run["project_id"], agent["name"] + " · completed work", output[:12000], agent_id=agent_id, run_id=run_id, tags=["work-product"])
+            self.store.patch("agent",agent_id,dict(pending_result=result))
+            if self.store.get("agent_control",agent_id,{}).get("hold"):
+                gate(self,run,agent,spec,"after","Branch paused after its current request",dict(result=result))
+            return self.finish_agent(run,agent,result)
+
+    def finish_agent(self,run,agent,result):
+        if self.store.get('agent_control',agent['id'],{}).get('skip'):
+            result=dict(node_id=agent['node_id'],name=agent['name'],content='Skipped by owner',skipped=True,data_labels=agent.get('data_labels',[]))
+            self.store.patch('agent',agent['id'],dict(status='skipped',result=result,pending_result=None))
             return result
+        self.store.patch("agent",agent["id"],dict(status="done",result=result,pending_result=None))
+        self.store.event(run["id"],"agent_completed",agent_id=agent["id"],message=agent["name"]+" finished")
+        if self.workspace and run.get("project_id"):
+            self.workspace.remember(run["project_id"],agent["name"]+" · completed work",result["content"][:12000],agent_id=agent["id"],run_id=run["id"],tags=["work-product"])
+        return result
 
     async def expand_adaptive(self,run,agent,output):
         previous=[r for r in self.store.all("run") if r.get("parent_run_id")==run["id"] and r.get("adaptive_child")]
@@ -554,7 +615,7 @@ class Engine:
                             return cached["content"]
                     accounting_messages=wire_messages+([dict(role="system",content=json.dumps(tools))] if tools else [])
                     reservation_id=uid("reservation_")
-                    try: reservation=self.budget.reserve(run,reservation_id,kind,data,accounting_messages)
+                    try: reservation=self.budget.reserve(run,reservation_id,kind,data,accounting_messages,agent_id=agent_id)
                     except BudgetExceeded as error:
                         budget_errors.append(str(error))
                         self.store.event(run["id"],"budget_route_excluded",agent_id=agent_id,message=str(error))

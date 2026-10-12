@@ -3,6 +3,7 @@ import sqlite3
 import threading
 import time
 import uuid
+from contextlib import contextmanager
 from pathlib import Path
 
 
@@ -15,6 +16,7 @@ class Store:
     def __init__(self, path: Path):
         path.parent.mkdir(parents=True, exist_ok=True)
         self.lock = threading.RLock()
+        self.atomic_depth = 0
         self.db = sqlite3.connect(path, check_same_thread=False)
         version = self.db.execute("PRAGMA user_version").fetchone()[0]
         if version > 5:
@@ -41,7 +43,7 @@ class Store:
     def put(self, kind, id, value):
         with self.lock:
             self.db.execute("INSERT INTO records VALUES (?,?,?) ON CONFLICT(kind,id) DO UPDATE SET value=excluded.value", (kind, id, json.dumps(value)))
-            self.db.commit()
+            if not self.atomic_depth: self.db.commit()
         return value
 
     def patch(self, kind, id, changes):
@@ -55,13 +57,27 @@ class Store:
     def delete(self, kind, id):
         with self.lock:
             self.db.execute("DELETE FROM records WHERE kind=? AND id=?", (kind, id))
-            self.db.commit()
+            if not self.atomic_depth: self.db.commit()
 
     def event(self, run_id, type, **data):
         with self.lock:
             event = dict(type=type, time=time.time(), **data)
             self.db.execute("INSERT INTO events(run_id,value) VALUES (?,?)", (run_id, json.dumps(event)))
-            self.db.commit()
+            if not self.atomic_depth: self.db.commit()
+
+    @contextmanager
+    def transaction(self):
+        with self.lock:
+            name=uid("atomic_")
+            self.db.execute("SAVEPOINT "+name);self.atomic_depth+=1
+            try:
+                yield
+                self.db.execute("RELEASE SAVEPOINT "+name)
+            except BaseException:
+                self.db.execute("ROLLBACK TO SAVEPOINT "+name)
+                self.db.execute("RELEASE SAVEPOINT "+name)
+                raise
+            finally: self.atomic_depth-=1
 
     def events(self, run_id, limit=100):
         with self.lock:

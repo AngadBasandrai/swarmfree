@@ -4,7 +4,7 @@
   "payload": {
     "id": "hierarchy",
     "name": "Hierarchical team",
-    "version": "0.6.5",
+    "version": "0.7.0",
     "kind": "architecture",
     "license": "MIT",
     "permissions": [],
@@ -25,7 +25,17 @@
           "subswarm_id": "",
           "max_depth": 2,
           "task_source": "",
+          "task_path": "",
+          "tasks_path": "tasks",
+          "max_fanout": 2,
           "recursion_stop_contains": "",
+          "break_before": false,
+          "detect_repetition": false,
+          "request_budget": null,
+          "token_budget": null,
+          "preferred_route": {},
+          "parameter_values": {},
+          "inputs_from_mission": {},
           "input_schema": {},
           "message_budget": 8,
           "run_if": {},
@@ -45,7 +55,17 @@
           "subswarm_id": "",
           "max_depth": 2,
           "task_source": "",
+          "task_path": "",
+          "tasks_path": "tasks",
+          "max_fanout": 2,
           "recursion_stop_contains": "",
+          "break_before": false,
+          "detect_repetition": false,
+          "request_budget": null,
+          "token_budget": null,
+          "preferred_route": {},
+          "parameter_values": {},
+          "inputs_from_mission": {},
           "input_schema": {},
           "message_budget": 8,
           "run_if": {},
@@ -58,15 +78,19 @@
       "edges": [
         {
           "source": "lead",
-          "target": "reviewer"
+          "target": "reviewer",
+          "bindings": []
         }
       ],
       "builtin": true,
+      "revision": null,
       "max_rounds": 1,
       "stop_when_contains": "",
       "channels": [],
       "input_schema": {},
-      "output_schema": {}
+      "output_schema": {},
+      "parameters": {},
+      "output_ports": []
     },
     "examples": [
       "Connect a provider, local model, or paired device before running this architecture"
@@ -76,5 +100,5 @@
       "note": "No live-provider quality ranking is claimed"
     }
   },
-  "signature": "EGJu3x724PO2f/pmvI/36e2ISOTDbcl+Kv9U1reMW0NPPsmmfkbFCNbZKGbIOTZxg/qM4i3JXV7Mm1KLeVyPDA=="
+  "signature": "AXO4u8tHXHfLzm0ReK63HY9Y2QNV54lpCtQxPafN3FatG48iXAr6Q6RZLEzVR0d6tw7eNYNTrFO7MNX8Gh+1Dg=="
 }

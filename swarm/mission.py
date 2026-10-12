@@ -45,7 +45,7 @@ class MissionBudget:
                     remaining_seconds=max(0, limits["max_seconds"]-seconds),
                     note="Conservative token estimates and owner-declared prices; external tools may have independent fees")
 
-    def reserve(self, run, id, kind, data, messages):
+    def reserve(self, run, id, kind, data, messages, *, agent_id=None):
         with self.store.lock:
             root = self.root(run)
             usage = self.usage(root)
@@ -58,6 +58,15 @@ class MissionBudget:
             if usage["remaining_requests"] < units:
                 raise BudgetExceeded("Mission request budget reached")
             output_tokens = min(output_tokens, usage["remaining_tokens"]//units-input_tokens)
+            scopes=list(dict.fromkeys([*run.get('budget_scopes',[]),*([agent_id] if agent_id else [])]))
+            for scope in scopes:
+                cap=self.store.get('branch_budget',scope,{})
+                charged=[r for r in self.store.all('reservation') if scope in r.get('scopes',[])]
+                if cap.get('requests') is not None and sum(r.get('units',1) for r in charged)+units>cap['requests']:
+                    raise BudgetExceeded('Branch request allowance reached: '+scope)
+                if cap.get('tokens') is not None:
+                    remaining=cap['tokens']-sum(r['tokens'] for r in charged)
+                    output_tokens=min(output_tokens,remaining//units-input_tokens)
             if output_tokens < 32:
                 raise BudgetExceeded("Mission token budget cannot fit another request")
             cost = 0
@@ -74,7 +83,7 @@ class MissionBudget:
             if ceiling is not None and usage["estimated_spend_usd"] + cost > ceiling:
                 raise BudgetExceeded("Mission estimated spending budget reached")
             record = dict(id=id, root_id=root["id"], run_id=run["id"], status="pending", tokens=units*(input_tokens+output_tokens),units=units,
-                          input_tokens=input_tokens, output_limit=output_tokens, cost=cost, created_at=time.time())
+                          input_tokens=input_tokens, output_limit=output_tokens, cost=cost, created_at=time.time(),agent_id=agent_id,scopes=scopes)
             self.store.put("reservation", id, record)
             return record
 
