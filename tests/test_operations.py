@@ -244,6 +244,30 @@ def test_companion_invitation_one_use_and_questions_project_roles(client,vault):
     assert client.post('/api/team/questions/q/answer',json={'answer':'Use blue'},headers=h).status_code==200
 
 
+def test_companion_pairing_exports_large_certificate_chains_without_qr(client,tmp_path,monkeypatch):
+    from swarm.pairing import generate_certificate
+    created=generate_certificate(tmp_path,'127.0.0.1')
+    from pathlib import Path
+    certificate=Path(created['cert_file']);certificate.write_text(certificate.read_text()*8)
+    monkeypatch.setattr('swarm.private_listener.load_settings',lambda _:SimpleNamespace(enabled=True,cert_file=str(certificate),public_origin='https://127.0.0.1:9470'))
+    response=client.post('/api/ops/companion/pair',json=dict(name='Phone',role='viewer',project_ids=[client.project['id']]))
+    assert response.status_code==200,response.text
+    assert response.json()['bundle']['certificate']==certificate.read_text()
+    assert len(response.json()['qr_png'])==0 and 'JSON' in response.json()['note']
+
+
+def test_companion_bundle_never_exports_private_keys_from_combined_pem(client,tmp_path,monkeypatch):
+    from swarm.pairing import generate_certificate
+    from pathlib import Path
+    created=generate_certificate(tmp_path,'127.0.0.1')
+    certificate=Path(created['cert_file']);public=certificate.read_text();certificate.write_text(public+Path(created['key_file']).read_text())
+    monkeypatch.setattr('swarm.private_listener.load_settings',lambda _:SimpleNamespace(enabled=True,cert_file=str(certificate),public_origin='https://127.0.0.1:9470'))
+    response=client.post('/api/ops/companion/pair',json=dict(name='Phone',role='viewer',project_ids=[client.project['id']]))
+    assert response.status_code==200,response.text
+    assert response.json()['bundle']['certificate']==public
+    assert 'PRIVATE KEY' not in response.text
+
+
 def test_compatibility_runs_real_engine_workflows_with_scripted_provider_fixture(client,monkeypatch,vault):
     # This verifies harness behavior, not real model accuracy or provider compatibility.
     s=client.state.store

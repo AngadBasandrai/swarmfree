@@ -97,3 +97,13 @@ test('Stop releases microphone access while the audio engine is still starting',
  await page.getByRole('button',{name:'Stop microphone'}).click();await expect.poll(()=>page.evaluate(()=>(window as any).__stopped)).toBe(1);await expect.poll(()=>page.evaluate(()=>(window as any).__closed)).toBe(1);
  await expect(page.getByRole('button',{name:'Start microphone'})).toBeEnabled();
 });
+
+test('a certificate bundle too large for QR remains available as a pairing JSON download',async({page,request})=>{
+ const snapshot=await (await request.get('/api/snapshot')).json();let project=snapshot.projects[0];
+ if(!project){project=await (await request.post('/api/projects',{data:{name:'Phone pairing fixture',root:process.cwd(),tools:[],checks:{}}})).json();}
+ await page.route('**/api/ops/companion/pair',route=>route.fulfill({json:{qr_png:'',note:'Export the pairing JSON for this large certificate bundle.',certificate_sha256:'fixture-public-certificate-hash',member:{id:'fixture-member'},bundle:{format:'swarm-companion-v1',origin:'https://127.0.0.1:9470',certificate:'fixture-public-certificate',invite_id:'fixture-invite',invite:'fixture-one-use-invitation',expires_at:Date.now()/1000+600}}}));
+ await page.goto('/');await page.getByRole('button',{name:'Command center',exact:true}).click();await page.getByLabel('Command center project').selectOption(project.id);await page.getByRole('tab',{name:'Phone companion',exact:true}).click();
+ await page.getByRole('button',{name:'Create one-use phone invitation'}).click();await expect(page.getByText('Export the pairing JSON for this large certificate bundle.',{exact:true})).toBeVisible();
+ await expect(page.getByAltText('One-use companion pairing invitation')).toHaveCount(0);
+ const downloaded=page.waitForEvent('download');await page.getByRole('button',{name:'Export pairing bundle'}).click();expect((await downloaded).suggestedFilename()).toMatch(/\.json$/);
+});

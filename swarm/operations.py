@@ -204,15 +204,27 @@ def install_operations(app):
         if not config.enabled: raise RouteError("Enable the private TLS listener with a reachable HTTPS origin first")
         cert = Path(config.cert_file)
         if cert.stat().st_size > 16000: raise RouteError("Certificate is too large for a pairing bundle")
-        pem = cert.read_text(encoding="utf-8")
+        import re
+        from cryptography import x509
+        from cryptography.hazmat.primitives import serialization
+        blocks = re.findall(r"-----BEGIN CERTIFICATE-----.*?-----END CERTIFICATE-----",cert.read_text(encoding="utf-8"),re.S)
+        try:
+            pem = "".join(x509.load_pem_x509_certificate(block.encode()).public_bytes(serialization.Encoding.PEM).decode() for block in blocks)
+        except ValueError as error: raise RouteError("Use a valid PEM public certificate chain") from error
+        if not pem: raise RouteError("Use a PEM public certificate chain")
         member = app.state.team.add(form)
         invite = secrets.token_urlsafe(32); id = uid("phone_")
         app.state.vault.set(id,member["token"],True)
         app.state.store.put("companion_invite",id,dict(id=id,member_id=member["member"]["id"],invite_hash=token_hash(invite),expires_at=time.time()+600,redeemed=False))
         bundle = dict(format="swarm-companion-v1",origin=config.public_origin,invite_id=id,invite=invite,certificate=pem,expires_at=time.time()+600)
         import qrcode
-        image = qrcode.make(json.dumps(bundle,separators=(",",":")),error_correction=qrcode.constants.ERROR_CORRECT_L)
-        buffer=io.BytesIO();image.save(buffer,format="PNG")
-        return dict(bundle=bundle,qr_png=base64.b64encode(buffer.getvalue()).decode(),member=member["member"],certificate_sha256=hashlib.sha256(pem.encode()).hexdigest())
+        from qrcode.exceptions import DataOverflowError
+        encoded = ""; note = ""
+        try:
+            image = qrcode.make(json.dumps(bundle,separators=(",",":")),error_correction=qrcode.constants.ERROR_CORRECT_L)
+            buffer=io.BytesIO();image.save(buffer,format="PNG");encoded=base64.b64encode(buffer.getvalue()).decode()
+        except (DataOverflowError, ValueError):
+            note = "This certificate bundle is too large for a QR code. Export the pairing JSON and import or paste it on the phone."
+        return dict(bundle=bundle,qr_png=encoded,note=note,member=member["member"],certificate_sha256=hashlib.sha256(pem.encode()).hexdigest())
 
     app.include_router(router)
