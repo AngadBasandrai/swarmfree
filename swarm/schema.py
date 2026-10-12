@@ -145,7 +145,7 @@ class RunInput(BaseModel):
     task: str = Field(min_length=1, max_length=24000)
     architecture_id: str
     preset: Literal["general", "coding", "research"] = "general"
-    mode: Literal["live", "demo"] = "live"
+    mode: Literal["live"] = "live"
     free_only: bool = True
     route: Route = Field(default_factory=Route)
     project_id: str = Field(default="", max_length=80)

@@ -3,98 +3,98 @@
   "key_id": "swarmfree",
   "payload": {
     "kind": "index",
-    "serial": 1791736230,
-    "expires_at": 1823272230,
+    "serial": 1791804001,
+    "expires_at": 1823340001,
     "packages": [
       {
         "id": "supervisor",
         "name": "Supervisor",
-        "version": "0.5.0",
+        "version": "0.6.4",
         "kind": "architecture",
         "path": "packages/supervisor.json",
-        "sha256": "e881bcc9951865defd30b734911c1829942fc87ebde97ba8d7dfbeeaa878a85f"
+        "sha256": "4b191cd59105abc37ce1a0a801b041a223aa8a07605a2938c778d28cebdd8906"
       },
       {
         "id": "pipeline",
         "name": "Pipeline",
-        "version": "0.5.0",
+        "version": "0.6.4",
         "kind": "architecture",
         "path": "packages/pipeline.json",
-        "sha256": "aa4d76740afa44fc96eafac2878fdbc49112df37b956562f881d28c98c76fe8d"
+        "sha256": "1e0ca2baccd88ad7a584ea6149e1a7be6dd51b35cbeda23b9f5c330921ceb343"
       },
       {
         "id": "parallel",
         "name": "Parallel / join",
-        "version": "0.5.0",
+        "version": "0.6.4",
         "kind": "architecture",
         "path": "packages/parallel.json",
-        "sha256": "7de2e7134958921cf3bf944852735f5dd77fc371f1e1402b4b24cae84192928f"
+        "sha256": "93948d5d14d5ef834b8e7a707086eb3c5fdbe0705e019a343252daf68e4e9e3b"
       },
       {
         "id": "critic",
         "name": "Creator / critic",
-        "version": "0.5.0",
+        "version": "0.6.4",
         "kind": "architecture",
         "path": "packages/critic.json",
-        "sha256": "d582ac685a346cfc45fb9140a890d4a5f9cd6a47022ffc69c1b485e72853ac81"
+        "sha256": "9fa5e7d946d0761671d36f594c5448db4fcc72c357c46e39a99145dbc8d9da2a"
       },
       {
         "id": "baseline",
         "name": "Single-agent baseline",
-        "version": "0.5.0",
+        "version": "0.6.4",
         "kind": "architecture",
         "path": "packages/baseline.json",
-        "sha256": "5b0b33973d1c21893416073eeb5c02c910e07a9b3c922326d21442da4b2d1f8e"
+        "sha256": "9807de43aee428bb68fbd9c9aea1fce9e67b7e70f0176aa94487c1af6dc9a6ba"
       },
       {
         "id": "handoff",
         "name": "Specialist handoff",
-        "version": "0.5.0",
+        "version": "0.6.4",
         "kind": "architecture",
         "path": "packages/handoff.json",
-        "sha256": "efeee83100945a6bb093136051bbd878a07291b11aa5c8566c38ffbe9249dcd6"
+        "sha256": "1da3045e596d490544e60a2685f4f26a56d565a1b3503e9fa74518af42b35f70"
       },
       {
         "id": "hierarchy",
         "name": "Hierarchical team",
-        "version": "0.5.0",
+        "version": "0.6.4",
         "kind": "architecture",
         "path": "packages/hierarchy.json",
-        "sha256": "233c09a139520bdb598cf0358f7a9fff0f64cea9d1be49112b5d2fe3821efd3a"
+        "sha256": "22b5c03891669da2f9de03be3e8ea2c336b43982ee2d874246ab58625f6d6b41"
       },
       {
         "id": "blackboard",
         "name": "Shared blackboard",
-        "version": "0.5.0",
+        "version": "0.6.4",
         "kind": "architecture",
         "path": "packages/blackboard.json",
-        "sha256": "e9d251af94d7d9e8aee762d0d4dc47b6feb75190f55eb204b24de8567e9a7558"
+        "sha256": "2c75aa2dfcf3f551c35e1398c677c8c9ff050a2c566bd6ce527c383fa2161d73"
       },
       {
         "id": "ensemble",
         "name": "Debate / ensemble",
-        "version": "0.5.0",
+        "version": "0.6.4",
         "kind": "architecture",
         "path": "packages/ensemble.json",
-        "sha256": "6cfc455ef4c1e687180669c33d9927a3d3e6e9872363c2da72c208035362670f"
+        "sha256": "94c60338e451a5e067c9f6c212351b0e49569405fdc524ceacb2b26ea6c13fd0"
       },
       {
         "id": "revision",
         "name": "Bounded revision",
-        "version": "0.5.0",
+        "version": "0.6.4",
         "kind": "architecture",
         "path": "packages/revision.json",
-        "sha256": "79f33baa143e6f87a101b4457da00adf4da4b53efb5afb619def0d98950413b0"
+        "sha256": "39695f691482096ca287c35ef90176962d124904a24f6af146de6c2d643f5fdb"
       },
       {
         "id": "mcp-local-example",
         "name": "Local MCP adapter example",
-        "version": "0.5.0",
+        "version": "0.6.4",
         "kind": "plugin",
         "path": "packages/mcp-local-example.json",
-        "sha256": "e79e4c28bb7b0b8e7ea660c236a7392df941cb853a786a48cdace90053b12417"
+        "sha256": "8be9466c5f1c3f1ba4fd9cc19b1c42e56eed731b8a8e737356ccfdf07cdcf73a"
       }
     ]
   },
-  "signature": "dhA3yvOumFvOQvNqgIo6QI8/NE0Nk0ESO8nkYg1JPCVxA9hKm6vjVA/KCN9xNaBrwI3XRqP8jo2nvPDA7rV9CQ=="
+  "signature": "73BEknI3QNGtbjbl5FlQnXOARe6pWYerwriIZL4jnJe140qrbXLkyFRGrmNyrMPT2TZ3MuQUjwAHFGTqDM3ADg=="
 }

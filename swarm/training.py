@@ -57,7 +57,7 @@ class Training:
         for id in dict.fromkeys(form.agent_ids):
             a = self.store.get("agent", id); r = self.store.get("run", a["run_id"]) if a else None
             if not r or r.get("project_id") != form.project_id: raise RouteError("Select agents from this project")
-            if r.get("mode") == "demo" or a.get("status") != "done": excluded.append(dict(agent_id=id, reason="Only completed live work can become training data")); continue
+            if r.get("mode", "live") != "live" or a.get("status") != "done": excluded.append(dict(agent_id=id, reason="Only completed live work can become training data")); continue
             if a.get("data_labels"): excluded.append(dict(agent_id=id, reason="File-derived provenance requires a separately curated dataset")); continue
             answer = a.get("result", {}).get("content", "")
             prompt = r["task"]

@@ -24,7 +24,7 @@ def project(client,tmp_path):
     assert r.status_code==201,r.text
     return r.json()
 
-def test_setup_design_cache_and_bounded_inputs(tmp_path,vault):
+def test_setup_design_cache_and_bounded_inputs(tmp_path,vault,model_fixture):
     with owner(tmp_path,vault) as c:
         assert c.get('/api/workbench').status_code==401
         c.post('/api/session',json={'token':'owner'})
@@ -53,7 +53,7 @@ def test_team_project_scope_roles_expiration_revocation_and_audit(tmp_path,vault
         view=c.get('/api/team/snapshot',headers=h('viewer'))
         assert view.status_code==200 and 'root' not in view.json()['projects'][0]
         assert 'token_hash' not in view.text and 'owner' not in view.text
-        body=dict(task='test',architecture_id='baseline',project_id=p['id'],mode='demo')
+        body=dict(task='test',architecture_id='baseline',project_id=p['id'],mode='live')
         assert c.post('/api/team/runs',json=body,headers=h('viewer')).status_code==403
         assert c.post('/api/team/runs',json={**body,'project_id':'other'},headers=h('operator')).status_code==404
         run=c.post('/api/team/runs',json=body,headers=h('operator'))

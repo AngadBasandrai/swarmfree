@@ -206,15 +206,16 @@ def test_package_import_is_inert_and_does_not_grant_permissions(store):
     with pytest.raises(RouteError):preview(dict(value,api_key='not allowed'))
 
 
-async def test_schedule_requires_approval_debounces_files_and_survives_state(store,vault,tmp_path):
+async def test_schedule_requires_approval_debounces_files_and_survives_state(store,vault,tmp_path,model_fixture):
     settings(store)
+    model_fixture(store,vault)
     store.put('architecture','single',Architecture(id='single',name='Single',nodes=[dict(id='a',name='A',role='Help')]).model_dump())
     repo=tmp_path/'files';repo.mkdir();(repo/'a.py').write_text('before')
     store.put('project','p',dict(id='p',root=str(repo),tools=[],checks={}))
     async with AsyncSqliteSaver.from_conn_string(str(tmp_path/'cp.sqlite')) as saver:
         engine=Engine(store,Providers(store,vault,'http://127.0.0.1:1'),PrivatePool(store),saver)
         automation=Automation(store,engine)
-        created=automation.add(AutomationInput(name='Watch',kind='files',enabled=True,mission=dict(task='Review changes',architecture_id='single',project_id='p',mode='demo')))
+        created=automation.add(AutomationInput(name='Watch',kind='files',enabled=True,mission=dict(task='Review changes',architecture_id='single',project_id='p',mode='live')))
         await automation.tick()
         assert not store.all('trigger')
         (repo/'a.py').write_text('after')

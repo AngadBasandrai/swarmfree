@@ -32,3 +32,9 @@ def store(tmp_path):
 @pytest.fixture
 def vault():
     return MemoryVault()
+
+
+@pytest.fixture
+def model_fixture(monkeypatch):
+    from scripts.test_model_fixture import install_model_fixture
+    return lambda store, vault, response=None: install_model_fixture(store, vault, monkeypatch, response)

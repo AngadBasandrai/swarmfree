@@ -2,7 +2,9 @@
 
 A downloadable desktop workbench for persistent agents using your own model providers, local Ollama models, linked devices, and opt-in volunteer inference. Each installation measures its own hardware and owns its own workspace. MIT licensed.
 
-**0.6.3 desktop alpha:** a Tauri desktop app with a bundled engine for Windows x64, macOS Apple Silicon/Intel, and Linux x64. End users need no Python, Node.js or Rust. Browser agents use an optional headless Chromium download; the desktop UI uses the operating system's webview. Package validation and supported scope are recorded in [build status](docs/BUILD_STATUS.md), the [0.6 feature guide](docs/FEATURES_0_6.md) and the [research/design plan](docs/SWARM_WORKBENCH_PLAN.md).
+**0.6.4 desktop alpha:** a Tauri desktop app with a bundled engine for Windows x64, macOS Apple Silicon/Intel, and Linux x64. End users need no Python, Node.js or Rust. Browser agents use an optional headless Chromium download; the desktop UI uses the operating system's webview. Package validation and supported scope are recorded in [build status](docs/BUILD_STATUS.md), the [0.6 feature guide](docs/FEATURES_0_6.md) and the [research/design plan](docs/SWARM_WORKBENCH_PLAN.md).
+
+Missions use connected models. The offline demonstration mode was removed in 0.6.4; historical demonstration records remain inspectable and exportable, with execution disabled.
 
 ## Downloads
 
@@ -38,13 +40,13 @@ Local artifacts are in `releases/`; the public source and release target is [Ang
 - Opt-in MCP stdio/HTTP tools and ACP v1 stdio agents. Per-project and per-agent permissions; visible operations; emergency stop.
 - Paired-database backups, offline integrity-checked restore, schema migrations, single-writer workspace locks, and a configurable signature-verifying native updater. A signed public release channel is configured, with a GitHub fallback.
 
-The [0.6 feature guide](docs/FEATURES_0_6.md) explains the newest additions; the [0.4 guide](docs/FEATURES_0_4.md) explains the earlier additions, setup and practical limits; the [0.2 guide](docs/FEATURES_0_2.md) covers the earlier tools. Offline demo responses are explicitly scripted; they are not LLM output. Named checks and external extensions run with your OS permissions unless you explicitly configure the supported container wrapper for checks. OCR/transcription programs are separate trusted installations.
+The [0.6 feature guide](docs/FEATURES_0_6.md) explains the newest additions; the [0.4 guide](docs/FEATURES_0_4.md) explains the earlier additions, setup and practical limits; the [0.2 guide](docs/FEATURES_0_2.md) covers the earlier tools. Named checks and external extensions run with your OS permissions unless you explicitly configure the supported container wrapper for checks. OCR/transcription programs are separate trusted installations.
 
 ## First run
 
 1. Open **Providers** to link your own key, model and real quota scope. Alternatively install/start [Ollama](https://ollama.com/download) and use **Devices** to select models and set resource budgets.
 2. For coding or research, open **Studio > Projects & permissions**, select a project directory and grant the tools it needs. Configure named checks or a search server only when needed.
-3. Create a mission, choose its project, architecture and preset, and enable the project's tools. Public inference consent is off by default. With no connected models, select **Offline demo**.
+3. Create a mission, choose its project, architecture and preset, and enable the project's tools. Public inference consent is off by default. Connect a provider, an installed local model, or a paired device before launching.
 4. Click any agent to chat, inspect routing or change its model/permissions. Completed work remains portable. Partial interrupted responses remain drafts and are excluded from the next model's history.
 5. Review proposed edits under **Studio > Review changes** before applying them. Use **Memory & sources**, **Activity**, **Swarm lab** and **Model doctor** to inspect what happened.
 6. Use **Control room** for automations, packages, tuning/media, evidence, quotas and encrypted device links. **Execution tools** contains model routing/GGUF, semantic search, owned browser agents, private execution workers, agent questions, evaluations and encrypted recovery. The mission inspector's **Context** and **Debugger** tabs explain what each agent sends and how to replay a stage.

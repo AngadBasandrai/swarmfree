@@ -3,6 +3,7 @@ import asyncio
 from pathlib import Path
 import re
 import time
+from typing import Literal
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 from .schema import RunInput, Route, Architecture
@@ -36,7 +37,7 @@ class BranchInput(BaseModel):
 class LabInput(BaseModel):
     task: str = Field(min_length=1, max_length=24000)
     architecture_ids: list[str] = Field(min_length=1, max_length=4)
-    mode: str = "demo"
+    mode: Literal["live"] = "live"
     route: Route = Field(default_factory=Route)
     free_only: bool = True
     project_id: str = ""

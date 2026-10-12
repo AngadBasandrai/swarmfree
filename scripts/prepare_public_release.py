@@ -50,14 +50,14 @@ def main():
     def signed(payload): return dict(format='swarm-json-v1',key_id='swarmfree',payload=payload,signature=base64.b64encode(key.sign(canonical(payload).encode())).decode())
     packages=[]
     for template in TEMPLATES:
-        payload=dict(id=template['id'],name=template['name'],version='0.5.0',kind='architecture',license='MIT',permissions=sorted({tool for node in template['nodes'] for tool in node.get('tools') or []}),architecture=template,
-            examples=['Run with the offline demo before assigning live models'],evaluation=dict(status='deterministic demo validation',note='No live-provider quality ranking is claimed'))
+        payload=dict(id=template['id'],name=template['name'],version=config['version'],kind='architecture',license='MIT',permissions=sorted({tool for node in template['nodes'] for tool in node.get('tools') or []}),architecture=template,
+            examples=['Connect a provider, local model, or paired device before running this architecture'],evaluation=dict(status='deterministic provider-fixture validation',note='No live-provider quality ranking is claimed'))
         name=template['id']+'.json';raw=(json.dumps(signed(payload),indent=2)+'\n').encode();(registry/'packages'/name).write_bytes(raw)
         packages.append(dict(id=payload['id'],name=payload['name'],version=payload['version'],kind=payload['kind'],path='packages/'+name,sha256=hashlib.sha256(raw).hexdigest()))
-    payload=dict(id='mcp-local-example',name='Local MCP adapter example',version='0.5.0',kind='plugin',license='MIT',permissions=['Run an owner-installed executable','Invoke explicitly granted MCP tools'],
+    payload=dict(id='mcp-local-example',name='Local MCP adapter example',version=config['version'],kind='plugin',license='MIT',permissions=['Run an owner-installed executable','Invoke explicitly granted MCP tools'],
         extension=dict(kind='mcp',transport='stdio',argv=['OWNER_INSTALLED_MCP_SERVER'],enabled=False),examples=['Replace argv with an installed server and review tools in Extensions'],evaluation=dict(status='declaration example; executable not bundled'))
     raw=(json.dumps(signed(payload),indent=2)+'\n').encode();(registry/'packages/mcp-local-example.json').write_bytes(raw)
-    packages.append(dict(id=payload['id'],name=payload['name'],version='0.5.0',kind='plugin',path='packages/mcp-local-example.json',sha256=hashlib.sha256(raw).hexdigest()))
+    packages.append(dict(id=payload['id'],name=payload['name'],version=config['version'],kind='plugin',path='packages/mcp-local-example.json',sha256=hashlib.sha256(raw).hexdigest()))
     now=int(time.time());index=dict(kind='index',serial=now,expires_at=now+365*86400,packages=packages)
     (registry/'index.json').write_text(json.dumps(signed(index),indent=2)+'\n',encoding='utf-8')
     (ROOT/'public/.nojekyll').touch();(ROOT/'public/CNAME').write_text('swarms.grafitelab.in\n')

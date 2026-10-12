@@ -65,7 +65,7 @@ test('microphone setup failure releases its simulated stream',async({page})=>{
 });
 
 test('queued transcription finishes before a transcript can be reviewed and sent',async({page,request})=>{
- const created=await request.post('/api/runs',{data:{task:'Voice fixture',architecture_id:'baseline',mode:'demo'}});expect(created.ok()).toBeTruthy();const mission=await created.json();
+ const created=await request.post('/api/runs',{data:{task:'Voice fixture',architecture_id:'baseline',mode:'live'}});expect(created.ok()).toBeTruthy();const mission=await created.json();
  let release:()=>void=()=>{};const gate=new Promise<void>(resolve=>{release=resolve;});let chunk=false;
  await page.route('**/api/ops',async route=>{const response=await route.fetch();const body=await response.json();body.voice={trusted:true,argv:['fixture']};await route.fulfill({response,json:body});});
  await page.route('**/api/ops/voice/chunk',async route=>{chunk=true;await gate;await route.fulfill({json:{text:'Simulated local transcript'}});});

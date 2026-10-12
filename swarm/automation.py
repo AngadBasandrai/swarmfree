@@ -90,6 +90,7 @@ class Automation:
     def launch(self,id):
         trigger=self.store.get("trigger",id)
         if not trigger or trigger["status"]!="pending": raise RouteError("Trigger is no longer pending")
+        self.engine.require_live(trigger["mission"])
         form=RunInput.model_validate(trigger["mission"])
         architecture=self.store.get("architecture",form.architecture_id)
         if not architecture: raise RouteError("Architecture no longer exists")

@@ -349,17 +349,3 @@ async def ollama_stream(url, model, messages, budgets, placement):
                     raise RouteError("Ollama stream ended before completion")
         except httpx.HTTPError as e:
             raise RouteError("Ollama request failed. Check the runtime and available memory.") from e
-
-
-async def demo_stream(name, role, task, prior, steering=""):
-    """Explicit offline UI exercise; this is intentionally not a language model."""
-    text = f"Offline demonstration · {name}\n\nTask: {task[:260]}\n\n"
-    text += f"My role is to {role.lower()}. In a live run, a selected model receives this task, the agent's instructions, and completed upstream work.\n\n"
-    if prior:
-        text += "Received work from: " + ", ".join(p["name"] for p in prior) + ". Their completed outputs are part of this agent's context.\n\n"
-    if steering:
-        text += f"Your direction: {steering}\n\n"
-    text += "This demo checks graph execution, parallel branches, handoffs, chat, and checkpoints. Connect a provider or local model for generated answers."
-    for i in range(0, len(text), 18):
-        await asyncio.sleep(.035)
-        yield text[i:i+18]

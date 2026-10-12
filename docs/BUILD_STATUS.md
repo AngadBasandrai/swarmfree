@@ -1,4 +1,7 @@
-# Alpha build status
+# Swarm Workbench build status
+
+0.6.4 removes the offline demonstration backend and controls. Local validation passes 141 Python tests, 27 headless UI flows, three native request-boundary checks, and the isolated frozen Windows engine acceptance, including rejected demonstration requests and actual provider-protocol fixtures. Missions now require connected models; legacy demonstration records are retained for inspection without execution. Public desktop releases are gated on the complete four-platform package matrix; hosted build evidence is recorded after publication.
+
 
 12 October 2026 · version 0.6.3 · MIT
 

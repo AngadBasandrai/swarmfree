@@ -56,8 +56,7 @@ test('configure bounded mission limits and attach a text document',async({page})
   await page.getByLabel('Mission attachment').setInputFiles({name:'notes.txt',mimeType:'text/plain',buffer:Buffer.from('Owner-provided project notes.')});
   await expect(page.getByText('notes.txt',{exact:true})).toBeVisible();
   await page.getByLabel('THE MISSION').fill('Use these notes for a checklist');
-  await page.getByLabel('Execution mode').selectOption('demo');
-  await page.getByRole('button',{name:'Run offline demo',exact:true}).click();
+  await page.getByRole('button',{name:'Launch swarm',exact:true}).click();
   await expect(page.locator('.run-title .badge')).toHaveText('budget_exceeded',{timeout:15000});
   await page.getByRole('button',{name:'Debugger',exact:true}).click();
   await page.locator('.timeline-request').first().click();

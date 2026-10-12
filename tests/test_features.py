@@ -99,20 +99,20 @@ def test_web_retrieval_blocks_private_dns_and_non_https(monkeypatch):
     with pytest.raises(RouteError): public_fetch("http://example.com/")
 
 
-async def test_bounded_rounds_conditions_and_vote_are_executable(store,vault,tmp_path,monkeypatch):
+async def test_bounded_rounds_conditions_and_vote_are_executable(store,vault,tmp_path,monkeypatch,model_fixture):
     store.put("settings","budgets",dict(ram_gb=4,vram_gb=0,context=4096,allow_cpu=True))
     calls = []
     async def response(name,*args):
         calls.append(name)
         yield '{"decision":"yes"}'
-    monkeypatch.setattr("swarm.engine.demo_stream",response)
+    model_fixture(store,vault,response)
     arch = Architecture(id="rounds",name="Rounds",max_rounds=2,nodes=[
         dict(id="one",name="One",role="decide"),dict(id="two",name="Two",role="decide"),
         dict(id="skip",name="Skipped",role="help",run_if={"source":"one","contains":"nope"}),
         dict(id="vote",name="Vote",role="vote",kind="vote")],edges=[dict(source="one",target="skip"),dict(source="one",target="vote"),dict(source="two",target="vote")]).model_dump()
     async with AsyncSqliteSaver.from_conn_string(str(tmp_path/"cp.sqlite")) as saver:
         engine = Engine(store,Providers(store,vault,"http://127.0.0.1:1"),PrivatePool(store),saver)
-        run = engine.create(RunInput(task="Choose",architecture_id="rounds",mode="demo"),arch)
+        run = engine.create(RunInput(task="Choose",architecture_id="rounds",mode="live"),arch)
         await until(lambda:store.get("run",run["id"])["status"] in {"completed","interrupted"})
         final = store.get("run",run["id"])
         assert final["status"] == "completed" and calls.count("One") == 2 and "Skipped" not in calls
@@ -176,7 +176,7 @@ def test_owner_features_api_lab_and_backup_restore_guard(tmp_path,vault):
         project = client.post("/api/projects",json=dict(name="Project",root=str(tmp_path),tools=["memory.search"],checks={})).json()
         assert project["id"]
         assert client.post(f"/api/projects/{project['id']}/memory",json=dict(title="Decision",content="Preserve context")).status_code == 201
-        lab = client.post("/api/labs",json=dict(task="Compare",architecture_ids=["pipeline"],mode="demo")).json()
+        lab = client.post("/api/labs",json=dict(task="Compare",architecture_ids=["pipeline"],mode="live")).json()
         assert lab["id"]
         data = client.get("/api/features").json()
         assert {r["architecture"] for r in data["labs"][0]["rows"]} == {"Single-agent baseline","Pipeline"}

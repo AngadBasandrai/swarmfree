@@ -18,13 +18,14 @@ from swarm.training import Training, DatasetInput, TrainingInput
 
 
 @pytest.fixture
-def client(tmp_path,vault,monkeypatch):
+def client(tmp_path,vault,monkeypatch,model_fixture):
     monkeypatch.setenv('SWARM_OLLAMA_URL','http://127.0.0.1:1')
     hw=lambda:dict(name='fixture',system='Windows',machine='x64',cpu='fixture',cores=4,threads=8,ram_total_gb=16,ram_available_gb=12,gpus=[],unified_memory=False)
     monkeypatch.setattr('swarm.app.hardware',hw)
     monkeypatch.setattr('swarm.hardware.hardware',hw)
     with TestClient(create_app(tmp_path/'state',token='owner',vault=vault)) as c:
         c.post('/api/session',json={'token':'owner'})
+        model_fixture(c.app.state.store,vault)
         project=tmp_path/'project';project.mkdir();(project/'file.txt').write_text('ordinary text')
         p=c.post('/api/projects',json=dict(name='Project',root=str(project),tools=[])).json()
         c.project=p;c.state=c.app.state
@@ -41,7 +42,7 @@ def poll(client,kind,id):
 
 
 def test_campaign_dependencies_reviews_budget_and_restart(client):
-    form=dict(name='Release',mission=dict(task='Project',architecture_id='baseline',project_id=client.project['id'],mode='demo'),
+    form=dict(name='Release',mission=dict(task='Project',architecture_id='baseline',project_id=client.project['id'],mode='live'),
         milestones=[dict(id='plan',title='Plan',task='Plan project',criteria='A reviewable plan'),dict(id='build',title='Build',task='Deliver project',depends_on=['plan'])],
         limits=dict(max_requests=2,max_tokens=20000,max_seconds=60,max_spend_usd=0))
     row=client.post('/api/ops/campaigns',json=form);assert row.status_code==200,row.text
@@ -58,7 +59,7 @@ def test_campaign_dependencies_reviews_budget_and_restart(client):
 
 
 def test_stop_all_disables_automatic_campaigns(client):
-    row=client.post('/api/ops/campaigns',json=dict(name='Campaign',automatic=True,mission=dict(task='x',architecture_id='baseline',project_id=client.project['id'],mode='demo'),milestones=[dict(id='one',title='One',task='work')])).json()
+    row=client.post('/api/ops/campaigns',json=dict(name='Campaign',automatic=True,mission=dict(task='x',architecture_id='baseline',project_id=client.project['id'],mode='live'),milestones=[dict(id='one',title='One',task='work')])).json()
     client.state.store.patch('campaign',row['id'],dict(enabled=True))
     assert client.post('/api/stop').status_code==200
     assert not client.state.store.get('campaign',row['id'])['enabled']
@@ -105,13 +106,13 @@ def test_preflight_reports_shared_quota_without_claiming_requests(client):
     for name,limit in [('first',10),('second',3)]:
         result=client.post('/api/profiles',json=dict(provider='google',label=name,api_key='fake-fixture-key-'+name,ephemeral=True,model='fixture',quota_scope='one-project',requests_per_minute=limit,free_eligible=True))
         assert result.status_code==201,result.text
-    scope=client.state.store.all('profile')[0]['quota_group'];now=time.time()
+    scope=next(p for p in client.state.store.all('profile') if p['label']=='first')['quota_group'];now=time.time()
     client.state.store.put('quota',scope,dict(requests=[now]*3,cooldown_until=now+20))
     before=client.state.store.get('quota',scope)
     result=client.post('/api/ops/preflight',json=dict(mission=dict(task='Check',architecture_id='baseline'),architecture_ids=['baseline'])).json()
-    group=result['quota_groups'][0]
+    group=next(g for g in result['quota_groups'] if g['quota_group']==scope)
     assert group['requests_per_minute']==3 and group['remaining_requests']==0 and group['cooldown_seconds']>0
-    assert not any(p['available_now'] for p in result['profiles'])
+    assert not any(p['available_now'] for p in result['profiles'] if p['quota_group']==scope)
     assert client.state.store.get('quota',scope)==before
 
 

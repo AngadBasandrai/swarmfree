@@ -4,7 +4,7 @@
   "payload": {
     "id": "critic",
     "name": "Creator / critic",
-    "version": "0.5.0",
+    "version": "0.6.4",
     "kind": "architecture",
     "license": "MIT",
     "permissions": [],
@@ -87,12 +87,12 @@
       "output_schema": {}
     },
     "examples": [
-      "Run with the offline demo before assigning live models"
+      "Connect a provider, local model, or paired device before running this architecture"
     ],
     "evaluation": {
-      "status": "deterministic demo validation",
+      "status": "deterministic provider-fixture validation",
       "note": "No live-provider quality ranking is claimed"
     }
   },
-  "signature": "rz7R4aIWtugmsAEkzWH+M0HjFRNY7agTZ//0PQSCCPINDGqFEJyj/Hx/qGLJ5UrCQguRPex75/eu6axoPcJpAg=="
+  "signature": "vyCjWyUvYI05LcPFlWq4tUL45iDNt3BCXvgh2mJJ4fkVqkEzAzYQKaE8Zk/r5E4BKnhQ1iwAMFjzfYyZpOUkBQ=="
 }

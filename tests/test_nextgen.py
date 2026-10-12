@@ -262,11 +262,12 @@ def test_nextgen_owner_boundary_and_reviewed_inputs(tmp_path,vault):
         finally: client.portal.call(release_download)
 
 
-def test_evaluation_suite_recommends_smallest_passing_team(tmp_path,vault):
+def test_evaluation_suite_recommends_smallest_passing_team(tmp_path,vault,model_fixture):
     app=create_app(tmp_path/'state',token='owner',vault=vault)
     with TestClient(app) as client:
         client.headers['Authorization']='Bearer owner'
-        result=client.post('/api/next/evaluations',json=dict(name='Compare teams',tasks=[dict(task='Include verification',checks=[dict(kind='contains',value='verification')])],variants=[dict(name='One',architecture_id='baseline'),dict(name='Team',architecture_id='pipeline')],mission=dict(mode='demo')))
+        model_fixture(app.state.store,vault)
+        result=client.post('/api/next/evaluations',json=dict(name='Compare teams',tasks=[dict(task='Include verification',checks=[dict(kind='contains',value='verification')])],variants=[dict(name='One',architecture_id='baseline'),dict(name='Team',architecture_id='pipeline')],mission=dict(mode='live')))
         assert result.status_code==200
         end=time.monotonic()+12
         while time.monotonic()<end:
@@ -336,15 +337,16 @@ async def test_gguf_managed_lifecycle_uses_loopback_auth_and_reloads_changed_con
     await manager.close();assert not manager.processes and not providers.vault.get('runtime_'+row['id'])
 
 
-def test_evaluations_execute_granted_named_checks_and_fail_when_permissions_are_missing(tmp_path,vault):
+def test_evaluations_execute_granted_named_checks_and_fail_when_permissions_are_missing(tmp_path,vault,model_fixture):
     import sys
     directory=tmp_path/'project';directory.mkdir()
     app=create_app(tmp_path/'state',token='owner',vault=vault)
     with TestClient(app) as client:
         client.headers['Authorization']='Bearer owner'
+        model_fixture(app.state.store,vault)
         project=client.post('/api/projects',json=dict(name='Checks',root=str(directory),tools=['checks.run'],checks={'verify':[sys.executable,'-c','print("passing named check")']})).json()
         for enabled in (True,False):
-            response=client.post('/api/next/evaluations',json=dict(name='Named checks',tasks=[dict(task='Complete the task',checks=[dict(kind='named_check',value='verify')])],variants=[dict(name='One',architecture_id='baseline')],mission=dict(mode='demo',project_id=project['id'],tools_enabled=enabled)))
+            response=client.post('/api/next/evaluations',json=dict(name='Named checks',tasks=[dict(task='Complete the task',checks=[dict(kind='named_check',value='verify')])],variants=[dict(name='One',architecture_id='baseline')],mission=dict(mode='live',project_id=project['id'],tools_enabled=enabled)))
             assert response.status_code==200
             id=response.json()['id'];end=time.monotonic()+8
             while time.monotonic()<end:

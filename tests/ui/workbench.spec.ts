@@ -1,5 +1,18 @@
 import { test, expect } from '@playwright/test';
 
+test('missions require connected models and reject the removed demonstration mode', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.getByRole('heading', { name: /Give your swarm/ })).toBeVisible();
+  await expect(page.getByLabel('Execution mode')).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Run offline demo' })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Launch swarm' })).toBeVisible();
+  const response = await page.request.post('/api/runs', { data: { task: 'Removed execution mode', architecture_id: 'baseline', mode: 'demo' } });
+  expect(response.status()).toBe(422);
+  await page.getByRole('button', { name: 'Command center', exact: true }).click();
+  await page.getByRole('tab', { name: 'Campaigns', exact: true }).click();
+  await expect(page.getByLabel('Command execution mode')).toHaveCount(0);
+});
+
 test('launch a swarm, inspect agents, follow up, and export completed work', async ({ page }) => {
   const browserErrors: string[] = [];
   page.on('pageerror', e => browserErrors.push(e.message));
@@ -7,8 +20,7 @@ test('launch a swarm, inspect agents, follow up, and export completed work', asy
   await expect(page.getByRole('heading', { name: /Give your swarm/ })).toBeVisible();
   await page.screenshot({ path: 'test-results/workbench-home.png', fullPage: true });
   await page.getByLabel('THE MISSION').fill('Compare three approaches to building a community research library');
-  await page.getByLabel('Execution mode').selectOption('demo');
-  await page.getByRole('button', { name: 'Run offline demo' }).click();
+  await page.getByRole('button', { name: 'Launch swarm' }).click();
   await expect(page.locator('.run-title .badge')).toHaveText('completed', { timeout: 25000 });
   await expect(page.locator('.dock-agent')).toHaveCount(4);
   await page.locator('.dock-agent').filter({ hasText: 'Researcher' }).click();
@@ -43,9 +55,9 @@ test('link two account profiles sharing a Google project without exposing keys',
     await modal.getByRole('button', { name: 'Link profile', exact: true }).click();
     await expect(page.getByRole('heading', { name: label, exact: true })).toBeVisible();
   }
-  await expect(page.locator('.stats-row > div').nth(0).locator('strong')).toHaveText('2');
-  await expect(page.locator('.stats-row > div').nth(1).locator('strong')).toHaveText('1');
-  await expect(page.locator('.quota-details strong')).toHaveText(['same-project', 'same-project']);
+  await expect(page.locator('.stats-row > div').nth(0).locator('strong')).toHaveText('3');
+  await expect(page.locator('.stats-row > div').nth(1).locator('strong')).toHaveText('2');
+  await expect(page.locator('.quota-details strong')).toHaveText(['owned-test-fixture', 'same-project', 'same-project']);
   await expect(page.locator('body')).not.toContainText('ui-placeholder-key');
   await page.getByLabel('Model for Personal Gemini').fill('user-selected-model');
   await page.getByRole('heading', { name: 'Bring your own capacity.' }).click();
@@ -80,8 +92,7 @@ test('small-screen mission and conversation stay usable', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { name: /Give your swarm/ })).toBeVisible();
   await page.getByLabel('THE MISSION').fill('Make a simple checklist');
-  await page.getByLabel('Execution mode').selectOption('demo');
-  await page.getByRole('button', { name: 'Run offline demo' }).click();
+  await page.getByRole('button', { name: 'Launch swarm' }).click();
   await expect(page.getByRole('button', { name: 'Send agent message' })).toBeVisible();
   await expect(page.locator('.dock-agent')).toHaveCount(4);
   await expect(page.locator('.dock-agent').first()).toBeInViewport({ ratio: .95 });

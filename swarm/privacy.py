@@ -75,7 +75,7 @@ class Privacy:
         for label in labels: self.mark(agent_id,label["project_id"],[label["path"]])
 
     def destination(self,kind,data):
-        if kind in {"local","runtime","demo"}: return "local"
+        if kind in {"local","runtime"}: return "local"
         if kind=="device": return "private"
         if kind=="profile": return "public" if data.get("provider")=="community" else "cloud"
         return "cloud"

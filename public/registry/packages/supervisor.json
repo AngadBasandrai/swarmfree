@@ -4,7 +4,7 @@
   "payload": {
     "id": "supervisor",
     "name": "Supervisor",
-    "version": "0.5.0",
+    "version": "0.6.4",
     "kind": "architecture",
     "license": "MIT",
     "permissions": [],
@@ -108,12 +108,12 @@
       "output_schema": {}
     },
     "examples": [
-      "Run with the offline demo before assigning live models"
+      "Connect a provider, local model, or paired device before running this architecture"
     ],
     "evaluation": {
-      "status": "deterministic demo validation",
+      "status": "deterministic provider-fixture validation",
       "note": "No live-provider quality ranking is claimed"
     }
   },
-  "signature": "dvDp1tRKTIeSSg8ZVBJ8HrrrfsZbAnYUtYQTuPVCKSzE6PROsSMA0kLgjHglai+VoJsolK3qMm54mFxcLPcgBw=="
+  "signature": "9kRwnDjieza/ctX7Aocsp3TFsRTy3vejOFEDBahcmY7XrU+fMQ1DEyxVXzLGqgCENZlAwazrx2YVOq2XhgvJAg=="
 }

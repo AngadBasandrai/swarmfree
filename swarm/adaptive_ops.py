@@ -67,7 +67,7 @@ class AdaptiveOps:
     def feedback(self, form):
         outcome = self.store.get("outcome", form.outcome_id)
         if not outcome or not self.store.get("run", outcome["run_id"]): raise RouteError("Measured outcome not found")
-        if self.store.get("run", outcome["run_id"]).get("mode") == "demo": raise RouteError("Scripted demo feedback cannot train live routing")
+        if self.store.get("run", outcome["run_id"]).get("mode", "live") != "live": raise RouteError("Archived execution feedback cannot train live routing")
         # One editable vote per outcome; editing never multiplies its weight.
         return self.store.put("route_feedback", form.outcome_id, dict(id=form.outcome_id, **form.model_dump(), created_at=time.time()))
 

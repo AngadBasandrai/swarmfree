@@ -1,5 +1,7 @@
 # Swarm Workbench 0.6
 
+From 0.6.4 onward, every mission uses connected models. The offline demonstration mode and its execution controls have been removed from missions, automations, campaigns, comparisons, evaluations, and onboarding. Saved demonstration records remain inspectable and exportable, but cannot resume, branch, or accept new messages. Connect a provider, local model, or paired device to begin.
+
 These twelve additions are part of the downloadable desktop application. Open **Command center** for their controls. The separate Swarm Companion project packages the phone interface as a native Tauri application. No inference or API credentials are hosted at swarms.grafitelab.in.
 
 1. **Mission command center.** Running work, blocked missions, pending agent questions, proposed changes and local/linked capacity have direct links to their existing inspectors and controls. Selecting a project narrows the displayed work. Stop all also disables automatic campaigns.

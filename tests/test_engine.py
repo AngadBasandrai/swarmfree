@@ -15,7 +15,7 @@ async def until(predicate, timeout=4):
 
 
 @pytest.mark.asyncio
-async def test_join_waits_for_both_branches_and_receives_their_work(store, vault, tmp_path, monkeypatch):
+async def test_join_waits_for_both_branches_and_receives_their_work(store, vault, tmp_path, monkeypatch, model_fixture):
     store.put("settings", "budgets", dict(ram_gb=4, vram_gb=0, context=4096, allow_cpu=True))
     calls = []
 
@@ -25,10 +25,10 @@ async def test_join_waits_for_both_branches_and_receives_their_work(store, vault
             await asyncio.sleep(.05)
         yield name + " output"
 
-    monkeypatch.setattr("swarm.engine.demo_stream", response)
+    model_fixture(store, vault, response)
     async with AsyncSqliteSaver.from_conn_string(str(tmp_path / "checkpoints.sqlite")) as saver:
         engine = Engine(store, Providers(store, vault, "http://127.0.0.1:1"), PrivatePool(store), saver)
-        run = engine.create(RunInput(task="Analyze it", architecture_id="parallel", mode="demo"), next(t for t in TEMPLATES if t["id"] == "parallel"))
+        run = engine.create(RunInput(task="Analyze it", architecture_id="parallel", mode="live"), next(t for t in TEMPLATES if t["id"] == "parallel"))
         await until(lambda: store.get("run", run["id"])["status"] in {"completed", "interrupted"})
         assert store.get("run", run["id"])["status"] == "completed"
         assert calls[-1][0] == "Synthesizer" and set(calls[-1][1]) == {"Analyst", "Skeptic"}
@@ -38,7 +38,7 @@ async def test_join_waits_for_both_branches_and_receives_their_work(store, vault
 
 
 @pytest.mark.asyncio
-async def test_pause_and_process_restart_resume_without_repeating_completed_agent(store, vault, tmp_path, monkeypatch):
+async def test_pause_and_process_restart_resume_without_repeating_completed_agent(store, vault, tmp_path, monkeypatch, model_fixture):
     store.put("settings", "budgets", dict(ram_gb=4, vram_gb=0, context=4096, allow_cpu=True))
     calls = []
     gate = asyncio.Event()
@@ -50,11 +50,11 @@ async def test_pause_and_process_restart_resume_without_repeating_completed_agen
             await gate.wait()
         yield name + " completed"
 
-    monkeypatch.setattr("swarm.engine.demo_stream", response)
+    model_fixture(store, vault, response)
     path = str(tmp_path / "checkpoints.sqlite")
     async with AsyncSqliteSaver.from_conn_string(path) as saver:
         engine = Engine(store, Providers(store, vault, "http://127.0.0.1:1"), PrivatePool(store), saver)
-        run = engine.create(RunInput(task="Continue work", architecture_id="pipeline", mode="demo"), next(t for t in TEMPLATES if t["id"] == "pipeline"))
+        run = engine.create(RunInput(task="Continue work", architecture_id="pipeline", mode="live"), next(t for t in TEMPLATES if t["id"] == "pipeline"))
         await until(lambda: "Builder" in calls)
         await engine.pause(run["id"])
         assert store.get("run", run["id"])["status"] == "paused"
@@ -76,7 +76,7 @@ async def test_pause_and_process_restart_resume_without_repeating_completed_agen
 
 
 @pytest.mark.asyncio
-async def test_provider_fallback_keeps_history_and_excludes_partial_draft(store, vault, tmp_path, monkeypatch):
+async def test_provider_fallback_keeps_history_and_excludes_partial_draft(store, vault, tmp_path, monkeypatch, model_fixture):
     store.put("settings", "budgets", dict(ram_gb=4, vram_gb=0, context=4096, allow_cpu=True))
     providers = Providers(store, vault, "http://127.0.0.1:1")
     for i in range(2):

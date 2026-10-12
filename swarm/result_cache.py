@@ -29,7 +29,7 @@ class ResultCache:
     def __init__(self,store,workspace,privacy): self.store,self.workspace,self.privacy=store,workspace,privacy
 
     def key(self,run,agent,messages,kind,data):
-        if not run.get("reuse_cache") or run.get("mode")=="demo" or run.get("attachments") or self.workspace.permissions(run,agent): return None
+        if not run.get("reuse_cache") or run.get("mode", "live")!="live" or run.get("attachments") or self.workspace.permissions(run,agent): return None
         revision=(data.get("model_revision") or run.get("model_revision")) if kind=="profile" else run.get("model_revision")
         if kind=="runtime": revision=digest({k:data.get(k) for k in ("identity","modified_ns","size")})
         if kind not in {"profile","local","runtime","device"} or not revision: return None

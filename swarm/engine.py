@@ -6,7 +6,7 @@ import time
 from typing import Annotated, TypedDict
 from langgraph.graph import StateGraph, START, END
 from .hardware import hardware, inventory, fit_model
-from .providers import RouteError, demo_stream
+from .providers import RouteError
 from .store import uid
 from .workspace import tool_request
 from .context import ContextManager
@@ -41,6 +41,8 @@ class Engine:
         self.agent_locks = {}
         self.queue_task = asyncio.create_task(self.queue_loop())
         for run in store.all("run"):
+            if run.get("mode", "live") != "live" and run["status"] in {"ready", "running", "queued"}:
+                run = store.patch("run", run["id"], dict(status="interrupted", error="This execution mode has been removed. Create a new mission with a connected model."))
             if run.get("active_since"):
                 store.patch("run",run["id"],dict(active_since=None,active_seconds=run.get("active_seconds",0)+max(0,time.time()-run["active_since"])))
             if run["status"] == "running":
@@ -53,6 +55,7 @@ class Engine:
                         self.update_message(agent["id"], message["id"], interrupted=True)
 
     def create(self, form, architecture, *, start=True):
+        self.require_live(form.model_dump())
         if form.adaptive != "off":
             from .schema import Architecture
             architecture = Architecture(id="adaptive", name="Adaptive team · " + form.adaptive, nodes=[
@@ -82,9 +85,15 @@ class Engine:
         return run
 
     def start(self, run_id):
+        self.require_live(self.store.get("run", run_id))
         if run_id in self.tasks and not self.tasks[run_id].done():
             return
         self.tasks[run_id] = asyncio.create_task(self.execute(run_id))
+
+    @staticmethod
+    def require_live(run):
+        if run.get("mode", "live") != "live":
+            raise RouteError("This archived run used a removed execution mode. Create a new mission with a connected model.")
 
     def graph(self, run):
         builder = StateGraph(GraphState)
@@ -197,9 +206,13 @@ class Engine:
             await asyncio.sleep(1)
             for run in self.store.all("run"):
                 if run["status"] == "queued" and run.get("next_retry", 0) <= time.time():
+                    if run.get("mode", "live") != "live":
+                        self.store.patch("run", run["id"], dict(status="interrupted", error="This execution mode has been removed. Create a new mission with a connected model."))
+                        continue
                     self.start(run["id"])
 
     def branch(self, run, architecture, route, through="", *, rerun=False, step=False):
+        self.require_live(run)
         from .schema import RunInput
         if step and through:
             keep=self.ancestors(run,through)|{through}
@@ -484,6 +497,7 @@ class Engine:
         return self.context.build(run,agent,guidance,context,media)
 
     async def respond(self, run, agent_id, upstream):
+        self.require_live(run)
         self.store.patch("agent", agent_id, dict(status="running", error=""))
         latest_output = ""
         rejected_routes=set()
@@ -493,8 +507,8 @@ class Engine:
                 agent = self.store.get("agent", agent_id)
                 latest_user = next((m["id"] for m in reversed(agent["messages"]) if m["role"] == "user"), None)
                 messages = self.messages(run, agent)
-                options = [("demo", None)] if run["mode"] == "demo" else await self.candidates(run, agent)
-                if self.adaptive_ops and run["mode"] != "demo":
+                options = await self.candidates(run, agent)
+                if self.adaptive_ops:
                     admitted = []
                     for kind, data in options:
                         reason = self.adaptive_ops.admission(kind,data)
@@ -508,7 +522,7 @@ class Engine:
                 from .intelligence import route_key,check_output
                 if agent["route"]["kind"]=="auto": options=[(k,d) for k,d in options if route_key(k,d) not in rejected_routes]
                 if not options:
-                    raise RouteError("No eligible model. Connect a provider and select its model, start Ollama, or pair a device. Offline demo is available without keys.", retry_after=30)
+                    raise RouteError("No eligible model. Connect a provider and select its model, start Ollama, or pair a device.", retry_after=30)
                 from .protocol import tool_definitions,decode_calls
                 tools,mapping=tool_definitions(self.workspace,run,agent) if self.workspace and run.get("native_tools") else ([],{})
                 accounting_messages=messages+([dict(role="system",content=json.dumps(tools))] if tools else [])
@@ -563,9 +577,7 @@ class Engine:
                         project = self.store.get("project", run["project_id"])
                         stream = self.workspace.extensions.agent_stream(data, project, wire_messages)
                     else:
-                        label = "Offline demo · no LLM"
-                        direction = next((m["content"] for m in reversed(agent["messages"]) if m.get("source") == "steering"), "")
-                        stream = demo_stream(agent["name"], agent["role"], run["task"], upstream, direction)
+                        raise RouteError("Unsupported model route")
                     self.store.patch("agent", agent_id, {"actual_route": label})
                     message = self.append_message(agent_id, "assistant", "", complete=False, route=label)
                     from .media import compatible_messages
@@ -618,7 +630,7 @@ class Engine:
                     if budget_errors and not errors: raise BudgetExceeded("; ".join(dict.fromkeys(budget_errors)))
                     retry = self.providers.retry_delay()
                     raise RouteError("; ".join(errors[-3:]) or "All selected routes failed", retry_after=retry)
-                request = tool_request(latest_output) if run["mode"] != "demo" else None
+                request = tool_request(latest_output)
                 try: requests=decode_calls(native_calls,mapping) if native_calls else [request] if request else []
                 except RouteError as error:
                     validation_attempts+=1
@@ -642,7 +654,7 @@ class Engine:
                     continue
                 validation=check_output(latest_output,agent.get("output_schema"),agent.get("validators"))
                 self.store.patch("agent",agent_id,dict(validation=validation))
-                if self.intelligence and run["mode"]!="demo": self.intelligence.outcome(run,agent,kind,data,validation,round((time.monotonic()-started)*1000))
+                if self.intelligence: self.intelligence.outcome(run,agent,kind,data,validation,round((time.monotonic()-started)*1000))
                 if not validation["passed"]:
                     validation_attempts+=1
                     self.update_message(agent_id,message["id"],validation_failed=True)
@@ -667,6 +679,7 @@ class Engine:
 
     def steer(self, agent_id, content):
         agent = self.store.get("agent", agent_id)
+        self.require_live(self.store.get("run", agent["run_id"]))
         self.append_message(agent_id, "user", content, source="steering")
         self.store.event(agent["run_id"], "agent_message", agent_id=agent_id, message=f"Direction sent to {agent['name']}")
         run = self.store.get("run", agent["run_id"])

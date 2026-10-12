@@ -61,7 +61,7 @@ class MissionBudget:
             if output_tokens < 32:
                 raise BudgetExceeded("Mission token budget cannot fit another request")
             cost = 0
-            if run.get("mode") != "demo" and kind in {"profile", "acp"}:
+            if kind in {"profile", "acp"}:
                 profile = data if isinstance(data, dict) else {}
                 declared_free = kind == "profile" and run.get("free_only") and profile.get("free_eligible")
                 rates = (profile.get("input_usd_per_million"), profile.get("output_usd_per_million"))

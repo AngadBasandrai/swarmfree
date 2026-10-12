@@ -60,6 +60,15 @@ def main():
             with urlopen(req, timeout=30) as response:
                 return json.load(response)
 
+        class ModelFixture(BaseHTTPRequestHandler):
+            def log_message(self,*args): pass
+            def do_POST(self):
+                payload=json.loads(self.rfile.read(int(self.headers['Content-Length'])))
+                text='Owned test provider response.\n'+next((m['content'] for m in payload['messages'] if m['role']=='user'),'Frozen verification')
+                body=('data: '+json.dumps(dict(choices=[dict(delta=dict(content=text),finish_reason='stop')]))+'\n\ndata: [DONE]\n\n').encode()
+                self.send_response(200);self.send_header('Content-Type','text/event-stream');self.send_header('Content-Length',str(len(body)));self.end_headers();self.wfile.write(body)
+        model_fixture=HTTPServer(('127.0.0.1',0),ModelFixture)
+        threading.Thread(target=model_fixture.serve_forever,daemon=True).start()
         process, ready = start()
         try:
             for path, method, body, expected in [("/", "GET", None, 404),
@@ -70,7 +79,14 @@ def main():
                 except HTTPError as error:
                     assert error.code == expected
             snapshot = request(ready, "/api/snapshot")
-            assert request(ready, "/api/health")["version"] == "0.6.3"
+            fixture_profile=request(ready,'/api/profiles','POST',dict(provider='compatible',label='Owned smoke fixture',quota_scope='owned-smoke-service',ephemeral=True,model='fixture',base_url=f'http://127.0.0.1:{model_fixture.server_port}/v1',input_usd_per_million=0,output_usd_per_million=0,requests_per_minute=600))
+            fixture_route=dict(kind='profile',profile_id=fixture_profile['id'])
+            try:
+                request(ready,'/api/runs','POST',dict(task='Removed execution',architecture_id='baseline',mode='demo'))
+                raise AssertionError('Frozen engine accepted the removed execution mode')
+            except HTTPError as error:
+                assert error.code==422
+            assert request(ready, "/api/health")["version"] == "0.6.4"
             assert snapshot["hardware"]["ram_total_gb"] > 0
             assert snapshot["architectures"]
             features = request(ready,"/api/features")
@@ -135,7 +151,7 @@ def main():
                 except HTTPError as error:
                     assert error.code == 401
             run = request(ready, "/api/runs", "POST", dict(task="Verify the bundled desktop engine",
-                architecture_id="parallel", preset="general", mode="demo", free_only=True))
+                architecture_id="parallel", preset="general", mode="live", free_only=False, route=fixture_route))
             deadline = time.monotonic() + 20
             while time.monotonic() < deadline:
                 run = request(ready, "/api/runs/" + run["id"])
@@ -155,7 +171,7 @@ def main():
             evaluation = request(ready, "/api/next/evaluations", "POST", dict(name="Frozen repeatable evaluation",
                 tasks=[dict(task="Frozen verification", checks=[dict(kind="contains", value="Frozen verification")])],
                 variants=[dict(name="Small team", architecture_id="baseline")],
-                mission=dict(mode="demo", free_only=True)))
+                mission=dict(mode="live", free_only=False, route=fixture_route)))
             deadline = time.monotonic() + 20
             while time.monotonic() < deadline:
                 evaluation = next(row for row in request(ready, "/api/next")["evaluations"] if row["id"] == evaluation["id"])
@@ -242,7 +258,7 @@ def main():
                 raise AssertionError('Invalid audio accepted')
             except HTTPError as error:
                 assert error.code == 400
-            campaign = request(ready, '/api/ops/campaigns', 'POST', dict(name='Frozen campaign', mission=dict(task='Plan',architecture_id='baseline',project_id=project['id'],mode='demo'), milestones=[dict(id='plan',title='Plan',task='Produce a plan')]))
+            campaign = request(ready, '/api/ops/campaigns', 'POST', dict(name='Frozen campaign', mission=dict(task='Plan',architecture_id='baseline',project_id=project['id'],mode='live',free_only=False,route=fixture_route), milestones=[dict(id='plan',title='Plan',task='Produce a plan')]))
             mission = request(ready, '/api/ops/campaigns/'+campaign['id']+'/launch', 'POST')
             deadline = time.monotonic()+20
             while time.monotonic()<deadline:
@@ -273,6 +289,8 @@ def main():
             process.stdin.close()
             assert process.wait(timeout=12) == 0
         finally:
+            model_fixture.shutdown()
+            model_fixture.server_close()
             if process.poll() is None:
                 # Let a one-file bootloader's child close its databases before cleanup.
                 try:

@@ -4,7 +4,7 @@
   "payload": {
     "id": "parallel",
     "name": "Parallel / join",
-    "version": "0.5.0",
+    "version": "0.6.4",
     "kind": "architecture",
     "license": "MIT",
     "permissions": [],
@@ -83,12 +83,12 @@
       "output_schema": {}
     },
     "examples": [
-      "Run with the offline demo before assigning live models"
+      "Connect a provider, local model, or paired device before running this architecture"
     ],
     "evaluation": {
-      "status": "deterministic demo validation",
+      "status": "deterministic provider-fixture validation",
       "note": "No live-provider quality ranking is claimed"
     }
   },
-  "signature": "wYRmMxokieg4e+vSGdcxVG9MgyY8GsoFOPaqwShi/fG8rhtoVahCuhzX9JqkFbFz7ffWvHIsKaPbYdj7SyOhDg=="
+  "signature": "Eu9szvG8skvHfdnhzSjWxvePQRn5F/Fjx6f274bxHv3mptIfMtXbhWTY8jg5ZPpezdpdUBSBf7eCYvbFV9KpCw=="
 }

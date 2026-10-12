@@ -62,10 +62,10 @@ class Onboarding:
             provider_count=len(self.providers.public()),paired_devices=len([d for d in devices if d.get("approved") and not d.get("revoked")]),
             progress=self.store.get("settings","setup",dict(completed=[])),downloads=self.store.all("setup_download")[-20:],
             steps=[dict(id="allocation",title="Set RAM, VRAM and context allocations",ready=True),dict(id="model",title="Select an installed model or link a provider",ready=bool(self.providers.public() or self.store.all("runtime"))),
-                dict(id="project",title="Choose project files and tool grants",ready=bool(self.store.all("project"))),dict(id="device",title="Optionally pair a contributing device",ready=any(d.get("approved") and not d.get("revoked") for d in devices)),dict(id="demo",title="Run and inspect the offline demo",ready=any(r.get("mode")=="demo" and r["status"]=="completed" for r in self.store.all("run")))])
+                dict(id="project",title="Choose project files and tool grants",ready=bool(self.store.all("project"))),dict(id="device",title="Optionally pair a contributing device",ready=any(d.get("approved") and not d.get("revoked") for d in devices)),dict(id="mission",title="Run and inspect your first mission",ready=any(r.get("mode")=="live" and r["status"]=="completed" for r in self.store.all("run")))])
 
     def mark(self,id,done):
-        if id not in {"allocation","model","project","device","demo"}: raise RouteError("Unknown setup step")
+        if id not in {"allocation","model","project","device","mission"}: raise RouteError("Unknown setup step")
         completed=set(self.store.get("settings","setup",dict(completed=[]))["completed"])
         if done: completed.add(id)
         else: completed.discard(id)

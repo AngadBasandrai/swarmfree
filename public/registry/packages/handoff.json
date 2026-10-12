@@ -4,7 +4,7 @@
   "payload": {
     "id": "handoff",
     "name": "Specialist handoff",
-    "version": "0.5.0",
+    "version": "0.6.4",
     "kind": "architecture",
     "license": "MIT",
     "permissions": [],
@@ -83,12 +83,12 @@
       "output_schema": {}
     },
     "examples": [
-      "Run with the offline demo before assigning live models"
+      "Connect a provider, local model, or paired device before running this architecture"
     ],
     "evaluation": {
-      "status": "deterministic demo validation",
+      "status": "deterministic provider-fixture validation",
       "note": "No live-provider quality ranking is claimed"
     }
   },
-  "signature": "1uF/vbQ5xcJRKfKZr+bsYrYe0w2GDXJL7VOq2YhjMkKNfaE+J6pDWBO4I6OvJBWUb+o6dzWopnhzbiX5eRE2Bg=="
+  "signature": "NS+QUg1V/kH+JAdqQcQmBVtx6NbdcT+L47n+R/V9EpzhxUMaCSmLMu7odsdrtZUDIBzGy5DYPVKONWDudOLFCA=="
 }

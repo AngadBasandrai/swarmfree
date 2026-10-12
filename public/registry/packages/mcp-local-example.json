@@ -4,7 +4,7 @@
   "payload": {
     "id": "mcp-local-example",
     "name": "Local MCP adapter example",
-    "version": "0.5.0",
+    "version": "0.6.4",
     "kind": "plugin",
     "license": "MIT",
     "permissions": [
@@ -26,5 +26,5 @@
       "status": "declaration example; executable not bundled"
     }
   },
-  "signature": "ZkfFi9bL/4e2Kmzy5Pi6WYQGb76zczpUy2876MBcrGWEu1Mwbe8MUP7DdB5EXdYzoywglotbaXdxrz7m7ELLDg=="
+  "signature": "akBtWA7L26Eh0wDVzmE3YTyPfmKAXKWwmae7srwxgHYTTQDI03YADCNh1J4/4+9D6odw72KNJolEz7TPDQ9YAw=="
 }
