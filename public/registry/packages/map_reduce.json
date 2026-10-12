@@ -4,7 +4,7 @@
   "payload": {
     "id": "map_reduce",
     "name": "Map / reduce",
-    "version": "0.7.0",
+    "version": "0.8.1",
     "kind": "architecture",
     "license": "MIT",
     "permissions": [],
@@ -33,6 +33,8 @@
           "detect_repetition": false,
           "request_budget": null,
           "token_budget": null,
+          "timeout_seconds": null,
+          "incoming_policy": "any",
           "preferred_route": {},
           "parameter_values": {},
           "inputs_from_mission": {},
@@ -63,6 +65,8 @@
           "detect_repetition": false,
           "request_budget": null,
           "token_budget": null,
+          "timeout_seconds": null,
+          "incoming_policy": "any",
           "preferred_route": {},
           "parameter_values": {},
           "inputs_from_mission": {},
@@ -93,6 +97,8 @@
           "detect_repetition": false,
           "request_budget": null,
           "token_budget": null,
+          "timeout_seconds": null,
+          "incoming_policy": "any",
           "preferred_route": {},
           "parameter_values": {},
           "inputs_from_mission": {},
@@ -123,6 +129,8 @@
           "detect_repetition": false,
           "request_budget": null,
           "token_budget": null,
+          "timeout_seconds": null,
+          "incoming_policy": "any",
           "preferred_route": {},
           "parameter_values": {},
           "inputs_from_mission": {},
@@ -153,6 +161,8 @@
           "detect_repetition": false,
           "request_budget": null,
           "token_budget": null,
+          "timeout_seconds": null,
+          "incoming_policy": "any",
           "preferred_route": {},
           "parameter_values": {},
           "inputs_from_mission": {},
@@ -169,31 +179,37 @@
         {
           "source": "scope",
           "target": "facts",
+          "on": "success",
           "bindings": []
         },
         {
           "source": "scope",
           "target": "options",
+          "on": "success",
           "bindings": []
         },
         {
           "source": "scope",
           "target": "risks",
+          "on": "success",
           "bindings": []
         },
         {
           "source": "facts",
           "target": "reduce",
+          "on": "success",
           "bindings": []
         },
         {
           "source": "options",
           "target": "reduce",
+          "on": "success",
           "bindings": []
         },
         {
           "source": "risks",
           "target": "reduce",
+          "on": "success",
           "bindings": []
         }
       ],
@@ -205,7 +221,8 @@
       "input_schema": {},
       "output_schema": {},
       "parameters": {},
-      "output_ports": []
+      "output_ports": [],
+      "regression_gate_id": ""
     },
     "examples": [
       "Connect a provider, local model, or paired device before running this architecture"
@@ -215,5 +232,5 @@
       "note": "No live-provider quality ranking is claimed"
     }
   },
-  "signature": "dmvsNu67+9CYcvo0TnirKK36Hj1TYo045eYMHYnTo5rFCYIBn+7rpRZZp2/3y3oi5Rk5rWCnQOYxaFva/4pVAg=="
+  "signature": "MFsQdeSlzJVGjjz+8QoUPhS4joRomrTYoLiCsm/QFJHOPgejt3xOCL8FcOpxwmoai3XKQNF5RPCpTd6DwsVqAA=="
 }

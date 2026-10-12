@@ -4,7 +4,7 @@
   "payload": {
     "id": "jury",
     "name": "Debate with a judge",
-    "version": "0.7.0",
+    "version": "0.8.1",
     "kind": "architecture",
     "license": "MIT",
     "permissions": [],
@@ -33,6 +33,8 @@
           "detect_repetition": false,
           "request_budget": null,
           "token_budget": null,
+          "timeout_seconds": null,
+          "incoming_policy": "any",
           "preferred_route": {},
           "parameter_values": {},
           "inputs_from_mission": {},
@@ -63,6 +65,8 @@
           "detect_repetition": false,
           "request_budget": null,
           "token_budget": null,
+          "timeout_seconds": null,
+          "incoming_policy": "any",
           "preferred_route": {},
           "parameter_values": {},
           "inputs_from_mission": {},
@@ -93,6 +97,8 @@
           "detect_repetition": false,
           "request_budget": null,
           "token_budget": null,
+          "timeout_seconds": null,
+          "incoming_policy": "any",
           "preferred_route": {},
           "parameter_values": {},
           "inputs_from_mission": {},
@@ -123,6 +129,8 @@
           "detect_repetition": false,
           "request_budget": null,
           "token_budget": null,
+          "timeout_seconds": null,
+          "incoming_policy": "any",
           "preferred_route": {},
           "parameter_values": {},
           "inputs_from_mission": {},
@@ -139,16 +147,19 @@
         {
           "source": "for",
           "target": "cross",
+          "on": "success",
           "bindings": []
         },
         {
           "source": "against",
           "target": "cross",
+          "on": "success",
           "bindings": []
         },
         {
           "source": "cross",
           "target": "judge",
+          "on": "success",
           "bindings": []
         }
       ],
@@ -160,7 +171,8 @@
       "input_schema": {},
       "output_schema": {},
       "parameters": {},
-      "output_ports": []
+      "output_ports": [],
+      "regression_gate_id": ""
     },
     "examples": [
       "Connect a provider, local model, or paired device before running this architecture"
@@ -170,5 +182,5 @@
       "note": "No live-provider quality ranking is claimed"
     }
   },
-  "signature": "jc1SoqazkATXIZXa3B0XGy6HB13wsTqq7cgLMnuZw7rb5fDV4KZ4jDmGXr637VLFE3T6pc83Sm9g9ZdU8XG0AQ=="
+  "signature": "HJxknuyQLf7I+huNZonxEWtqf1onWlWr96IMXLJrwBv62jiVGnE48+djhAYBPPcQBRD0Hqjxt0nh9xduiwEXDA=="
 }
