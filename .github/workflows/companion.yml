@@ -5,6 +5,9 @@ on:
     paths: ['companion/**', '.github/workflows/companion.yml']
 permissions:
   contents: read
+concurrency:
+  group: companion-${{ github.ref_name }}
+  cancel-in-progress: true
 jobs:
   android:
     runs-on: ubuntu-24.04

@@ -2,6 +2,8 @@
 
 12 October 2026 · version 0.6.0 · MIT
 
+The 0.6.1 maintenance source corrects a test selector that also matched dependency labels and replaces a five-second graph-fixture deadline with fifteen seconds. Tagged 0.6 compilation/packaging succeeded for Windows, Apple Silicon and Linux; Intel macOS release verification stopped at the ambiguous selector, so 0.6 was not published. The fixed 0.6.1 runs are the publication candidates. Prior successful checks below remain evidence for feature behavior, rather than proof of the new artifacts until those checks finish.
+
 All twelve additions are integrated into the downloadable desktop application and the separate native companion. See [FEATURES_0_6.md](FEATURES_0_6.md) and [COMPANION.md](COMPANION.md).
 
 Verified:

@@ -32,9 +32,10 @@ test('preflight makes no inference calls and knowledge updates invalidate depend
  await expect(page.getByRole('table')).toContainText('Unknown');
  await page.getByRole('tab',{name:'Knowledge graph'}).click();
  await page.getByLabel('Knowledge title').fill('API contract');await page.getByLabel('Knowledge content').fill('Version one');await page.getByRole('button',{name:'Add knowledge'}).click();
- const api=page.locator('.knowledge-node').filter({hasText:'API contract'});await expect(api).toBeVisible();
+ const api=page.locator('.knowledge-node').filter({has:page.getByText('API contract',{exact:true})});await expect(api).toBeVisible();
  const rows=await (await request.get('/api/ops/knowledge/'+project.id)).json();const first=rows.find((r:{title:string})=>r.title==='API contract');
  await page.getByLabel('Knowledge title').fill('Dependent client');await page.getByLabel('Knowledge content').fill('Uses version one');await page.getByLabel('Dependency IDs, comma separated').fill(first.id);await page.getByRole('button',{name:'Add knowledge'}).click();
+ await expect(page.locator('.knowledge-node').filter({has:page.getByText('Dependent client',{exact:true})})).toBeVisible();
  await api.getByRole('button',{name:'Edit knowledge'}).click();await page.getByLabel('Knowledge content').fill('Version two');await page.getByRole('button',{name:'Save new revision'}).click();
  await expect(page.locator('.knowledge-node').filter({hasText:'Dependent client'})).toContainText('Dependency changed');
  await page.getByRole('tab',{name:'Notebooks',exact:true}).click();await page.getByLabel('Notebook title').fill('Mean calculation');await page.getByRole('button',{name:'Save notebook',exact:true}).click();

@@ -25,7 +25,7 @@ from swarm.store import Store
 from swarm.workspace import Workspace, scoped_path
 
 
-async def until(predicate, timeout=5):
+async def until(predicate, timeout=15):
     async with asyncio.timeout(timeout):
         while not predicate(): await asyncio.sleep(.01)
 

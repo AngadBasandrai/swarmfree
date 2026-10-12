@@ -1,4 +1,4 @@
-Swarm Workbench 0.6.0 adds all twelve command-center features to the downloadable desktop application:
+Swarm Workbench 0.6.1 adds all twelve command-center features to the downloadable desktop application:
 
 - Project campaigns with dependencies, shared budgets, acceptance review and restart recovery.
 - Routing feedback, architecture preflight with shared quota estimates, and versioned project knowledge.
@@ -10,4 +10,6 @@ Download the desktop installer or portable package for your platform. Model weig
 
 The Android companion development APK supports sideload testing. The iOS build targets the simulator; physical iOS distribution needs Apple signing and provisioning. These builds do not imply Play/App Store publication. Provider keys remain on the coordinator, and phone access uses scoped, revocable credentials.
 
-Updater signatures and SHA-256 checksums accompany desktop assets. OS signing/notarization depends on separately provisioned publisher credentials. See [the feature guide](https://github.com/AngadBasandrai/swarmfree/blob/v0.6.0/docs/FEATURES_0_6.md), [companion setup](https://github.com/AngadBasandrai/swarmfree/blob/v0.6.0/docs/COMPANION.md) and bundled BUILD_STATUS.md for supported scope and validation.
+The 0.6.1 maintenance build fixes an ambiguous dependency-card selector in the UI tests and gives graph fixtures enough time on loaded runners. Feature behavior remains the same as 0.6.
+
+Updater signatures and SHA-256 checksums accompany desktop assets. OS signing/notarization depends on separately provisioned publisher credentials. See [the feature guide](https://github.com/AngadBasandrai/swarmfree/blob/v0.6.1/docs/FEATURES_0_6.md), [companion setup](https://github.com/AngadBasandrai/swarmfree/blob/v0.6.1/docs/COMPANION.md) and bundled BUILD_STATUS.md for supported scope and validation.
