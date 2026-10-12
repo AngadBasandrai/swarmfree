@@ -4,7 +4,7 @@
   "payload": {
     "id": "hierarchy",
     "name": "Hierarchical team",
-    "version": "0.5.0",
+    "version": "0.6.4",
     "kind": "architecture",
     "license": "MIT",
     "permissions": [],
@@ -62,12 +62,12 @@
       "output_schema": {}
     },
     "examples": [
-      "Run with the offline demo before assigning live models"
+      "Connect a provider, local model, or paired device before running this architecture"
     ],
     "evaluation": {
-      "status": "deterministic demo validation",
+      "status": "deterministic provider-fixture validation",
       "note": "No live-provider quality ranking is claimed"
     }
   },
-  "signature": "r9hct6yhY85485C/y7jiVJQwIMWm07t1FXl8BQx65cBMKfU02BctX1WDP9Jr5sst1Ex0nmbLV56vBmk+PvLcDw=="
+  "signature": "VYut+j/THEziySXEoeeHRXFoRthxGJhLn5U5cY9xjE0aJYwPFiApTfKTFVbOVcfxRi3HQ1zmQsYtwzDBspsuAw=="
 }
