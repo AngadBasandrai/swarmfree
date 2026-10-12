@@ -1,23 +1,23 @@
 {
-  "version": "0.6.3",
-  "notes": "Swarm Workbench 0.6.3 \u2014 see FEATURES_0_6.md in the package",
-  "pub_date": "2026-10-12T08:51:47.484852+00:00",
+  "version": "0.6.4",
+  "notes": "Swarm Workbench 0.6.4 \u2014 see FEATURES_0_6.md in the package",
+  "pub_date": "2026-10-12T11:49:13.329552+00:00",
   "platforms": {
     "windows-x86_64": {
-      "url": "https://github.com/AngadBasandrai/swarmfree/releases/download/v0.6.3/Swarm-Workbench_0.6.3_x64-setup.exe",
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSTEw0VW9tOVRkZkh2UTdkOHFYL21XU3BBVnNDWjdFQTY4MHUxYlZWVHowQjlLNzRrS1MvMjNxelJTWnkxb1Zwa1d5eFo1T1NaQzFJb01BMTduZnpKYUVjVmgwQ2tISXdvPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkxNzk0OTUwCWZpbGU6U3dhcm0gV29ya2JlbmNoXzAuNi4zX3g2NC1zZXR1cC5leGUJdmVyc2lvbjowLjYuMwpWamxFdkprNUlzMVBXdzhFUEFHZ3ZNM2xvaCs2V3I4K0Q4MHpxKys4blNEWVVvdlMvYVBya2pwVGFES21Yd0tPUC9oSDY3b0hoVVgzR0hrOXNFMDZCQT09Cg=="
+      "url": "https://github.com/AngadBasandrai/swarmfree/releases/download/v0.6.4/Swarm-Workbench_0.6.4_x64-setup.exe",
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSTEw0VW9tOVRkZkJUcTZ3aVZMNitGMDlad0JDWnhQblIvTnBCTENTdGpZWjBuRXZ3ZGhSTWZSVGt0ZXNxVGszZTMzcUdVNVU3RGt6elBLSUxhaS9FNVpGMFhmbTkxMkFZPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkxODA1MzU5CWZpbGU6U3dhcm0gV29ya2JlbmNoXzAuNi40X3g2NC1zZXR1cC5leGUJdmVyc2lvbjowLjYuNAp6SEloMnRiZ0hGNzZ6ZFEydERBL3kyTHpaWWtTV3JkeVp2bUJYbmdPcExQZWdUR0VZeE82b281Qndld2RoNWREK3NTNEY2YXlKbFdQUTE5a1RqVDlEZz09Cg=="
     },
     "darwin-x86_64": {
-      "url": "https://github.com/AngadBasandrai/swarmfree/releases/download/v0.6.3/Swarm-Workbench_0.6.3_x86_64-apple-darwin.app.tar.gz",
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSTEw0VW9tOVRkZk9CYzJZeXhNa2swK214ZS9wMk4xa0IzSElFb1dxZmUxdWFrRHVDVFJyUnIxc2RTRjVJa0FnSUsxV0RMQld4amRXcGlFVkhmTEVuWlkrVmlXOGRqeXcwPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkxNzk0OTI5CWZpbGU6U3dhcm0gV29ya2JlbmNoLmFwcC50YXIuZ3oJdmVyc2lvbjowLjYuMwpiN3RuTkMrdThxWEhSOHJSM1ZCTHJVN3psYjhhZFFRR0Q4eTA5TEVobEVlSUU4MUxnaGV5MUVmZ1R6ZHlCZDR3RlBVUnBiaWg0cFAyRXpVejhZcnNEQT09Cg=="
+      "url": "https://github.com/AngadBasandrai/swarmfree/releases/download/v0.6.4/Swarm-Workbench_0.6.4_x86_64-apple-darwin.app.tar.gz",
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSTEw0VW9tOVRkZkhPYXgyL25SZkc5cGFQcG95WVppUWpoVC9GM09qa3Y1NnJ5cWpRejhnZkVTSWZROGFkanVZaE9mZU0rTzVmNDZTSkdqYkkybkk2azVCc280NTg5MUFnPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkxODA1NTM2CWZpbGU6U3dhcm0gV29ya2JlbmNoLmFwcC50YXIuZ3oJdmVyc2lvbjowLjYuNApEMDdmZTlMUGZOMzVoZHYyYjc1R05DVTE3S0x4RnF6amdxNkJOK0hlN3lJMHIxV20vcjhldnpMUWN2M0ZHSVdtWXFiK1RpZ1R3R0tTOUwxZE84Vm1DUT09Cg=="
     },
     "linux-x86_64": {
-      "url": "https://github.com/AngadBasandrai/swarmfree/releases/download/v0.6.3/Swarm-Workbench_0.6.3_amd64.AppImage",
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSTEw0VW9tOVRkZkNJTytzakg4RFllUGpOZlplQ01ucGpRcnhpSWdVcnd2NTlZQmJzb3lnZC9kVkc0c0JMQ2FheDBBQW9QUjhsK0FiNDdvbTE4eEFJSEg1YUozbUNaendNPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkxNzk0NzI0CWZpbGU6U3dhcm0gV29ya2JlbmNoXzAuNi4zX2FtZDY0LkFwcEltYWdlCXZlcnNpb246MC42LjMKVkY3YVdjYVZxWFppM0o2cFBVZ1JKc25XZENNdUpWSytZNTBBemZ2aW5seGRJMjRiSVNsZG42K1haeXl4ZnRYK1J3TFYvanAxZ0F2QlBmT2hZS0J1Qmc9PQo="
+      "url": "https://github.com/AngadBasandrai/swarmfree/releases/download/v0.6.4/Swarm-Workbench_0.6.4_amd64.AppImage",
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSTEw0VW9tOVRkZkNrNnNKWng3amtzQWowazJJNTZpajc2RS9OaXc4cXo4aDcrWG92bCs0ZVczTGtLejhQM1FZTzhadkhtZ3Z5ckQyOGpWRkpXdEhVRkh5V3ZlTWVuNEEwPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkxODA1NDUzCWZpbGU6U3dhcm0gV29ya2JlbmNoXzAuNi40X2FtZDY0LkFwcEltYWdlCXZlcnNpb246MC42LjQKdHAySnRmWFVHNC9OT0hGNHlMWGl2Nm02VEI3MWRrVFN1WTdzc0VtclN0V0VnUFkwSDFJQ2JJTW5NZWVTd1owV21vN254ZHBpMDRLMk9Eck1MS3Z1Q3c9PQo="
     },
     "darwin-aarch64": {
-      "url": "https://github.com/AngadBasandrai/swarmfree/releases/download/v0.6.3/Swarm-Workbench_0.6.3_aarch64-apple-darwin.app.tar.gz",
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSTEw0VW9tOVRkZk40YkQ4OFBIa015STJWTXA0c0JIbkUrbGVUUnNuZ3dwd243N3ZETVJGTDBhTXVTQW9PbVdDQzdwTXRlTTNPM25ub2M0VWhzcmRuZk84TlczUDlvVGdZPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkxNzk0NjUyCWZpbGU6U3dhcm0gV29ya2JlbmNoLmFwcC50YXIuZ3oJdmVyc2lvbjowLjYuMwptVk81WHJyUnZyY3V5eERtYSthOWgvcWwvU2ZzN1RhYlUza2NGd2xUcXlsSzhJUTM1UmVpcm15aURuVWtQWUtzMFBwZ3QweVdKc1NWNVV1ZnFobUVCdz09Cg=="
+      "url": "https://github.com/AngadBasandrai/swarmfree/releases/download/v0.6.4/Swarm-Workbench_0.6.4_aarch64-apple-darwin.app.tar.gz",
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSTEw0VW9tOVRkZkwrTWtWa2hsZGVOeDQ2YTYyclZKd1ZXMXViRG1laXk1VEdkNFpuOGhvVXlsOVBxUk5leTFRYkQzOUF6UllJSE9WOHg3YnJuZ2pNTm9uK3drUjFhQ0E0PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkxODA1MDQ5CWZpbGU6U3dhcm0gV29ya2JlbmNoLmFwcC50YXIuZ3oJdmVyc2lvbjowLjYuNApzVlM1NTFRQzc5QjVtY0pCUjJBdFlVL1pnanhobEI5ZCtwcEpyUGZDeVJWMjBqcUpvbmpEMlRmYStIN1cxbmdxM29zTmorZlFRNDZ2VzB3RGNFNFZCdz09Cg=="
     }
   }
 }
