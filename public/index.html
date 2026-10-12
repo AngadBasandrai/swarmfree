@@ -3,63 +3,73 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Download Swarm Workbench, an MIT-licensed desktop app for coordinating AI agents, local models, and linked devices.">
-  <meta name="theme-color" content="#101816">
-  <title>Download Swarm Workbench</title>
+  <meta name="description" content="Swarm Workbench is an open-source desktop workspace for AI agent teams. Connect your models, design your workflow, and follow every handoff.">
+  <meta name="theme-color" content="#f8f9f6">
+  <meta property="og:title" content="Swarmfree — a workspace for AI agent teams">
+  <meta property="og:description" content="Your models, linked devices, and agent workflows. Together in one open-source desktop app.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://swarms.grafitelab.in/">
+  <meta property="og:image" content="https://swarms.grafitelab.in/download-assets/workbench.png">
+  <title>Swarmfree — Download Swarm Workbench</title>
   <link rel="canonical" href="https://swarms.grafitelab.in/">
-  <style>
-    :root { color-scheme: dark; font-family: system-ui, sans-serif; background: #101816; color: #edf5ef; }
-    * { box-sizing: border-box; }
-    body { margin: 0; min-height: 100vh; display: flex; flex-direction: column; }
-    header, main, footer { width: min(100% - 3rem, 64rem); margin-inline: auto; }
-    header { padding-block: 2rem; display: flex; justify-content: space-between; gap: 1rem; align-items: center; }
-    .brand { font-weight: 700; letter-spacing: .04em; }
-    a { color: #a9efbd; text-underline-offset: .2em; }
-    a:focus-visible { outline: 3px solid #a9efbd; outline-offset: 5px; }
-    main { flex: 1; padding-block: clamp(3rem, 9vw, 7rem); }
-    .label { color: #a9efbd; font-size: .85rem; letter-spacing: .12em; text-transform: uppercase; }
-    h1 { max-width: 15ch; font-size: clamp(2.6rem, 6vw, 4.6rem); line-height: 1.08; letter-spacing: -.045em; margin: 1rem 0 1.5rem; }
-    .intro { max-width: 40rem; color: #bacdc1; font-size: 1.15rem; line-height: 1.7; }
-    .download { display: inline-block; margin-top: 1.2rem; background: #a9efbd; color: #101816; border-radius: .6rem; padding: 1rem 1.4rem; text-decoration: none; font-weight: 700; }
-    .download:hover { background: #cbf8d7; }
-    .platforms { color: #bacdc1; font-size: .95rem; line-height: 1.6; }
-    .details { border-top: 1px solid #31433a; margin-top: 3.5rem; padding-top: 1.5rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; }
-    h2 { font-size: 1rem; margin: 0 0 .6rem; }
-    .details p { color: #bacdc1; line-height: 1.6; margin: 0; font-size: .95rem; }
-    footer { border-top: 1px solid #31433a; padding-block: 1.5rem; color: #bacdc1; font-size: .9rem; line-height: 1.8; }
-    @media (max-width: 600px) { .details { grid-template-columns: 1fr; gap: 1.5rem; } header, main, footer { width: calc(100% - 2rem); } }
-  </style>
+  <link rel="icon" href="./download-assets/mark.svg" type="image/svg+xml">
+  <link rel="preload" href="./download-assets/dm-sans-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="./download-assets/dm-sans-600.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="./download-assets/site.css?v=2">
+  <script src="./download-assets/site.js?v=2" defer></script>
 </head>
 <body>
-  <header>
-    <span class="brand">SWARM WORKBENCH</span>
-    <a href="https://github.com/AngadBasandrai/swarmfree">GitHub</a>
-  </header>
-  <main>
-    <p class="label">Open source · MIT licensed</p>
-    <h1>Your models. One swarm.</h1>
-    <p class="intro">A downloadable workbench for coordinating AI agents. Connect local models and provider accounts, link your devices, and choose how your agents work together.</p>
-    <a class="download" href="https://github.com/AngadBasandrai/swarmfree/releases/latest">Download the latest release</a>
-    <p class="platforms">Windows · macOS (Apple silicon and Intel) · Linux<br>Choose the installer or portable package for your system under release assets.</p>
-    <div class="details">
-      <section>
-        <h2>Build your swarm</h2>
-        <p>Start with coding and research presets, customize the architecture, and interact with individual agents.</p>
-      </section>
-      <section>
-        <h2>Connect your devices</h2>
-        <p>Use worker packages to run models on linked computers. Review the <a href="https://github.com/AngadBasandrai/swarmfree/blob/main/docs/COMPANION.md">phone companion guide</a> for available mobile builds.</p>
-      </section>
-      <section>
-        <h2>Bring your models</h2>
-        <p>Model weights and optional runtimes are separate downloads. Provider accounts use each provider’s limits and terms.</p>
-      </section>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <svg class="symbol-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <symbol id="icon-mark" viewBox="0 0 32 32"><path d="M8 8h16M8 8v16m0-8h16m0-8v16M8 24h16" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="4" y="4" width="8" height="8" rx="2" fill="currentColor"/><rect x="20" y="4" width="8" height="8" rx="2" fill="currentColor"/><rect x="4" y="20" width="8" height="8" rx="2" fill="currentColor"/><rect x="20" y="20" width="8" height="8" rx="2" fill="currentColor"/></symbol>
+    <symbol id="icon-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
+    <symbol id="icon-out" viewBox="0 0 24 24"><path d="M6 18 18 6M6 6h12v12"/></symbol>
+    <symbol id="icon-download" viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M4 16v4h16v-4"/></symbol>
+    <symbol id="icon-github" viewBox="0 0 24 24"><path d="M9 19c-4.3 1.3-4.3-2.2-6-2.7m12 5v-3.7c0-1 .1-1.4-.5-2.1 3.3-.4 6.5-1.6 6.5-7A5.4 5.4 0 0 0 19.5 5c.2-1 .1-2.1-.4-3-1.2 0-3.1.8-3.9 1.5a13 13 0 0 0-6.4 0C8 2.8 6.1 2 4.9 2c-.5.9-.6 2-.4 3A5.4 5.4 0 0 0 3 8.5c0 5.4 3.2 6.6 6.5 7-.6.7-.6 1.4-.5 2.1v3.7"/></symbol>
+    <symbol id="icon-windows" viewBox="0 0 24 24"><path d="M3 4.5 10.5 3.5v7H3zm10-1.4L21 2v8.5h-8zM3 13h7.5v7.5L3 19.5zm10 0h8v9l-8-1.1z" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="icon-mac" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="14" rx="2"/><path d="M8 21h8m-4-4v4M8 7h.01M16 7h.01M8 11c2 2 6 2 8 0"/></symbol>
+    <symbol id="icon-linux" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="m7 9 3 3-3 3m6 0h4"/></symbol>
+    <symbol id="icon-close" viewBox="0 0 24 24"><path d="m6 6 12 12M6 18 18 6"/></symbol>
+  </svg>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="./" aria-label="Swarmfree home"><span class="brand-mark"><svg aria-hidden="true"><use href="#icon-mark"/></svg></span><span>swarmfree<span class="brand-dot">.</span></span></a>
+      <nav aria-label="Main navigation"><a href="#workbench">The workbench</a><a href="#workflow">How it works</a><a class="github-link" href="https://github.com/AngadBasandrai/swarmfree"><svg class="icon" aria-hidden="true"><use href="#icon-github"/></svg><span>GitHub</span></a></nav>
+      <a class="header-download" href="#download">Get the app<svg class="icon" aria-hidden="true"><use href="#icon-download"/></svg></a>
     </div>
+  </header>
+  <main id="main">
+    <section class="hero container" aria-labelledby="hero-title">
+      <div class="hero-heading"><p class="eyebrow"><span class="accent-dot"></span>OPEN-SOURCE AGENT WORKBENCH</p><h1 id="hero-title">A workspace for<br><span>AI agent teams.</span></h1></div>
+      <div class="hero-intro"><p>Connect your models, provider accounts, and other computers. Design a team of agents, then follow and direct their work in one desktop app.</p><a class="button button-primary" href="#download">Download the app<svg class="icon" aria-hidden="true"><use href="#icon-download"/></svg></a><div class="hero-meta"><span class="release-label" data-release-label>Alpha release</span><span class="meta-divider"></span><span>Free &amp; MIT licensed</span></div></div>
+    </section>
+    <section class="product-section container" id="workbench" aria-label="The workbench preview">
+      <div class="preview-label"><span><span class="section-number">01</span> THE WORKBENCH</span><a href="./download-assets/workbench.png" data-preview>View full preview<svg class="icon icon-small" aria-hidden="true"><use href="#icon-out"/></svg></a></div>
+      <figure class="product-frame"><img src="./download-assets/workbench.png" width="1600" height="1000" alt="Swarm Workbench showing a completed offline demo: a planner hands work to a researcher and builder, then a synthesizer joins the results. The selected researcher's conversation is visible on the right." fetchpriority="high"><figcaption><span class="caption-title"><span class="status-dot"></span>Every agent. Every handoff. In view.</span><span>Actual app interface · offline demo</span></figcaption></figure>
+      <div class="model-strip" aria-label="Supported model connections"><p>Bring the models you use.</p><div><span>Ollama</span><span>Gemini</span><span>Groq</span><span>OpenRouter</span><span class="compatible-label">Compatible APIs</span></div></div>
+    </section>
+    <section class="workflow-section container" id="workflow" aria-labelledby="workflow-title">
+      <div class="section-heading"><div><p class="eyebrow"><span class="section-number">02</span> YOUR WORKFLOW</p><h2 id="workflow-title">Shape the way your agents work.</h2></div><p>Start with a coding or research preset.<br>Make the workflow your own.</p></div>
+      <div class="workflow-steps">
+        <article><div class="step-top"><span>01 / CONNECT</span><svg class="icon" aria-hidden="true"><use href="#icon-arrow"/></svg></div><h3>Use your own capacity.</h3><p>Bring provider accounts, run local models, or pair another computer. Set resource budgets for each device.</p><span class="detail-label">Local models + provider APIs + linked devices</span></article>
+        <article><div class="step-top"><span>02 / ORCHESTRATE</span><svg class="icon" aria-hidden="true"><use href="#icon-arrow"/></svg></div><h3>Choose how agents work.</h3><p>Use a supervisor, pipeline, parallel team, or critic loop. Start from ten presets, or design your own architecture.</p><span class="detail-label">Visual graphs + custom architectures</span></article>
+        <article><div class="step-top"><span>03 / COLLABORATE</span><svg class="icon" aria-hidden="true"><use href="#icon-arrow"/></svg></div><h3>Stay in the conversation.</h3><p>Open any agent to inspect its work, give it direction, or switch its model. Completed work carries across handoffs.</p><span class="detail-label">Agent conversations + persistent work</span></article>
+      </div>
+    </section>
+    <section class="download-section" id="download" aria-labelledby="download-title"><div class="container">
+      <div class="section-heading"><div><p class="eyebrow"><span class="section-number">03</span> GET STARTED</p><h2 id="download-title">Download Swarm Workbench.</h2></div><div class="download-heading-note"><span class="version-badge" data-release-label>Alpha release</span><p>Choose a build<br>for your desktop.</p></div></div>
+      <div class="download-grid">
+        <article class="download-option"><div class="platform-heading"><svg class="platform-icon icon" aria-hidden="true"><use href="#icon-windows"/></svg><span class="platform-arch">64-bit</span></div><h3>Windows</h3><p>A familiar installer, or a portable app.</p><a class="button button-platform" href="https://github.com/AngadBasandrai/swarmfree/releases/latest" data-platform="windows-x86_64" data-asset="Swarm-Workbench_{version}_x64-setup.exe">Windows installer<svg class="icon" aria-hidden="true"><use href="#icon-download"/></svg></a><a class="alternative-download" href="https://github.com/AngadBasandrai/swarmfree/releases/latest" data-platform="windows-x86_64" data-asset="Swarm-Workbench_{version}_windows-x64_portable.zip">Portable .zip<svg class="icon icon-small" aria-hidden="true"><use href="#icon-out"/></svg></a></article>
+        <article class="download-option"><div class="platform-heading"><svg class="platform-icon icon" aria-hidden="true"><use href="#icon-mac"/></svg><span class="platform-arch">Apple silicon / Intel</span></div><h3>macOS</h3><p>Choose the build for your Mac.</p><a class="button button-platform" href="https://github.com/AngadBasandrai/swarmfree/releases/latest" data-platform="darwin-aarch64" data-asset="Swarm-Workbench_{version}_aarch64.dmg">Apple silicon .dmg<svg class="icon" aria-hidden="true"><use href="#icon-download"/></svg></a><a class="alternative-download" href="https://github.com/AngadBasandrai/swarmfree/releases/latest" data-platform="darwin-x86_64" data-asset="Swarm-Workbench_{version}_x64.dmg">Intel .dmg<svg class="icon icon-small" aria-hidden="true"><use href="#icon-out"/></svg></a></article>
+        <article class="download-option"><div class="platform-heading"><svg class="platform-icon icon" aria-hidden="true"><use href="#icon-linux"/></svg><span class="platform-arch">x86_64</span></div><h3>Linux</h3><p>An AppImage, plus distro packages.</p><a class="button button-platform" href="https://github.com/AngadBasandrai/swarmfree/releases/latest" data-platform="linux-x86_64" data-asset="Swarm-Workbench_{version}_amd64.AppImage">Linux AppImage<svg class="icon" aria-hidden="true"><use href="#icon-download"/></svg></a><div class="alternative-row"><a class="alternative-download" href="https://github.com/AngadBasandrai/swarmfree/releases/latest" data-platform="linux-x86_64" data-asset="Swarm-Workbench_{version}_amd64.deb">.deb<svg class="icon icon-small" aria-hidden="true"><use href="#icon-out"/></svg></a><a class="alternative-download" href="https://github.com/AngadBasandrai/swarmfree/releases/latest" data-platform="linux-x86_64" data-asset="Swarm-Workbench-{version}-1.x86_64.rpm">.rpm<svg class="icon icon-small" aria-hidden="true"><use href="#icon-out"/></svg></a></div></article>
+      </div>
+      <div class="download-notes"><p>Early-access software. Model weights and optional runtimes are separate downloads.<br><a href="https://github.com/AngadBasandrai/swarmfree/blob/main/docs/BUILD_STATUS.md">See build status and platform notes<svg class="icon icon-small" aria-hidden="true"><use href="#icon-out"/></svg></a></p><a class="all-releases" href="https://github.com/AngadBasandrai/swarmfree/releases/latest">Release notes &amp; checksums<svg class="icon icon-small" aria-hidden="true"><use href="#icon-out"/></svg></a></div>
+      <noscript><p class="no-script-note">Download links open GitHub Releases. Choose your platform's file under Assets.</p></noscript>
+      <div class="companion-note"><span>Taking your work to another screen?</span><a href="https://github.com/AngadBasandrai/swarmfree/blob/main/docs/COMPANION.md">Explore the phone companion<svg class="icon icon-small" aria-hidden="true"><use href="#icon-arrow"/></svg></a></div>
+    </div></section>
+    <section class="closing-section container" aria-labelledby="closing-title"><div><p class="eyebrow">BUILT IN THE OPEN</p><h2 id="closing-title">Open source. Yours to build on.</h2><p>MIT licensed. Inspect the source, shape the project,<br>or build something of your own.</p></div><a class="button button-outline" href="https://github.com/AngadBasandrai/swarmfree"><svg class="icon" aria-hidden="true"><use href="#icon-github"/></svg>Explore the source<svg class="icon" aria-hidden="true"><use href="#icon-out"/></svg></a></section>
   </main>
-  <footer>
-    <a href="https://github.com/AngadBasandrai/swarmfree/blob/main/README.md">Setup guide</a> ·
-    <a href="https://github.com/AngadBasandrai/swarmfree/blob/main/docs/BUILD_STATUS.md">Build status</a> ·
-    <a href="https://github.com/AngadBasandrai/swarmfree/blob/main/LICENSE">MIT license</a>
-  </footer>
+  <footer class="site-footer"><div class="container footer-inner"><a class="brand" href="./" aria-label="Swarmfree home"><span class="brand-mark"><svg aria-hidden="true"><use href="#icon-mark"/></svg></span><span>swarmfree<span class="brand-dot">.</span></span></a><span class="footer-description">An open-source desktop workbench.</span><nav aria-label="Footer navigation"><a href="https://github.com/AngadBasandrai/swarmfree/blob/main/README.md">Documentation</a><a href="https://github.com/AngadBasandrai/swarmfree/issues">Issues</a><a href="https://github.com/AngadBasandrai/swarmfree/blob/main/LICENSE">MIT license</a></nav></div></footer>
+  <dialog class="preview-dialog" aria-label="Full workbench preview"><div class="dialog-toolbar"><span>Swarm Workbench · offline demo</span><button type="button" class="close-preview" aria-label="Close preview"><svg class="icon" aria-hidden="true"><use href="#icon-close"/></svg></button></div><img src="./download-assets/workbench.png" alt="Full-size Swarm Workbench interface showing an offline demo with four agents and the researcher conversation."></dialog>
 </body>
 </html>
