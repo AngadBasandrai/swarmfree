@@ -1,7 +1,8 @@
 name: Registry and update channel
 on:
   push:
-    branches: [main, release-channel]
+    # The github-pages environment permits deployments from main only.
+    branches: [main]
     paths: ['public/**', '.github/workflows/pages.yml']
   workflow_dispatch:
   workflow_run:
