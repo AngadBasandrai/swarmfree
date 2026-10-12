@@ -84,3 +84,16 @@ test('queued transcription finishes before a transcript can be reviewed and sent
  await expect.poll(()=>chunk).toBe(true);await expect(page.getByRole('button',{name:'Send reviewed transcript'})).toBeDisabled();
  release();await expect(page.getByLabel('Voice transcript')).toHaveValue(/Simulated local transcript/);await expect(page.getByRole('button',{name:'Send reviewed transcript'})).toBeEnabled();
 });
+
+test('Stop releases microphone access while the audio engine is still starting',async({page})=>{
+ await page.route('**/api/ops',async route=>{const response=await route.fetch();const body=await response.json();body.voice={trusted:true,argv:['fixture']};await route.fulfill({response,json:body});});
+ await page.addInitScript(()=>{
+  (window as any).__opened=0;(window as any).__stopped=0;(window as any).__closed=0;
+  Object.defineProperty(navigator.mediaDevices,'getUserMedia',{value:async()=>({getTracks:()=>[{stop:()=>{(window as any).__stopped++;}}]})});
+  (window as any).AudioContext=class{constructor(){(window as any).__opened++;}resume(){return new Promise(()=>{});}async close(){(window as any).__closed++;}};
+ });
+ await page.goto('/');await page.getByRole('button',{name:'Command center',exact:true}).click();await page.getByRole('tab',{name:'Live voice',exact:true}).click();
+ await page.getByRole('button',{name:'Start microphone'}).click();await expect.poll(()=>page.evaluate(()=>(window as any).__opened)).toBe(1);
+ await page.getByRole('button',{name:'Stop microphone'}).click();await expect.poll(()=>page.evaluate(()=>(window as any).__stopped)).toBe(1);await expect.poll(()=>page.evaluate(()=>(window as any).__closed)).toBe(1);
+ await expect(page.getByRole('button',{name:'Start microphone'})).toBeEnabled();
+});

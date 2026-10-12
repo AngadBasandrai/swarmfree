@@ -70,7 +70,7 @@ def main():
                 except HTTPError as error:
                     assert error.code == expected
             snapshot = request(ready, "/api/snapshot")
-            assert request(ready, "/api/health")["version"] == "0.6.1"
+            assert request(ready, "/api/health")["version"] == "0.6.2"
             assert snapshot["hardware"]["ram_total_gb"] > 0
             assert snapshot["architectures"]
             features = request(ready,"/api/features")

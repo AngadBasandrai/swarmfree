@@ -4,6 +4,8 @@
 
 The 0.6.1 maintenance source corrects a test selector that also matched dependency labels and replaces a five-second graph-fixture deadline with fifteen seconds. Tagged 0.6 compilation/packaging succeeded for Windows, Apple Silicon and Linux; Intel macOS release verification stopped at the ambiguous selector, so 0.6 was not published. The fixed 0.6.1 runs are the publication candidates. Prior successful checks below remain evidence for feature behavior, rather than proof of the new artifacts until those checks finish.
 
+The 0.6.1 checks subsequently passed, including all four desktop packaging checks and Android/iOS simulator builds. Publication was held after a simulated startup test showed that microphone Stop did not release an acquired stream while AudioContext.resume was pending. The 0.6.2 source tracks pending resources and startup generations, closes them on Stop/unmount, and ignores cancelled startup completions. It is the final publication candidate; microphone hardware has never been activated during development.
+
 All twelve additions are integrated into the downloadable desktop application and the separate native companion. See [FEATURES_0_6.md](FEATURES_0_6.md) and [COMPANION.md](COMPANION.md).
 
 Verified:

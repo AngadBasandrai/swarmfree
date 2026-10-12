@@ -2,6 +2,8 @@
 
 The companion is a downloadable native application in `companion/`, built with Tauri 2 for Android/iOS. It has its own Rust HTTPS client and scoped credential store in session memory. It does not bundle or start the desktop Python engine.
 
+Companion files are distributed alongside the desktop files in [GitHub Releases](https://github.com/AngadBasandrai/swarmfree/releases). Choose the Android development APK for sideload testing; the iOS tar archive contains a simulator app.
+
 ## Pairing
 
 1. On the desktop, enable a reachable private HTTPS listener in Devices. Configure its certificate with the correct DNS/IP subject alternative names and restart the desktop yourself.
