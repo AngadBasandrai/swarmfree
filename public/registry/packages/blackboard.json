@@ -4,7 +4,7 @@
   "payload": {
     "id": "blackboard",
     "name": "Shared blackboard",
-    "version": "0.8.0",
+    "version": "0.8.1",
     "kind": "architecture",
     "license": "MIT",
     "permissions": [],
@@ -144,5 +144,5 @@
       "note": "No live-provider quality ranking is claimed"
     }
   },
-  "signature": "dVcnfKU5RnxgT7wVyQuciSDP8MYxxW7gc8AEaiA3u6vUtWS7NAWsUl9Utc1lHMDdGFiA7hnmIp/NBQtPDp6qCA=="
+  "signature": "jd1aj6AEOwHK0MXxCNvLTBH7tDnpqcWLa/EHVRTz++bQHJsV/U/EbzL40HyWAD2nsE5qnoo+mtX56ZSJNckuCQ=="
 }

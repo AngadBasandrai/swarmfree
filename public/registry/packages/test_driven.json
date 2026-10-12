@@ -4,7 +4,7 @@
   "payload": {
     "id": "test_driven",
     "name": "Test-driven team",
-    "version": "0.8.0",
+    "version": "0.8.1",
     "kind": "architecture",
     "license": "MIT",
     "permissions": [],
@@ -144,5 +144,5 @@
       "note": "No live-provider quality ranking is claimed"
     }
   },
-  "signature": "PgRmo3O2ub12TZ5rccLEyM+kzDHJ6g1+QnKbdrvz6q6CXR3p404AU8jdEZVwuJdU5VGbuRIH0EhjaOEuYPycAg=="
+  "signature": "KMgaUqW6lvRPvkx/kfRc45NW0+A8hIFmbEfqjyXPGdSxindPNf+XHlHXQHvexhAh2ndIcdKyCL+Fk1GfSmvuCg=="
 }

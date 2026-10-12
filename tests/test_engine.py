@@ -63,7 +63,9 @@ async def test_pause_and_process_restart_resume_without_repeating_completed_agen
     async with AsyncSqliteSaver.from_conn_string(path) as saver:
         engine = Engine(store, Providers(store, vault, "http://127.0.0.1:1"), PrivatePool(store), saver)
         engine.start(run["id"])
-        await until(lambda: store.get("run", run["id"])["status"] in {"completed", "interrupted"})
+        # Completion is a correctness condition, not a four-second hardware
+        # probe performance requirement on a cold Windows runner.
+        await asyncio.wait_for(asyncio.shield(engine.tasks[run['id']]),15)
         assert store.get("run", run["id"])["status"] == "completed"
         assert calls.count("Planner") == 1
         assert calls.count("Builder") == 2

@@ -4,7 +4,7 @@
   "payload": {
     "id": "supervisor",
     "name": "Supervisor",
-    "version": "0.8.0",
+    "version": "0.8.1",
     "kind": "architecture",
     "license": "MIT",
     "permissions": [],
@@ -188,5 +188,5 @@
       "note": "No live-provider quality ranking is claimed"
     }
   },
-  "signature": "gIpoUyfm6Zw4xSGieYfCUoaNkOFIH/BliNeGyhKEhYMBFgRkJKog+HYCtK5epIpfqbM0vW7lIVZUp1IzAPzEDw=="
+  "signature": "vRzjJHwm1UzX0E0exwDChyBpnHo/QOh3ss5DlO9rLvWOjhN+nxrDhq14O0yxz/WCfoodMbgE2o163DBO8SXWAg=="
 }

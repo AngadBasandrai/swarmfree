@@ -4,7 +4,7 @@
   "payload": {
     "id": "handoff",
     "name": "Specialist handoff",
-    "version": "0.8.0",
+    "version": "0.8.1",
     "kind": "architecture",
     "license": "MIT",
     "permissions": [],
@@ -144,5 +144,5 @@
       "note": "No live-provider quality ranking is claimed"
     }
   },
-  "signature": "T4/h0nmO6zr9ykWqcyURn4tLU3wab97KPpBalMco02rliAesrvuy5phFbFkJUEqT/Lp91hrv0BXCL2nlCeqVDw=="
+  "signature": "wkyGmide1ax2+F06r8tsFqtw3LpF7GFOOHO1RKIPBxO+V+kckE5k96C4XWd74l9XQgsk4XgkckFyq0ZxfSN/DA=="
 }

@@ -112,8 +112,8 @@ class Architecture(BaseModel):
     @model_validator(mode="after")
     def validate_graph(self):
         ids = [n.id for n in self.nodes]
-        if "results" in ids:
-            raise ValueError("The agent ID 'results' is reserved by the graph engine")
+        if set(ids)&{'results','architecture_digest'}:
+            raise ValueError("Agent IDs 'results' and 'architecture_digest' are reserved by the graph engine")
         if len(set(ids)) != len(ids):
             raise ValueError("Every agent needs a unique ID")
         from .protocol import validate_schema

@@ -4,7 +4,7 @@
   "payload": {
     "id": "revision",
     "name": "Bounded revision",
-    "version": "0.8.0",
+    "version": "0.8.1",
     "kind": "architecture",
     "license": "MIT",
     "permissions": [],
@@ -150,5 +150,5 @@
       "note": "No live-provider quality ranking is claimed"
     }
   },
-  "signature": "plwRDaKEyxGZwbXKv//HYrVCBTmMXvxYaRRfj55Z/aC9mKeRT/NaH+0Lcz/0YR4rqfrAUmfPfHwvsSD6N2BBAA=="
+  "signature": "V3/3ZAAy/ZP0IRN0GEgwtU7ZBmDi/0uSDzmjbOdD2zFisB49MRWFkjhGBhnQ5/kUSFDIH5PkP+QqF8lQoYk5DQ=="
 }

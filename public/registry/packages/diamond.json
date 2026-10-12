@@ -4,7 +4,7 @@
   "payload": {
     "id": "diamond",
     "name": "Diamond comparison",
-    "version": "0.8.0",
+    "version": "0.8.1",
     "kind": "architecture",
     "license": "MIT",
     "permissions": [],
@@ -188,5 +188,5 @@
       "note": "No live-provider quality ranking is claimed"
     }
   },
-  "signature": "6+ts4kqEnGeR/LV+scP+tKT1h4CLWPNpAyFLS35ObtDn8jBIMwJRSxV+sa3kBZ4zWHVuZMZDiU26vrWG1aDSCQ=="
+  "signature": "1xDUrTXwsHuHe8FxQCDyHgjQIGhwQMQGf6WPWhOcN5k0h9SrUoZvH88LYfVQojyBMDCv9TOcpXdzHdHJL/49CQ=="
 }

@@ -4,7 +4,7 @@
   "payload": {
     "id": "parallel",
     "name": "Parallel / join",
-    "version": "0.8.0",
+    "version": "0.8.1",
     "kind": "architecture",
     "license": "MIT",
     "permissions": [],
@@ -144,5 +144,5 @@
       "note": "No live-provider quality ranking is claimed"
     }
   },
-  "signature": "Lq3hdlJOPDhiUoHH+mL1aWXL4N7TvJXoSqTR0KIZXm3sg+ZSfcdNMQE0450rU5LHmxgAeNwh02EkZrBcajHXCw=="
+  "signature": "FrStnPeYWbA1MWES4NhbO2e53e9uPr96pRVDwPQhu5bmpmRHa8civfDFwJwInLBBNlQlXkD6MDqIDme0UjV2Bg=="
 }

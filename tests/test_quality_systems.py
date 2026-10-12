@@ -99,6 +99,8 @@ async def test_acceptance_failed_is_saved_and_checkpoint_fork_reuses_completed_r
 
 
 def test_graph_lint_and_fix_find_parameter_type_and_missing_port(store):
+    for reserved in ('results','architecture_digest'):
+        with pytest.raises(ValueError,match='reserved'):team((reserved,))
     arch=team(('source','target'),(('source','target'),))
     arch['nodes'][0].update(instructions='Work in {{language}}',output_schema={'type':'object','properties':{'count':{'type':'integer'}},'additionalProperties':False})
     arch['nodes'][1]['input_schema']={'type':'object','properties':{'count':{'type':'string'}},'required':['count']}
@@ -290,24 +292,36 @@ def test_extension_snapshot_does_not_follow_in_project_symlink_to_private_file(t
 @pytest.mark.asyncio
 async def test_ablations_preserve_frozen_child_revisions(store,vault,tmp_path,model_fixture):
     calls=[]
-    async def response(name,*args):calls.append(name);yield 'ok'
+    (tmp_path/'data.txt').write_text('fixture evidence')
+    store.put('project','p',dict(id='p',name='Project',root=str(tmp_path),tools=['workspace.read'],checks={}))
+    async def response(name,*args):
+        calls.append(name)
+        if name in {'child','New child'}:
+            agent=next(a for a in store.all('agent') if a['name']==name and a['status']=='running')
+            await engine.workspace.execute(store.get('run',agent['run_id']),agent,dict(tool='workspace.read',arguments=dict(path='data.txt')))
+        yield 'ok'
     model_fixture(store,vault,response)
     child={**team(('child',)),'id':'child_team'};store.put('architecture',child['id'],child)
     parent=team(('nested','extra'),())
     parent['nodes'][0].update(kind='subswarm',subswarm_id='child_team')
     async with runner(store,vault,tmp_path) as engine:
         service=Experiments(store,engine)
-        form=dict(architecture=parent,tasks=[dict(task='Work',checks=[dict(kind='contains',value='ok')])],repeats=1,ablations=[dict(name='Without extra',remove_nodes=['extra'])],mission={'max_subtasks':8,'limits':{'max_requests':20,'max_tokens':64000}})
+        form=dict(architecture=parent,tasks=[dict(task='Work',checks=[dict(kind='contains',value='ok')])],repeats=1,ablations=[dict(name='Without extra',remove_nodes=['extra'])],mission={'project_id':'p','tools_enabled':True,'max_subtasks':8,'limits':{'max_requests':20,'max_tokens':64000}})
         row=service.prepare(form)
         changed=copy.deepcopy(child);changed['nodes'][0]['name']='New child';store.put('architecture',child['id'],changed)
         await service.run(row['id'])
         assert store.get('experiment',row['id'])['status']=='completed'
         assert calls.count('child')==2 and 'New child' not in calls
+        assert [r['requests'] for r in store.get('experiment',row['id'])['rows']]==[2,1]
         assert row['architecture_digest']!=fingerprint(store,parent)
         policy=store.get('experiment',row['id'])['policy']
         store.put('regression_gate','frozen_gate',dict(id='frozen_gate',policy=policy,proof_id=row['id']))
         with pytest.raises(RouteError,match='passing repeated evaluation'):
             engine.create(RunInput(task='New mission',architecture_id=parent['id']),{**parent,'regression_gate_id':'frozen_gate'})
+        restricted=service.prepare({**form,'forbidden_tools':['workspace.read']});await service.run(restricted['id'])
+        restricted=store.get('experiment',restricted['id'])
+        assert restricted['status']=='completed' and not restricted['passed']
+        assert all('Forbidden tool: workspace.read' in r['failures'] for r in restricted['rows'])
 
 
 @pytest.mark.asyncio

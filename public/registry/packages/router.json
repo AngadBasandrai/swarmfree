@@ -4,7 +4,7 @@
   "payload": {
     "id": "router",
     "name": "Router and specialists",
-    "version": "0.8.0",
+    "version": "0.8.1",
     "kind": "architecture",
     "license": "MIT",
     "permissions": [],
@@ -257,5 +257,5 @@
       "note": "No live-provider quality ranking is claimed"
     }
   },
-  "signature": "5C3wXeavho4Jw+AJr1TuWHgRSBdWXvphe/shwzIfpczEpoHgemyxIc6yITPAMzYUJbbmhiuKBK2KT/KsPWffDg=="
+  "signature": "95Ysg8xssxNNAc7gR9AK33F1lxDXQ9qrdu7FiFHfGQvYLOwgDCIlgZIpOk51d7X5NXogocSa56K+bxlvwW+QBw=="
 }

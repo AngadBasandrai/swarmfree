@@ -4,7 +4,7 @@
   "payload": {
     "id": "recursive_fork",
     "name": "Recursive fork / join",
-    "version": "0.8.0",
+    "version": "0.8.1",
     "kind": "architecture",
     "license": "MIT",
     "permissions": [],
@@ -220,5 +220,5 @@
       "note": "No live-provider quality ranking is claimed"
     }
   },
-  "signature": "B004AXJuNkOUckFq4STsoNFs+e4rJoOhwwA9YqE+xtcUpdgg7VOdVYOJJScyrvkOa1mcFEW1C8TXEhdWr1ucAQ=="
+  "signature": "5CRWn8A17ptY4fZBRia/Cl2CVXyL7z35XANtfFvqlRscx6r5dfXtCsnD+sGj6x6rZuM8klEzNpFjRMOxTATiDQ=="
 }

@@ -3,194 +3,194 @@
   "key_id": "swarmfree",
   "payload": {
     "kind": "index",
-    "serial": 1791827310,
-    "expires_at": 1823363310,
+    "serial": 1791829664,
+    "expires_at": 1823365664,
     "packages": [
       {
         "id": "supervisor",
         "name": "Supervisor",
-        "version": "0.8.0",
+        "version": "0.8.1",
         "kind": "architecture",
         "path": "packages/supervisor.json",
-        "sha256": "63ee010d99f768e98867e35b8d460a7081de478743f95c5f41c0f9edc6dff39c"
+        "sha256": "1f48e3fbe25e93679f9022ea4f6a7b9488d01404a5f5d986b133eeacdc824bf9"
       },
       {
         "id": "pipeline",
         "name": "Pipeline",
-        "version": "0.8.0",
+        "version": "0.8.1",
         "kind": "architecture",
         "path": "packages/pipeline.json",
-        "sha256": "9e97c43b8d96212345c9190b22542b5e8653c6b62d3861c378736b80b5fd3314"
+        "sha256": "96f1769c6a442dbe96d603e97f885498c9184cfb000d467d06db785e14070488"
       },
       {
         "id": "parallel",
         "name": "Parallel / join",
-        "version": "0.8.0",
+        "version": "0.8.1",
         "kind": "architecture",
         "path": "packages/parallel.json",
-        "sha256": "ca9319c720201c26fea92f334f57e0b1d828e71791980419680f4b32384bce1a"
+        "sha256": "68837d4caf3ff1fadc8cd66ec86494adfde33149611d160f90d695b3828ebfc7"
       },
       {
         "id": "critic",
         "name": "Creator / critic",
-        "version": "0.8.0",
+        "version": "0.8.1",
         "kind": "architecture",
         "path": "packages/critic.json",
-        "sha256": "d0a01c82a28dfdca87c79090d4b8514ad74b5ad7d175b3038aa29d3720c96554"
+        "sha256": "2c213040350121e6cbf32915fd20e65d82e7f514f32ecc5df3d0289db36110a2"
       },
       {
         "id": "baseline",
         "name": "Single-agent baseline",
-        "version": "0.8.0",
+        "version": "0.8.1",
         "kind": "architecture",
         "path": "packages/baseline.json",
-        "sha256": "c423465bf6a2ccceb1d673c13cb2732c6526dc650b68920a5349e340b9c962f7"
+        "sha256": "dc6175cc4bafeef6febf48f826d68f1d474266a8e780bf0119665e26121c0b9b"
       },
       {
         "id": "handoff",
         "name": "Specialist handoff",
-        "version": "0.8.0",
+        "version": "0.8.1",
         "kind": "architecture",
         "path": "packages/handoff.json",
-        "sha256": "b13c7f60401e899d890143f7e02cc1c6712c5dc5e8528d1398e1f6e970466512"
+        "sha256": "f43ee639d07a043533f4372c423739b33283912d85f9652a2ab0f39a5ac58009"
       },
       {
         "id": "hierarchy",
         "name": "Hierarchical team",
-        "version": "0.8.0",
+        "version": "0.8.1",
         "kind": "architecture",
         "path": "packages/hierarchy.json",
-        "sha256": "3fcc2aa5dedd8b35bafa82c88f65305595641dbea99598ac3cdae1345a6e04ae"
+        "sha256": "b5f7d2be7fc34d5313789e510b44f667550da349869ec675b612b4c61b05f508"
       },
       {
         "id": "blackboard",
         "name": "Shared blackboard",
-        "version": "0.8.0",
+        "version": "0.8.1",
         "kind": "architecture",
         "path": "packages/blackboard.json",
-        "sha256": "37e35c49f33174194ff8e8a213cd1a0c3174a23e8ade8632bfe1c37d22b98886"
+        "sha256": "377d48aa397d0e76eaacec7d04df36162a82067220fb07b4dd23ef7ce30d3ed8"
       },
       {
         "id": "ensemble",
         "name": "Debate / ensemble",
-        "version": "0.8.0",
+        "version": "0.8.1",
         "kind": "architecture",
         "path": "packages/ensemble.json",
-        "sha256": "b0b092490a91f27f273d5e7aeef461f9e9666530fbe9af45831a914ded8efacc"
+        "sha256": "0f70b5dc143918cc3d5e12b34cd9cd45229b9dad5e4ee1016a3d8002f0eac5b7"
       },
       {
         "id": "revision",
         "name": "Bounded revision",
-        "version": "0.8.0",
+        "version": "0.8.1",
         "kind": "architecture",
         "path": "packages/revision.json",
-        "sha256": "d004f01ba90b30d3f035ff700c90e9013c936a5812616e540b5729d9c3a4e63f"
+        "sha256": "4858aa7cc61860536715850c96e90381d01c4a02c975d3624daa7e0ffcd3802f"
       },
       {
         "id": "map_reduce",
         "name": "Map / reduce",
-        "version": "0.8.0",
+        "version": "0.8.1",
         "kind": "architecture",
         "path": "packages/map_reduce.json",
-        "sha256": "df3386a28bc99d840bdb563f96084798eab5d13aab96d507fa512bf1bdd4a1e1"
+        "sha256": "d503d46ef7d96b63fe60d9f4431973cfc7935cc2562837f5ed37821c0460b263"
       },
       {
         "id": "jury",
         "name": "Debate with a judge",
-        "version": "0.8.0",
+        "version": "0.8.1",
         "kind": "architecture",
         "path": "packages/jury.json",
-        "sha256": "2298b9dad2b9bc073ba2b84d5359e77d604d89a35115ed7edb93485e7139c473"
+        "sha256": "205c1709e24a6e6a992ab7abe424ed87f9c3d917898dc8afd69e709c484cc5f5"
       },
       {
         "id": "test_driven",
         "name": "Test-driven team",
-        "version": "0.8.0",
+        "version": "0.8.1",
         "kind": "architecture",
         "path": "packages/test_driven.json",
-        "sha256": "8d6677785923b1a047329c50ac2e09896a2d67c58bdd4380125a7adcd2ce25e3"
+        "sha256": "f2023451180a1d94ea63a6c4ae508d054fe4546b5a29c1cb95fe0809c92c7dda"
       },
       {
         "id": "evidence",
         "name": "Evidence and fact-check",
-        "version": "0.8.0",
+        "version": "0.8.1",
         "kind": "architecture",
         "path": "packages/evidence.json",
-        "sha256": "d076c250e7b98debff715490b2a9858f8849d4d1f124805235b0e48b84038dd8"
+        "sha256": "6590b1448a2465ab8cd6f50b8768c52a287cb41b05109c430db767269a88ce83"
       },
       {
         "id": "red_team",
         "name": "Red team / blue team",
-        "version": "0.8.0",
+        "version": "0.8.1",
         "kind": "architecture",
         "path": "packages/red_team.json",
-        "sha256": "4984e258fd8e6eef453f64da969e6e4bf469edef10f85d3495427dc90dd2ab18"
+        "sha256": "ca5dd1415202ed5f126855c184022f95bb9b82ee7a2e0842287f5b63df701c0c"
       },
       {
         "id": "router",
         "name": "Router and specialists",
-        "version": "0.8.0",
+        "version": "0.8.1",
         "kind": "architecture",
         "path": "packages/router.json",
-        "sha256": "5ba47a5a33eedce6f363140ce8e1cac716314a42d8328b97015473d1a6ecab25"
+        "sha256": "da59720edecfc7402651a60cb929f620e2ccd08d0a6ff3f5b511822b0c8762c4"
       },
       {
         "id": "review_board",
         "name": "Specialist review board",
-        "version": "0.8.0",
+        "version": "0.8.1",
         "kind": "architecture",
         "path": "packages/review_board.json",
-        "sha256": "10ffa0eb00143bcac795b61615c75021a8b8d9ea4c15cafd721fb1e17f3ec566"
+        "sha256": "0a258cb846a6995705cfbcb65d3ec83901fca4cd7cf990ff317b9b748df69566"
       },
       {
         "id": "diamond",
         "name": "Diamond comparison",
-        "version": "0.8.0",
+        "version": "0.8.1",
         "kind": "architecture",
         "path": "packages/diamond.json",
-        "sha256": "562c0a6de39d678c90fd74ac0d27e3622fae412e8e7dca7b60f8ba5b1d34cd53"
+        "sha256": "7a6f69efa90266ce68f03b5e29b70e3e05cbcf476ab2290e44526f8657e539d1"
       },
       {
         "id": "spec_build_verify",
         "name": "Specify / build / verify",
-        "version": "0.8.0",
+        "version": "0.8.1",
         "kind": "architecture",
         "path": "packages/spec_build_verify.json",
-        "sha256": "a2c484c24a4e71ad8e3b142d2f879c22b3f0c0822be6db6932cc1e2024868a50"
+        "sha256": "c417e1643bf9f6846e9d3a2137294a2aa93f27d60b3c06748e7b35dfe192ebda"
       },
       {
         "id": "recursive_decompose",
         "name": "Recursive decomposition",
-        "version": "0.8.0",
+        "version": "0.8.1",
         "kind": "architecture",
         "path": "packages/recursive_decompose.json",
-        "sha256": "f5f07fe1951b51ab01bf49cead5286b65a04638a676e9ae80b5e3016604d5adc"
+        "sha256": "861d44beacad13f57fc7eed165aca794316971fdb74f457a479ddb02caa3f101"
       },
       {
         "id": "recursive_review",
         "name": "Recursive critique and repair",
-        "version": "0.8.0",
+        "version": "0.8.1",
         "kind": "architecture",
         "path": "packages/recursive_review.json",
-        "sha256": "273a67f7692fd9757ba068ef77e1ad1762ced3612a627141e557c62da6302b84"
+        "sha256": "c4b45062d91f968a105904808260b0933e820feff6643945222c2942d6c1f1b5"
       },
       {
         "id": "recursive_fork",
         "name": "Recursive fork / join",
-        "version": "0.8.0",
+        "version": "0.8.1",
         "kind": "architecture",
         "path": "packages/recursive_fork.json",
-        "sha256": "29bdc078edb04311c550fe3824da160ff1e4576c829c09a595110c0ca79897bb"
+        "sha256": "40860870fbef14e78dafeb3e607fd7dbbb2791ce2a928533a8e7cc0b8719d2af"
       },
       {
         "id": "mcp-local-example",
         "name": "Local MCP adapter example",
-        "version": "0.8.0",
+        "version": "0.8.1",
         "kind": "plugin",
         "path": "packages/mcp-local-example.json",
-        "sha256": "ff4cd239239e21ed19a569f67db7d8e5e1a0388b7f376b6eea1b0b9dce7a2538"
+        "sha256": "c115330cb06ae10970b84458b07528b819ef721bc33dc6b5a48a601287f34bfc"
       }
     ]
   },
-  "signature": "LHGy7wrW2aSWZCf8ATTwLeojzFmzTCaBTWbXmqbpcR8tdFVEEJRigzCiwTPgSfvm3c7/AiW4vVe1XpXMhkyIAA=="
+  "signature": "U39paOVDx34pUzWiC2nCmMGrO3gGRkr7rBgIFLlAjR7a7mpdJOcfClS3lm3DlaZW34j755Vr1j7/yTZCEJ/fCA=="
 }

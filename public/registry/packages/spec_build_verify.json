@@ -4,7 +4,7 @@
   "payload": {
     "id": "spec_build_verify",
     "name": "Specify / build / verify",
-    "version": "0.8.0",
+    "version": "0.8.1",
     "kind": "architecture",
     "license": "MIT",
     "permissions": [],
@@ -150,5 +150,5 @@
       "note": "No live-provider quality ranking is claimed"
     }
   },
-  "signature": "ghnPegSqwDzUGIr/dHCy5SjIRi+FUDKvfpkWHmgFUQ2tx8tU21PhFZPEa9BpcJq3G3NyX1OPu4OXBSEzRav+Ag=="
+  "signature": "3IHtgTlgSORhzG6xxR/GvwwXDUFsVFm0uzrk8BmgSXHvmkdk+u7ZbfOr9AiJtjBz5iYPM0/IB+x1mn/ap5EnDQ=="
 }

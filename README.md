@@ -2,7 +2,7 @@
 
 A downloadable desktop workbench for persistent agents using your own model providers, local Ollama models, linked devices, and opt-in volunteer inference. Each installation measures its own hardware and owns its own workspace. MIT licensed.
 
-**0.8.0 desktop alpha:** a Tauri desktop app with a bundled engine for Windows x64, macOS Apple Silicon/Intel, and Linux x64. End users need no Python, Node.js or Rust. Browser agents use an optional headless Chromium download; the desktop UI uses the operating system's webview. Package validation and supported scope are recorded in [build status](docs/BUILD_STATUS.md), the [0.6 feature guide](docs/FEATURES_0_6.md) and the [research/design plan](docs/SWARM_WORKBENCH_PLAN.md).
+**0.8.1 desktop alpha:** a Tauri desktop app with a bundled engine for Windows x64, macOS Apple Silicon/Intel, and Linux x64. End users need no Python, Node.js or Rust. Browser agents use an optional headless Chromium download; the desktop UI uses the operating system's webview. Package validation and supported scope are recorded in [build status](docs/BUILD_STATUS.md), the [0.6 feature guide](docs/FEATURES_0_6.md) and the [research/design plan](docs/SWARM_WORKBENCH_PLAN.md).
 
 Missions use connected models. The offline demonstration mode was removed in 0.6.4; historical demonstration records remain inspectable and exportable, with execution disabled.
 

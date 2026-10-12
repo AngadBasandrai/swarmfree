@@ -4,7 +4,7 @@
   "payload": {
     "id": "recursive_decompose",
     "name": "Recursive decomposition",
-    "version": "0.8.0",
+    "version": "0.8.1",
     "kind": "architecture",
     "license": "MIT",
     "permissions": [],
@@ -150,5 +150,5 @@
       "note": "No live-provider quality ranking is claimed"
     }
   },
-  "signature": "tCbsQuJCbuJnOVIEFpEov6XNDncLsnYkRgluWwOup2SrBSR7Wn6SWEgRMz3SGXJsRDlJaZ15wiu5/3lktOLjBQ=="
+  "signature": "OnaP+l4Q1v1xTJSkhL9Ei1CLBy0WuSf3btgFvjp5EHxrlrvhesvRX7zPi98BaI6+QcyH6ByNNKO5lW/vfWCCBg=="
 }

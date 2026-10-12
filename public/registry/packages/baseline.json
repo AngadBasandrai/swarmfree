@@ -4,7 +4,7 @@
   "payload": {
     "id": "baseline",
     "name": "Single-agent baseline",
-    "version": "0.8.0",
+    "version": "0.8.1",
     "kind": "architecture",
     "license": "MIT",
     "permissions": [],
@@ -67,5 +67,5 @@
       "note": "No live-provider quality ranking is claimed"
     }
   },
-  "signature": "oPfacUPbMSvGEMNQ8iOF7Eb86aH0zXO/kgn+KnL3d6fSEOE/4AOccGSxpE21apakc4CXN55NpT+ir7y3vBL4CA=="
+  "signature": "hxppUyclCs9onXYtuAOAu+S2ChBf3ECSz1PVUD5GE+HnxE09OCPz7yjjrVNdQwXZJEzItr16BkD+q6mXINt/Ag=="
 }

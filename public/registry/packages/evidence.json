@@ -4,7 +4,7 @@
   "payload": {
     "id": "evidence",
     "name": "Evidence and fact-check",
-    "version": "0.8.0",
+    "version": "0.8.1",
     "kind": "architecture",
     "license": "MIT",
     "permissions": [],
@@ -182,5 +182,5 @@
       "note": "No live-provider quality ranking is claimed"
     }
   },
-  "signature": "R/Dj+WaY61sM8G6aF9aPgLkRurradwKrjLe0qK0vIWpPExGt5ZoVjkTgzx+UOmHexGGsvvUnlg19RlzXlgUCDQ=="
+  "signature": "qreTi+vd4TU2buU9PWwnbs0MjCCik37Es0a5IPS3DSV/S9GI3bo01du3ewD0U29Z+rNfBv9OwuggMd5WRi+8BQ=="
 }

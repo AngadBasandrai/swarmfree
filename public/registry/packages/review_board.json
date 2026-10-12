@@ -4,7 +4,7 @@
   "payload": {
     "id": "review_board",
     "name": "Specialist review board",
-    "version": "0.8.0",
+    "version": "0.8.1",
     "kind": "architecture",
     "license": "MIT",
     "permissions": [],
@@ -232,5 +232,5 @@
       "note": "No live-provider quality ranking is claimed"
     }
   },
-  "signature": "DVLZSso0JSxyW/Nr7iGkcGpJh138rS/Uutvb+Cpz9rZ5hxzsTHwIOmzsmdhnRYYY9dIKTurh5JhKRbMw+Jy1Cw=="
+  "signature": "FPhyL/Y4G2yVab8RFFbBJFtVTYbDEvy0UZ+MP1c3Wi23mIF8/U+sQC45tQXiS8ZAG4lKJdP+lkE+0NAUId03Ag=="
 }

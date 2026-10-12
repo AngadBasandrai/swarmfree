@@ -4,7 +4,7 @@
   "payload": {
     "id": "ensemble",
     "name": "Debate / ensemble",
-    "version": "0.8.0",
+    "version": "0.8.1",
     "kind": "architecture",
     "license": "MIT",
     "permissions": [],
@@ -182,5 +182,5 @@
       "note": "No live-provider quality ranking is claimed"
     }
   },
-  "signature": "jP1A5DueqFkWd2N29R4AMGu3Jr5S7C7+SOaXdn0duHnU5+85Qwe31GoNRiU+k66M4tIatXVX75om/unjL489Bg=="
+  "signature": "c+EJ7YIOkQAATGteKBeKxvK9gDQ/pegu3BgDmGlbS1ev0WgEBSUH3pHzqZB4Ejro9bJArn+EBTIUYMJVSXRnAA=="
 }

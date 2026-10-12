@@ -1,4 +1,4 @@
-# Swarm Workbench 0.8.0 alpha
+# Swarm Workbench 0.8.1 alpha
 
 Downloadable native desktop workbench for Windows x64, macOS Apple silicon/Intel, and Linux x64. End users need no Python, Node.js or Rust.
 

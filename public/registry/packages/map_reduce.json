@@ -4,7 +4,7 @@
   "payload": {
     "id": "map_reduce",
     "name": "Map / reduce",
-    "version": "0.8.0",
+    "version": "0.8.1",
     "kind": "architecture",
     "license": "MIT",
     "permissions": [],
@@ -232,5 +232,5 @@
       "note": "No live-provider quality ranking is claimed"
     }
   },
-  "signature": "1rW7jCEXDVyGJSPJ9rmkBFpB/cc6yvu3bmzJ13Lmyhp6cQ7Hrz9F5b7D/rqSGIE9ggsrXt2eNRcTND4TTxWjBA=="
+  "signature": "MFsQdeSlzJVGjjz+8QoUPhS4joRomrTYoLiCsm/QFJHOPgejt3xOCL8FcOpxwmoai3XKQNF5RPCpTd6DwsVqAA=="
 }

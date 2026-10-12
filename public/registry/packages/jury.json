@@ -4,7 +4,7 @@
   "payload": {
     "id": "jury",
     "name": "Debate with a judge",
-    "version": "0.8.0",
+    "version": "0.8.1",
     "kind": "architecture",
     "license": "MIT",
     "permissions": [],
@@ -182,5 +182,5 @@
       "note": "No live-provider quality ranking is claimed"
     }
   },
-  "signature": "CJtUUQ9/SBmPBSCiOqzx9/uuTenporCfBJE1nUHaANLSzDDjYiaH355zk5Ow0i1L4oot6WwPE6vHpdbHfsLYAg=="
+  "signature": "HJxknuyQLf7I+huNZonxEWtqf1onWlWr96IMXLJrwBv62jiVGnE48+djhAYBPPcQBRD0Hqjxt0nh9xduiwEXDA=="
 }

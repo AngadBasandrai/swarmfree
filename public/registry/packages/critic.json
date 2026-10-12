@@ -4,7 +4,7 @@
   "payload": {
     "id": "critic",
     "name": "Creator / critic",
-    "version": "0.8.0",
+    "version": "0.8.1",
     "kind": "architecture",
     "license": "MIT",
     "permissions": [],
@@ -150,5 +150,5 @@
       "note": "No live-provider quality ranking is claimed"
     }
   },
-  "signature": "p4wvdxqCp4WKdKfaSwMqG2JOlIkOH13Pycd3mc6DJDYeBctyyZLZQRlPCsgKeWf5a+eWo/hywXGIU/Jn0NJMCQ=="
+  "signature": "WBbkoZjJ8pDg/VdLAkuzO53eJdTOyWAtyOzb/JfrtYUl3UFOv7NVqsJFSSfW1BJJvzdeW4Dad05QI0i3nogkBg=="
 }

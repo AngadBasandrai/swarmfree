@@ -4,7 +4,7 @@
   "payload": {
     "id": "red_team",
     "name": "Red team / blue team",
-    "version": "0.8.0",
+    "version": "0.8.1",
     "kind": "architecture",
     "license": "MIT",
     "permissions": [],
@@ -182,5 +182,5 @@
       "note": "No live-provider quality ranking is claimed"
     }
   },
-  "signature": "elrIEUU0MVhUiyTSCh7+bc+itDroOINxsjpd4i7rWQHnmFnnVf+7JkugvcDDhlZlkUJzkoyinkhzQhIq642SCw=="
+  "signature": "0roK8P8tX4OKpoY7od3GMspEGaymO+g4rWVetxUnEiChNfeKsfEdW1UZJE0fsx8DzMO7XBusYuD9oLutPyv+CQ=="
 }

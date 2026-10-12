@@ -4,7 +4,7 @@
   "payload": {
     "id": "hierarchy",
     "name": "Hierarchical team",
-    "version": "0.8.0",
+    "version": "0.8.1",
     "kind": "architecture",
     "license": "MIT",
     "permissions": [],
@@ -106,5 +106,5 @@
       "note": "No live-provider quality ranking is claimed"
     }
   },
-  "signature": "9lBFmmwy59giMERBGgve/Ouv721Qul7gPSztZXjieBnXETssgY4hNJqhUDTyFP+Lo2gQ4vB8WrVzJ3rTrPtIDw=="
+  "signature": "KMFQ0aOfm50UFfB5c00c2UKJQNKZbwPnhSCtug72kFlUWGxICWf8Ss4245Qmy6HNTxg88PPyIj7oGeVXVNJMAw=="
 }

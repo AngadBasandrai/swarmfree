@@ -4,7 +4,7 @@
   "payload": {
     "id": "recursive_review",
     "name": "Recursive critique and repair",
-    "version": "0.8.0",
+    "version": "0.8.1",
     "kind": "architecture",
     "license": "MIT",
     "permissions": [],
@@ -182,5 +182,5 @@
       "note": "No live-provider quality ranking is claimed"
     }
   },
-  "signature": "ZI+DLaU+5vVi2elglDc6QB/a0lPE/CdpYmA/yuNmTdKEWP7SozZ5w/XmgtyCG1asKf7R+JJ7pgpc2RV+oHTLAA=="
+  "signature": "tju95RbIn8RwcWB8sFDlca5DunobPZqunmbTPsT0u427vHr315iUSXXqLZY5Ey+FiTC5G4Gw2V0GLd/Yu6TiCw=="
 }

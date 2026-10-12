@@ -99,13 +99,18 @@ class Experiments:
                         self.store.patch('experiment',id,dict(status='running',active_run_id=active,root_run_id=root,rows=rows))
                         self.engine.start(active);await self.engine.tasks[active]
                         run=self.store.get('run',active);data=terminal_output(run)
+                        family={active};missions=self.store.all('run')
+                        for _ in range(5):
+                            added={r['id'] for r in missions if r.get('delegated') and r.get('parent_run_id') in family}
+                            if added<=family:break
+                            family.update(added)
                         checked=check_output(data if isinstance(data,str) else bounded_json(data),task.get('schema'),task.get('checks'))
                         completed={r['node_id'] for r in run.get('results',[]) if not r.get('skipped') and not r.get('failed')}
-                        forbidden=[o['tool'] for o in self.store.all('operation') if o.get('run_id')==active and o['tool'] in row['policy']['forbidden_tools']]
+                        forbidden=[o['tool'] for o in self.store.all('operation') if o.get('run_id') in family and o['tool'] in row['policy']['forbidden_tools']]
                         failures=checked['failures']+(['Mission '+run['status']] if run['status']!='completed' else [])
                         failures += ['Missing trajectory node: '+n for n in row['policy']['required_nodes'] if n not in completed]
                         failures += ['Forbidden tool: '+t for t in forbidden]
-                        reservations=[r for r in self.store.all('reservation') if r['run_id']==active]
+                        reservations=[r for r in self.store.all('reservation') if r['run_id'] in family]
                         rows.append(dict(variant=variant['name'],task=task['task'],repeat=repeat+1,run_id=active,passed=not failures,failures=failures,requests=sum(r.get('units',1) for r in reservations),tokens=sum(r['tokens'] for r in reservations),nodes=sorted(completed)))
             summaries=[dict(name=v['name'],passed=all(r['passed'] for r in rows if r['variant']==v['name']),tokens=sum(r['tokens'] for r in rows if r['variant']==v['name']),requests=sum(r['requests'] for r in rows if r['variant']==v['name'])) for v in row['variants']]
             passed=summaries[0]['passed']

@@ -4,7 +4,7 @@
   "payload": {
     "id": "pipeline",
     "name": "Pipeline",
-    "version": "0.8.0",
+    "version": "0.8.1",
     "kind": "architecture",
     "license": "MIT",
     "permissions": [],
@@ -144,5 +144,5 @@
       "note": "No live-provider quality ranking is claimed"
     }
   },
-  "signature": "NVV4ILWWMkrm7I1UDPFtpblbh1YDqaA5lPvwFmGfM05s5VSft1Z9yWGe9Hnu6vvBRN9yYZxog4J2GOVRQFwIAQ=="
+  "signature": "8cAuXWnQUYrPC3He4ejAVIfAiOqMqt6uaJ/PbOfFYzAPwK7iQ+N0d/ns8bZZeCZU5k2h1bk79yiM+8Qpp2HKDA=="
 }
