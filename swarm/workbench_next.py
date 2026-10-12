@@ -126,6 +126,8 @@ def install_workbench(app):
     @router.post("/architectures/save")
     async def save_design(form:PreviewInput):
         row=preview(form.architecture.model_dump())["architecture"];row["id"]=uid("custom_")
+        from .composition import resolve
+        resolve(app.state.store,row)
         return app.state.store.put("architecture",row["id"],row)
     @router.get("/channels/{run_id}")
     async def channels(run_id:str):

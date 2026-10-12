@@ -15,6 +15,7 @@ test('task routing controls and typed output contracts are saved',async({page})=
   await page.getByLabel('Task routing policy').selectOption('quality');
   await page.getByLabel('Use native function calling for granted tools').check();
   await page.getByRole('button',{name:'Architectures',exact:true}).click();
+  await page.getByText('Contracts, conditions and messages',{exact:true}).click();
   await page.getByText('Typed handoff and validation',{exact:true}).click();
   await page.getByLabel('Handoff JSON schema').fill(JSON.stringify({type:'object',required:['summary'],properties:{summary:{type:'string'}}}));
   await page.getByLabel('Agent validation checks').fill(JSON.stringify([{kind:'contains',value:'summary'}]));

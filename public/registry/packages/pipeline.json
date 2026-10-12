@@ -4,7 +4,7 @@
   "payload": {
     "id": "pipeline",
     "name": "Pipeline",
-    "version": "0.6.4",
+    "version": "0.6.5",
     "kind": "architecture",
     "license": "MIT",
     "permissions": [],
@@ -12,6 +12,7 @@
       "id": "pipeline",
       "name": "Pipeline",
       "description": "Pass work through planning, execution, and review.",
+      "category": "general",
       "nodes": [
         {
           "id": "planner",
@@ -22,6 +23,9 @@
           "requires": [],
           "kind": "agent",
           "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
           "input_schema": {},
           "message_budget": 8,
           "run_if": {},
@@ -39,6 +43,9 @@
           "requires": [],
           "kind": "agent",
           "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
           "input_schema": {},
           "message_budget": 8,
           "run_if": {},
@@ -56,6 +63,9 @@
           "requires": [],
           "kind": "agent",
           "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
           "input_schema": {},
           "message_budget": 8,
           "run_if": {},
@@ -90,5 +100,5 @@
       "note": "No live-provider quality ranking is claimed"
     }
   },
-  "signature": "UEUwRlfB2CaKvJKCX6uei8GJi6Bg61pegxVCDu4UmZn6abBWhEfc8zwHuse6mkQByTxLOnTpZA7UVYv5WhP5Ag=="
+  "signature": "H2EyzqHyvI1TWxO3hLPkLpOqQJ41BtpgP9ENf20xHpjPrWdhyn2FRzN9EitRW7tFrhb0JDQkRaFpUkeTuJnhDg=="
 }

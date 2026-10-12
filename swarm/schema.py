@@ -9,8 +9,11 @@ class AgentSpec(BaseModel):
     instructions: str = Field(default="", max_length=12000)
     tools: list[str] | None = Field(default=None, max_length=40)
     requires: list[Literal["json", "vision"]] = Field(default_factory=list)
-    kind: Literal["agent", "vote", "subswarm"] = "agent"
+    kind: Literal["agent", "vote", "subswarm", "recursive"] = "agent"
     subswarm_id: str = Field(default="",max_length=80)
+    max_depth: int = Field(default=2, ge=1, le=4)
+    task_source: str = Field(default="", max_length=48)
+    recursion_stop_contains: str = Field(default="", max_length=120)
     input_schema: dict = Field(default_factory=dict)
     message_budget: int = Field(default=8,ge=0,le=50)
     run_if: dict[str, str] = Field(default_factory=dict)
@@ -25,6 +28,7 @@ class AgentSpec(BaseModel):
         if self.output_schema: validate_schema(self.output_schema)
         if self.input_schema: validate_schema(self.input_schema)
         if self.kind=="subswarm" and not self.subswarm_id: raise ValueError("Choose a sub-swarm architecture")
+        if self.kind=="recursive" and not self.subswarm_id: self.subswarm_id="self"
         for rule in self.validators:
             if rule.get("kind") not in {"contains","excludes","json","min_length"}: raise ValueError("Unknown output validator")
             if rule.get("kind")=="json": validate_schema(rule.get("schema",{"type":"object"}))
@@ -48,6 +52,7 @@ class Architecture(BaseModel):
     id: str = Field(pattern=r"^[a-zA-Z][a-zA-Z0-9_-]{0,47}$")
     name: str = Field(min_length=1, max_length=80)
     description: str = Field(default="", max_length=400)
+    category: str = Field(default="general", max_length=40)
     nodes: list[AgentSpec] = Field(min_length=1, max_length=16)
     edges: list[Edge] = Field(default_factory=list, max_length=120)
     builtin: bool = False
@@ -94,7 +99,7 @@ class Architecture(BaseModel):
         for node in self.nodes:
             if node.run_if and (set(node.run_if) != {"source", "contains"} or node.run_if["source"] not in ids):
                 raise ValueError("A condition needs source and contains fields referencing an upstream node")
-            if node.run_if:
+            if node.run_if or node.task_source:
                 pending, seen = [node.id], set()
                 while pending:
                     current = pending.pop()
@@ -102,8 +107,10 @@ class Architecture(BaseModel):
                         if edge.target == current and edge.source not in seen:
                             seen.add(edge.source)
                             pending.append(edge.source)
-                if node.run_if["source"] not in seen:
+                if node.run_if and node.run_if["source"] not in seen:
                     raise ValueError("A condition can inspect only an upstream node")
+                if node.task_source and node.task_source not in seen:
+                    raise ValueError("A child task source must be an upstream node")
         return self
 
 
@@ -154,8 +161,8 @@ class RunInput(BaseModel):
     low_quota: bool = False
     queue_if_unavailable: bool = False
     public_allowed: bool = False
-    max_subtasks: int = Field(default=4, ge=0, le=8)
-    depth: int = Field(default=0, ge=0, le=2)
+    max_subtasks: int = Field(default=4, ge=0, le=32)
+    depth: int = Field(default=0, ge=0, le=4)
     lab_id: str = Field(default="", max_length=80)
     limits: MissionLimits = Field(default_factory=MissionLimits)
     adaptive: Literal["off", "speed", "quality", "resources"] = "off"

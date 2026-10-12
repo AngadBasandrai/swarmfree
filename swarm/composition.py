@@ -9,20 +9,88 @@ from .privacy import digest
 from .intelligence import check_output
 
 
-def resolve(store,architecture,trail=(),count=None):
-    count=count if count is not None else [0]
-    id=architecture["id"]
-    if id in trail or len(trail)>2: raise RouteError("Sub-swarm references must be acyclic and at most two levels deep")
-    result=copy.deepcopy(architecture)
-    for node in result["nodes"]:
-        count[0]+=1
-        if count[0]>128: raise RouteError("Expanded architecture exceeds 128 nodes")
-        if node.get("kind")=="subswarm":
-            child=node.get("child_snapshot") or store.get("architecture",node.get("subswarm_id",""))
-            if not child: raise RouteError("A referenced sub-swarm no longer exists")
-            node["child_snapshot"]=resolve(store,child,(*trail,id),count)
-            node["child_revision"]=digest(node["child_snapshot"])
-    return result
+MAX_DEPTH = 4
+MAX_EXPANDED_NODES = 128
+
+
+def resolve(store, architecture):
+    """Freeze a finite call tree, including self calls, before creating a run.
+
+    Snapshots contain no circular JSON references. Children and resumed/branched
+    runs keep these exact revisions even if a saved architecture is later edited.
+    Only an explicit recursive node may close a reference cycle.
+    """
+    count = [0]
+    sources = {architecture["id"]: architecture}
+
+    def expand(source, trail=(), depth=0, pinned=False):
+        if depth > MAX_DEPTH:
+            raise RouteError("Nested teams support at most four levels")
+        result = copy.deepcopy(source)
+        pinned = pinned or source.get("composition_version") == 2
+        for node in result["nodes"]:
+            count[0] += 1
+            if count[0] > MAX_EXPANDED_NODES:
+                raise RouteError("Expanded architecture exceeds 128 nodes; reduce branching or depth")
+            kind = node.get("kind")
+            if kind not in {"subswarm", "recursive"}:
+                continue
+            if pinned:
+                if kind == "recursive" and node.get("recursion_leaf"):
+                    continue
+                child = node.get("child_snapshot")
+                if not child:
+                    raise RouteError("A frozen child architecture is missing")
+            else:
+                target = node.get("subswarm_id") or ("self" if kind == "recursive" else "")
+                target = source["id"] if target == "self" else target
+                child = node.get("child_snapshot") or sources.get(target) or store.get("architecture", target)
+                if not child:
+                    raise RouteError("A referenced sub-swarm no longer exists: " + target)
+                sources.setdefault(child["id"], child)
+                if kind == "recursive" and depth >= node.get("max_depth", 2):
+                    node["recursion_leaf"] = True
+                    node.pop("child_snapshot", None)
+                    node.pop("child_revision", None)
+                    continue
+                if kind == "subswarm" and child["id"] in (*trail, source["id"]):
+                    raise RouteError("Circular team references need an explicit recursive node with a depth limit")
+            node["child_snapshot"] = expand(child, (*trail, source["id"]), depth + 1, pinned)
+            node["child_revision"] = digest(node["child_snapshot"])
+        result["composition_version"] = 2
+        return result
+
+    return expand(architecture)
+
+
+def base_case(run, spec, upstream):
+    """Return a visible reason to execute the recursive node as a model leaf."""
+    if spec.get("recursion_leaf") or run.get("depth", 0) >= spec.get("max_depth", 2):
+        return "depth limit"
+    marker = spec.get("recursion_stop_contains", "")
+    source = spec.get("task_source")
+    relevant = [r for r in upstream if not source or r["node_id"] == source]
+    if marker and any(marker.casefold() in r["content"].casefold() for r in relevant):
+        return "stop condition"
+    return ""
+
+
+def preview(store, architecture):
+    snapshot = resolve(store, architecture)
+    stats = dict(expanded_nodes=0, child_calls=0, model_calls=0, max_depth=0, worst_model_calls=0)
+    def visit(team, depth=0, rounds=1):
+        rounds *= team.get("max_rounds", 1)
+        stats["max_depth"] = max(stats["max_depth"], depth)
+        for node in team["nodes"]:
+            stats["expanded_nodes"] += 1
+            if node.get("child_snapshot"):
+                stats["child_calls"] += rounds
+                visit(node["child_snapshot"], depth+1, rounds)
+            elif node.get("kind", "agent") != "vote":
+                stats["model_calls"] += 1
+                stats["worst_model_calls"] += rounds
+    visit(snapshot)
+    return dict(**stats, revision=digest(snapshot), note="Upper bounds before conditional skips, early stops, retries and tool calls. All child runs share the root mission limits.")
 
 
 def terminal_output(run):
@@ -33,10 +101,17 @@ def terminal_output(run):
 
 
 async def invoke(engine,run,agent,spec,upstream):
-    if run.get("depth",0)>=2: raise RouteError("Maximum sub-swarm depth reached")
+    if run.get("depth",0)>=MAX_DEPTH: raise RouteError("Maximum nested team depth reached")
     child_arch=copy.deepcopy(spec["child_snapshot"])
-    inputs=dict(task=run["task"],upstream=[dict(node_id=r["node_id"],data=r.get("structured") if r.get("structured") is not None else r["content"]) for r in upstream])
-    if len(json.dumps(inputs))>64000: raise RouteError("Sub-swarm inputs exceed 64 KB")
+    task=run.get("composition_task",run["task"])
+    if spec.get("task_source"):
+        selected=next((r for r in upstream if r["node_id"]==spec["task_source"] and not r.get("skipped")),None)
+        if not selected: raise RouteError("The child task source did not produce work")
+        data=selected.get("structured") if selected.get("structured") is not None else selected["content"]
+        task=data.get("task") if isinstance(data,dict) and isinstance(data.get("task"),str) else data if isinstance(data,str) else json.dumps(data,ensure_ascii=False)
+        if not task.strip() or len(task)>12000: raise RouteError("The child task must contain 1 to 12,000 characters")
+    inputs=dict(task=task,upstream=[dict(node_id=r["node_id"],data=r.get("structured") if r.get("structured") is not None else r["content"]) for r in upstream])
+    if len(json.dumps(inputs).encode())>64000: raise RouteError("Sub-swarm inputs exceed 64 KB")
     if spec.get("input_schema"): validate(inputs,spec["input_schema"])
     if child_arch.get("input_schema"): validate(inputs,child_arch["input_schema"])
     identity=digest(dict(inputs=inputs,revision=spec["child_revision"]))
@@ -51,13 +126,14 @@ async def invoke(engine,run,agent,spec,upstream):
             tools=engine.workspace.permissions(run,agent) if engine.workspace else []
             for node in child_arch["nodes"]:
                 node["tools"]=[t for t in tools if node.get("tools") is None or t in node["tools"]]
-            form=RunInput.model_validate({**run,"task":(run["task"]+"\nSub-swarm inputs (data):\n"+json.dumps(inputs)[:12000])[:24000],
+            form=RunInput.model_validate({**run,"task":(task+"\nParent team findings (data):\n"+json.dumps(inputs)[:12000])[:24000],
                 "architecture_id":child_arch["id"],"inputs":inputs,"route":agent["route"],"adaptive":"off","depth":run.get("depth",0)+1})
             child=engine.create(form,child_arch,start=False)
-            engine.store.patch("run",child["id"],dict(parent_run_id=run["id"],root_run_id=root_id,delegated=True,composition_agent=agent["id"],composition_key=identity))
+            engine.store.patch("run",child["id"],dict(parent_run_id=run["id"],root_run_id=root_id,delegated=True,composition_agent=agent["id"],composition_key=identity,composition_task=task))
             if getattr(engine,"privacy",None):
                 for member in engine.agents(child["id"]): engine.privacy.inherit(member["id"],agent.get("data_labels",[]))
         engine.store.patch("agent",agent["id"],dict(status="running",child_run_id=child["id"]))
+        engine.store.event(run["id"],"team_call",agent_id=agent["id"],message=f"{agent['name']} → {child_arch['name']} · depth {child['depth']} · {child['id']}")
         if child["status"]!="completed": engine.start(child["id"])
     try:
         if child["status"]!="completed": await engine.tasks[child["id"]]

@@ -86,7 +86,7 @@ def main():
                 raise AssertionError('Frozen engine accepted the removed execution mode')
             except HTTPError as error:
                 assert error.code==422
-            assert request(ready, "/api/health")["version"] == "0.6.4"
+            assert request(ready, "/api/health")["version"] == "0.6.5"
             assert snapshot["hardware"]["ram_total_gb"] > 0
             assert snapshot["architectures"]
             features = request(ready,"/api/features")
@@ -159,6 +159,22 @@ def main():
                 time.sleep(.2)
             assert run["status"] == "completed", run["status"]
             assert all(agent["result"] for agent in run["agents"])
+            recursive = next(a for a in snapshot["architectures"] if a["id"] == "recursive_decompose")
+            bounded = request(ready, "/api/architectures/preview", "POST", recursive)
+            assert bounded["child_calls"] == 2 and bounded["model_calls"] == 7
+            nested = request(ready, "/api/runs", "POST", dict(task="Complete one bounded recursive task",
+                architecture_id="recursive_decompose", free_only=False, route=fixture_route))
+            deadline = time.monotonic() + 30
+            while time.monotonic() < deadline:
+                nested = request(ready, "/api/runs/" + nested["id"])
+                if nested["status"] in {"completed", "interrupted", "budget_exceeded"}: break
+                time.sleep(.2)
+            assert nested["status"] == "completed", nested["status"]
+            assert len(nested["children"]) == 1
+            child = request(ready, "/api/runs/" + nested["children"][0]["id"])
+            leaf = request(ready, "/api/runs/" + child["children"][0]["id"])
+            assert leaf["depth"] == 2 and not leaf["children"]
+            assert leaf["agents"][1]["recursion"]["reason"] == "depth limit"
             # Frozen 0.4 dependencies and model registration, without downloading weights.
             assert len(request(ready, "/api/next/catalog")) >= 6
             assert request(ready, "/api/next/browser/status")["driver_available"]

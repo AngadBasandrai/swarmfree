@@ -1,0 +1,128 @@
+{
+  "format": "swarm-json-v1",
+  "key_id": "swarmfree",
+  "payload": {
+    "id": "evidence",
+    "name": "Evidence and fact-check",
+    "version": "0.6.5",
+    "kind": "architecture",
+    "license": "MIT",
+    "permissions": [],
+    "architecture": {
+      "id": "evidence",
+      "name": "Evidence and fact-check",
+      "description": "Investigate independently, audit evidence, then produce a sourced synthesis.",
+      "category": "research",
+      "nodes": [
+        {
+          "id": "primary",
+          "name": "Primary investigator",
+          "role": "Gather primary evidence",
+          "instructions": "Use granted search/retrieval tools. Prioritize primary sources and preserve source IDs and URLs. Do not invent retrieval.",
+          "tools": null,
+          "requires": [],
+          "kind": "agent",
+          "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 0.0,
+          "y": 0.0
+        },
+        {
+          "id": "counter",
+          "name": "Counter-evidence",
+          "role": "Investigate competing explanations",
+          "instructions": "Look for conflicting evidence and alternative explanations with available tools.",
+          "tools": null,
+          "requires": [],
+          "kind": "agent",
+          "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 0.0,
+          "y": 220.0
+        },
+        {
+          "id": "audit",
+          "name": "Evidence auditor",
+          "role": "Check provenance and claims",
+          "instructions": "Audit supplied claims and citations. Separate verified retrieval, inference and missing evidence.",
+          "tools": null,
+          "requires": [],
+          "kind": "agent",
+          "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 280.0,
+          "y": 110.0
+        },
+        {
+          "id": "report",
+          "name": "Report writer",
+          "role": "Write the evidence-backed result",
+          "instructions": "Synthesize audited findings, cite available sources, and state limitations.",
+          "tools": null,
+          "requires": [],
+          "kind": "agent",
+          "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 560.0,
+          "y": 110.0
+        }
+      ],
+      "edges": [
+        {
+          "source": "primary",
+          "target": "audit"
+        },
+        {
+          "source": "counter",
+          "target": "audit"
+        },
+        {
+          "source": "audit",
+          "target": "report"
+        }
+      ],
+      "builtin": true,
+      "max_rounds": 1,
+      "stop_when_contains": "",
+      "channels": [],
+      "input_schema": {},
+      "output_schema": {}
+    },
+    "examples": [
+      "Connect a provider, local model, or paired device before running this architecture"
+    ],
+    "evaluation": {
+      "status": "deterministic provider-fixture validation",
+      "note": "No live-provider quality ranking is claimed"
+    }
+  },
+  "signature": "oxlVI3tr/PHtnxX1bKmBzi3GMhi8vNWhG+W6j6aZVR2Zz58URgE0EbeYNpSGuRQdjFy+uxP5yVmoMNXnHNqnAw=="
+}

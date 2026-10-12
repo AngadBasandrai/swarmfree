@@ -238,7 +238,8 @@ class Engine:
 
     async def delegate(self, run, agent, args):
         from .schema import RunInput, Architecture
-        if run.get("depth", 0) >= 2:
+        from .composition import MAX_DEPTH
+        if run.get("depth", 0) >= MAX_DEPTH:
             raise RouteError("Maximum subtask depth reached")
         with self.store.lock:
             children = [r for r in self.store.all("run") if r.get("parent_run_id") == run["id"] and r.get("delegated")]
@@ -250,7 +251,7 @@ class Engine:
             if len(descendants) >= root_run.get("max_subtasks", 4):
                 raise RouteError("Root mission subtask budget reached")
             tools = self.workspace.permissions(run, agent) if self.workspace else []
-            if run.get("depth", 0)+1 >= 2: tools = [t for t in tools if t != "agent.delegate"]
+            if run.get("depth", 0)+1 >= MAX_DEPTH: tools = [t for t in tools if t != "agent.delegate"]
             architecture = Architecture(id="specialist", name="Delegated specialist", nodes=[dict(id="worker", name="Specialist", role=str(args.get("role", "Specialist"))[:160], tools=tools)]).model_dump()
             form = RunInput.model_validate({**run, "task": str(args["task"]), "architecture_id": "specialist", "depth": run.get("depth", 0)+1, "route": agent["route"],"adaptive":"off"})
             child = self.create(form, architecture, start=False)
@@ -312,9 +313,13 @@ class Engine:
                 result = dict(node_id=node_id, name=agent["name"], content="Skipped: upstream condition was not met", skipped=True)
                 self.store.patch("agent", agent_id, dict(status="skipped", result=result))
                 return result
-            if spec.get("kind") == "subswarm":
-                from .composition import invoke
-                return await invoke(self,run,agent,spec,upstream)
+            if spec.get("kind") in {"subswarm", "recursive"}:
+                from .composition import invoke, base_case
+                reason = base_case(run,spec,upstream) if spec.get("kind") == "recursive" else ""
+                if not reason:
+                    return await invoke(self,run,agent,spec,upstream)
+                self.store.patch("agent",agent_id,dict(recursion=dict(reason=reason,depth=run.get("depth",0),max_depth=spec.get("max_depth",2))))
+                self.store.event(run_id,"recursion_base_case",agent_id=agent_id,message=f"{agent['name']} solves the base case: {reason} at depth {run.get('depth',0)}")
             if spec.get("kind") == "vote":
                 votes = []
                 for item in upstream:

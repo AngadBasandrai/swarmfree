@@ -1,8 +1,10 @@
 # Swarm Workbench build status
 
-12 October 2026 · version 0.6.4 · MIT
+12 October 2026 · version 0.6.5 candidate · MIT
 
-[Swarm Workbench 0.6.4 is published](https://github.com/AngadBasandrai/swarmfree/releases/tag/v0.6.4) for Windows x64, macOS Apple silicon/Intel, and Linux x64. The release source is the immutable commit `8c4caf12cd8ed0a6cccc12bbc2960b40e9a47334`.
+The 0.6.5 candidate adds 22 architecture presets, the new visual editor and bounded recursive child teams. Local acceptance passes 179 Python tests, 31 headless Chromium flows, three native request-boundary tests, frontend compilation, and isolated frozen Windows engine acceptance including recursive calls. Coverage includes every preset with owned model fixtures, depth/stop/budget controls, restart reuse, preflight estimates and editor/navigation workflows. Publication checks are in progress.
+
+Last published release: [Swarm Workbench 0.6.4](https://github.com/AngadBasandrai/swarmfree/releases/tag/v0.6.4) for Windows x64, macOS Apple silicon/Intel, and Linux x64. The release source is the immutable commit `8c4caf12cd8ed0a6cccc12bbc2960b40e9a47334`.
 
 The offline demonstration backend and controls have been removed from missions, automations, campaigns, comparisons, evaluations, and onboarding. Missions require connected models; missing capacity is reported or queued according to the owner's selection. Old demonstration records remain inspectable and exportable, with resume, branch, and chat disabled. Tests provide their own model fixtures outside the normal application entry point.
 

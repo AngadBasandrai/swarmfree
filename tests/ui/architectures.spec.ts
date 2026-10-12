@@ -1,0 +1,97 @@
+import { test, expect } from '@playwright/test';
+
+test('browse categories and edit connections with undo, redo and duplication', async ({ page }) => {
+  const errors: string[] = []; page.on('pageerror', e => errors.push(e.message));
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Architectures', exact: true }).click();
+  await expect(page.getByText('22 presets', { exact: true })).toBeVisible();
+  await page.getByLabel('Architecture category').selectOption('recursive');
+  await expect(page.getByLabel('Architecture template')).toContainText('Recursive fork / join');
+  await page.getByLabel('Architecture category').selectOption('all');
+  await page.getByLabel('Search architectures').fill('map');
+  await expect(page.getByLabel('Architecture template')).toContainText('Map / reduce');
+  await page.getByLabel('Search architectures').fill('');
+  await page.getByLabel('Architecture template').selectOption('pipeline');
+  await page.getByLabel('Connect from').selectOption('reviewer');
+  await page.getByLabel('Connect to').selectOption('planner');
+  await page.getByRole('button', { name: 'Connect agents', exact: true }).click();
+  await expect(page.getByText(/A connection creates a dependency cycle/)).toBeVisible();
+  await page.getByLabel('Connect from').selectOption('planner');
+  await page.getByLabel('Connect to').selectOption('reviewer');
+  await page.getByRole('button', { name: 'Connect agents', exact: true }).click();
+  await expect(page.locator('.react-flow__edge')).toHaveCount(3);
+  await page.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect(page.locator('.react-flow__edge')).toHaveCount(2);
+  await page.getByRole('button', { name: 'Redo', exact: true }).click();
+  await expect(page.locator('.react-flow__edge')).toHaveCount(3);
+  await page.getByRole('button', { name: 'Select agent Reviewer', exact: true }).click();
+  await page.getByRole('button', { name: 'Duplicate agent', exact: true }).click();
+  await expect(page.getByLabel('Agent name', { exact: true })).toHaveValue('Reviewer copy');
+  await expect(page.locator('.react-flow__edge')).toHaveCount(5);
+  await page.getByRole('button', { name: 'Remove agent', exact: true }).click();
+  await expect(page.locator('.architecture-agent-list > button')).toHaveCount(3);
+  await page.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect(page.locator('.architecture-agent-list > button')).toHaveCount(4);
+  await page.getByRole('button', { name: 'Auto layout', exact: true }).click();
+  await page.getByLabel('Architecture name').fill('Edited pipeline');
+  await page.getByRole('button', { name: 'Save custom copy' }).click();
+  await expect(page.getByRole('button', { name: 'Save architecture', exact: true })).toBeVisible();
+  expect(errors).toEqual([]);
+  await page.screenshot({ path: 'test-results/architecture-editor.png', fullPage: true });
+});
+
+test('edit a recursive team, preview its limits and preserve self-calls in a saved copy', async ({ page }) => {
+  await page.goto('/'); await page.getByRole('button', { name: 'Architectures', exact: true }).click();
+  await page.getByLabel('Architecture template').selectOption('recursive_decompose');
+  await page.getByRole('button', { name: 'Select agent Recursive solver', exact: true }).click();
+  await expect(page.getByLabel('Node behavior')).toHaveValue('recursive');
+  await expect(page.getByLabel('Child architecture', { exact: true })).toHaveValue('self');
+  await page.getByLabel('Recursive depth limit').fill('3');
+  await page.getByLabel('Recursion stop condition').fill('SOLVED');
+  await page.getByRole('button', { name: 'Check architecture', exact: true }).click();
+  await expect(page.getByText('3 possible child calls', { exact: true })).toBeVisible();
+  await expect(page.getByText('Depth 3', { exact: true })).toBeVisible();
+  await page.getByLabel('Architecture name').fill('My recursive team');
+  await page.getByRole('button', { name: 'Save custom copy' }).click();
+  await expect(page.getByRole('button', { name: 'Save architecture', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Select agent Recursive solver', exact: true }).click();
+  await expect(page.getByLabel('Child architecture', { exact: true })).toHaveValue('self');
+  await expect(page.getByLabel('Recursive depth limit')).toHaveValue('3');
+  await page.screenshot({ path: 'test-results/architecture-recursive.png', fullPage: true });
+});
+
+test('protect drafts on template changes and edit comfortably at mobile width', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/'); await page.getByRole('button', { name: 'Architectures', exact: true }).click();
+  await page.getByLabel('Architecture name').fill('Unsaved team');
+  await page.getByLabel('Architecture template').selectOption('recursive_fork');
+  await expect(page.getByText(/This team has unsaved edits/)).toBeVisible();
+  await page.getByRole('button', { name: 'Keep editing', exact: true }).click();
+  await expect(page.getByLabel('Architecture name')).toHaveValue('Unsaved team');
+  await page.getByLabel('Architecture template').selectOption('recursive_fork');
+  await page.getByRole('button', { name: 'Discard changes', exact: true }).click();
+  await page.getByRole('button', { name: 'Select agent First recursive branch', exact: true }).click();
+  await expect(page.getByLabel('Child task source')).toHaveValue('left_task');
+  await expect(page.getByLabel('Recursive depth limit')).toHaveValue('1');
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
+  expect(overflow).toBe(false);
+  await page.screenshot({ path: 'test-results/architecture-mobile.png', fullPage: true });
+});
+
+test('run a recursive preset with the owned provider fixture and navigate child teams', async ({ page }) => {
+  await page.goto('/');
+  await page.getByLabel('Mission architecture category').selectOption('recursive');
+  await page.getByRole('button', { name: /^Recursive decomposition/ }).click();
+  await page.getByLabel('THE MISSION').fill('Create a simple checklist');
+  await page.getByLabel('Shared child-run limit').fill('4');
+  await page.getByRole('button', { name: 'Launch swarm', exact: true }).click();
+  await expect(page.locator('.run-title .badge')).toHaveText('completed', { timeout: 25000 });
+  await page.getByRole('button', { name: 'Open child team Recursive decomposition', exact: true }).click();
+  await expect(page.getByText('Nested depth 1', { exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Open child team Recursive decomposition', exact: true }).click();
+  await expect(page.getByText('Nested depth 2', { exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Open child team Recursive decomposition', exact: true })).toHaveCount(0);
+  await page.getByRole('button', { name: 'Root mission', exact: true }).click();
+  await expect(page.getByText('Nested depth 2', { exact: true })).toHaveCount(0);
+  await expect(page.locator('.run-title .badge')).toHaveText('completed');
+});

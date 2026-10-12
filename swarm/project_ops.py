@@ -239,16 +239,15 @@ class ProjectOps:
 
     def preflight(self, form, architecture_ids, inventory=None):
         from .hardware import hardware, fit_model
-        from .composition import resolve
+        from .composition import preview
         hw = hardware(); inv = inventory or {}
         comparisons = []
         outcomes = self.store.all("outcome")
         for id in architecture_ids:
             a = self.store.get("architecture", id)
             if not a: raise RouteError("Architecture not found")
-            a = resolve(self.store, a)
-            def count(graph): return sum(count(n["child_snapshot"]) if n.get("kind") == "subswarm" else int(n.get("kind") != "vote") for n in graph["nodes"]) * graph.get("max_rounds", 1)
-            nodes = count(a)
+            expansion = preview(self.store, a)
+            nodes = expansion["worst_model_calls"]
             calls = nodes * (1+form.tool_budget if form.tools_enabled else 1)
             history = [o for o in outcomes if o["task_class"] == form.preset and o.get("measured")][-100:]
             ms = sorted(o["elapsed_ms"] for o in history if o.get("elapsed_ms", 0) > 0)
@@ -258,10 +257,11 @@ class ProjectOps:
             warnings = []
             if calls > form.limits.max_requests: warnings.append("Full tool-call allowance exceeds request budget")
             if tokens > form.limits.max_tokens: warnings.append("Initial token estimate exceeds budget")
+            if expansion["child_calls"] > form.max_subtasks: warnings.append("Expanded team may exceed the shared child-run limit; reduce depth or raise that limit")
             if form.adaptive != "off": warnings.append("Adaptive specialist counts are runtime decisions; graph estimates exclude expansion")
             comparisons.append(dict(architecture_id=id, name=a["name"], model_stages=nodes, initial_requests=nodes,
                 requests_with_tools=calls, estimated_tokens=tokens, serial_seconds=None if latency is None else round(latency*nodes, 1),
-                timing_samples=len(ms), warnings=warnings))
+                timing_samples=len(ms), child_calls=expansion["child_calls"], max_depth=expansion["max_depth"], warnings=warnings))
         catalog = self.engine.intelligence.catalog() if self.engine.intelligence else []
         models = [dict(model=m["model"], estimate_gb=m.get("estimated_ram_gb"), fit=fit_model(dict(name=m["model"], size=int(m.get("download_gb", 0)*1e9)), hw, self.store.get("settings", "budgets"), inv.get("loaded", []))) for m in catalog if m.get("source") == "local" and "embeddings" not in m.get("capabilities", [])][:20]
         profiles = []; groups = {}; now = time.time()

@@ -4,7 +4,7 @@
   "payload": {
     "id": "ensemble",
     "name": "Debate / ensemble",
-    "version": "0.6.4",
+    "version": "0.6.5",
     "kind": "architecture",
     "license": "MIT",
     "permissions": [],
@@ -12,6 +12,7 @@
       "id": "ensemble",
       "name": "Debate / ensemble",
       "description": "Three independent decisions with critique and synthesis.",
+      "category": "decision",
       "nodes": [
         {
           "id": "one",
@@ -22,6 +23,9 @@
           "requires": [],
           "kind": "agent",
           "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
           "input_schema": {},
           "message_budget": 8,
           "run_if": {},
@@ -39,6 +43,9 @@
           "requires": [],
           "kind": "agent",
           "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
           "input_schema": {},
           "message_budget": 8,
           "run_if": {},
@@ -56,6 +63,9 @@
           "requires": [],
           "kind": "agent",
           "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
           "input_schema": {},
           "message_budget": 8,
           "run_if": {},
@@ -73,6 +83,9 @@
           "requires": [],
           "kind": "vote",
           "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
           "input_schema": {},
           "message_budget": 8,
           "run_if": {},
@@ -111,5 +124,5 @@
       "note": "No live-provider quality ranking is claimed"
     }
   },
-  "signature": "BOOTxQ/Yrj3PbQVWF82NdmsnZ4jsRDmalZ6thMB4WZcFRPi27o0ziAWPvNFZBY2MJJMJXglGrHWJoIscPjzHBw=="
+  "signature": "CL5aGyt4Cs7bp0CdnHHogmmQ6m2BWjrptGdyko1jRljr7c95JPGNFmGafZp150FFe8EKJEBjbC5v4yvPoh9MCw=="
 }

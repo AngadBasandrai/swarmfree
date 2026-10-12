@@ -111,7 +111,8 @@ def create_app(data_dir=None, token=None, vault=None, *, desktop=False):
                 if job.get("status") in {"running", "starting"}:
                     store.patch(kind, job["id"], dict(status="interrupted"))
         for template in TEMPLATES:
-            if not store.get("architecture", template["id"]):
+            existing = store.get("architecture", template["id"])
+            if not existing or existing.get("builtin"):
                 store.put("architecture", template["id"], template)
         if not store.get("settings", "budgets"):
             store.put("settings", "budgets", default_budgets(hardware()))
@@ -200,7 +201,7 @@ def create_app(data_dir=None, token=None, vault=None, *, desktop=False):
             async with locked_lifespan(app):
                 yield
 
-    app = FastAPI(title="Swarm Workbench", version="0.6.4", lifespan=lifespan)
+    app = FastAPI(title="Swarm Workbench", version="0.6.5", lifespan=lifespan)
     app.state.owner_token = owner_token
     app.state.backup_active = False
     hosts = ["127.0.0.1", "localhost", "[::1]", "testserver"]
@@ -235,7 +236,7 @@ def create_app(data_dir=None, token=None, vault=None, *, desktop=False):
 
     @app.get("/api/health")
     async def health():
-        return dict(status="ok", version="0.6.4")
+        return dict(status="ok", version="0.6.5")
 
     @app.post("/api/session")
     async def session(form: SessionInput, request: Request):
@@ -304,7 +305,14 @@ def create_app(data_dir=None, token=None, vault=None, *, desktop=False):
         existing = app.state.store.get("architecture", form.id)
         if existing and existing["builtin"]:
             raise HTTPException(400, "Save a copy with a new ID to customize a built-in template")
+        from .composition import resolve
+        resolve(app.state.store, form.model_dump())
         return app.state.store.put("architecture", form.id, dict(form.model_dump(), builtin=False))
+
+    @app.post("/api/architectures/preview")
+    async def preview_architecture(form: Architecture):
+        from .composition import preview
+        return preview(app.state.store, form.model_dump())
 
     @app.delete("/api/architectures/{id}")
     async def delete_architecture(id: str):
@@ -330,7 +338,7 @@ def create_app(data_dir=None, token=None, vault=None, *, desktop=False):
         run = app.state.store.get("run", id)
         if not run:
             raise HTTPException(404, "Run not found")
-        children=[{k:r.get(k) for k in ("id","task","status")} for r in app.state.store.all("run") if r.get("parent_run_id")==id and r.get("delegated")]
+        children=[dict(**{k:r.get(k) for k in ("id","task","status","depth")}, name=r["architecture"]["name"], kind="team" if r.get("composition_agent") else "specialist") for r in app.state.store.all("run") if r.get("parent_run_id")==id and r.get("delegated")]
         return dict(**run, agents=app.state.engine.agents(id), events=app.state.store.events(id),usage=app.state.engine.budget.usage(run),children=children)
 
     @app.post("/api/runs/{id}/pause")

@@ -1,0 +1,108 @@
+{
+  "format": "swarm-json-v1",
+  "key_id": "swarmfree",
+  "payload": {
+    "id": "spec_build_verify",
+    "name": "Specify / build / verify",
+    "version": "0.6.5",
+    "kind": "architecture",
+    "license": "MIT",
+    "permissions": [],
+    "architecture": {
+      "id": "spec_build_verify",
+      "name": "Specify / build / verify",
+      "description": "An explicit specification guides implementation and independent verification.",
+      "category": "coding",
+      "nodes": [
+        {
+          "id": "spec",
+          "name": "Specifier",
+          "role": "Write a testable specification",
+          "instructions": "Translate the task into constraints, acceptance criteria and an implementation plan.",
+          "tools": null,
+          "requires": [],
+          "kind": "agent",
+          "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 0.0,
+          "y": 100.0
+        },
+        {
+          "id": "build",
+          "name": "Builder",
+          "role": "Implement the specification",
+          "instructions": "Produce the requested implementation against the supplied specification.",
+          "tools": null,
+          "requires": [],
+          "kind": "agent",
+          "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 280.0,
+          "y": 100.0
+        },
+        {
+          "id": "verify",
+          "name": "Independent verifier",
+          "role": "Verify the deliverable",
+          "instructions": "Independently assess acceptance criteria using granted tools. Correct defects and distinguish observed from proposed checks.",
+          "tools": null,
+          "requires": [],
+          "kind": "agent",
+          "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 560.0,
+          "y": 100.0
+        }
+      ],
+      "edges": [
+        {
+          "source": "spec",
+          "target": "build"
+        },
+        {
+          "source": "spec",
+          "target": "verify"
+        },
+        {
+          "source": "build",
+          "target": "verify"
+        }
+      ],
+      "builtin": true,
+      "max_rounds": 1,
+      "stop_when_contains": "",
+      "channels": [],
+      "input_schema": {},
+      "output_schema": {}
+    },
+    "examples": [
+      "Connect a provider, local model, or paired device before running this architecture"
+    ],
+    "evaluation": {
+      "status": "deterministic provider-fixture validation",
+      "note": "No live-provider quality ranking is claimed"
+    }
+  },
+  "signature": "WKJEtObsV+n9PUwAkOApELckLe0cgh4ZkWDt4DGdOGlX6MAOBp8X0ebEwjXZT7/E8AXgFgTZS6ocdkeC9T9mCw=="
+}

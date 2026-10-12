@@ -1,0 +1,160 @@
+{
+  "format": "swarm-json-v1",
+  "key_id": "swarmfree",
+  "payload": {
+    "id": "map_reduce",
+    "name": "Map / reduce",
+    "version": "0.6.5",
+    "kind": "architecture",
+    "license": "MIT",
+    "permissions": [],
+    "architecture": {
+      "id": "map_reduce",
+      "name": "Map / reduce",
+      "description": "Scope work once, explore three dimensions in parallel, and reduce the findings.",
+      "category": "general",
+      "nodes": [
+        {
+          "id": "scope",
+          "name": "Scope",
+          "role": "Define the units of work",
+          "instructions": "Define requirements, boundaries and useful dimensions to investigate.",
+          "tools": null,
+          "requires": [],
+          "kind": "agent",
+          "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 0.0,
+          "y": 180.0
+        },
+        {
+          "id": "facts",
+          "name": "Evidence mapper",
+          "role": "Map evidence",
+          "instructions": "Develop the evidence dimension. Mark unknowns and cite only available sources.",
+          "tools": null,
+          "requires": [],
+          "kind": "agent",
+          "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 280.0,
+          "y": 0.0
+        },
+        {
+          "id": "options",
+          "name": "Options mapper",
+          "role": "Map alternatives",
+          "instructions": "Develop alternatives and their tradeoffs.",
+          "tools": null,
+          "requires": [],
+          "kind": "agent",
+          "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 280.0,
+          "y": 180.0
+        },
+        {
+          "id": "risks",
+          "name": "Risk mapper",
+          "role": "Map constraints and risks",
+          "instructions": "Develop constraints, failure modes and mitigations.",
+          "tools": null,
+          "requires": [],
+          "kind": "agent",
+          "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 280.0,
+          "y": 360.0
+        },
+        {
+          "id": "reduce",
+          "name": "Reducer",
+          "role": "Combine the mapped work",
+          "instructions": "Reduce the supplied findings into a coherent deliverable without dropping disagreements.",
+          "tools": null,
+          "requires": [],
+          "kind": "agent",
+          "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 560.0,
+          "y": 180.0
+        }
+      ],
+      "edges": [
+        {
+          "source": "scope",
+          "target": "facts"
+        },
+        {
+          "source": "scope",
+          "target": "options"
+        },
+        {
+          "source": "scope",
+          "target": "risks"
+        },
+        {
+          "source": "facts",
+          "target": "reduce"
+        },
+        {
+          "source": "options",
+          "target": "reduce"
+        },
+        {
+          "source": "risks",
+          "target": "reduce"
+        }
+      ],
+      "builtin": true,
+      "max_rounds": 1,
+      "stop_when_contains": "",
+      "channels": [],
+      "input_schema": {},
+      "output_schema": {}
+    },
+    "examples": [
+      "Connect a provider, local model, or paired device before running this architecture"
+    ],
+    "evaluation": {
+      "status": "deterministic provider-fixture validation",
+      "note": "No live-provider quality ranking is claimed"
+    }
+  },
+  "signature": "JKvmYWu/otZk69SkiOT01Y+tSMONTSb8xwqV5clFpGLlSuP16QiEPCYTZLFPLOn5TDxOoXj07XFETnhc8Y5qAg=="
+}

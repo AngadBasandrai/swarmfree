@@ -4,7 +4,7 @@
   "payload": {
     "id": "parallel",
     "name": "Parallel / join",
-    "version": "0.6.4",
+    "version": "0.6.5",
     "kind": "architecture",
     "license": "MIT",
     "permissions": [],
@@ -12,6 +12,7 @@
       "id": "parallel",
       "name": "Parallel / join",
       "description": "Independent perspectives work in parallel, then merge.",
+      "category": "general",
       "nodes": [
         {
           "id": "analyst",
@@ -22,6 +23,9 @@
           "requires": [],
           "kind": "agent",
           "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
           "input_schema": {},
           "message_budget": 8,
           "run_if": {},
@@ -39,6 +43,9 @@
           "requires": [],
           "kind": "agent",
           "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
           "input_schema": {},
           "message_budget": 8,
           "run_if": {},
@@ -56,6 +63,9 @@
           "requires": [],
           "kind": "agent",
           "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
           "input_schema": {},
           "message_budget": 8,
           "run_if": {},
@@ -90,5 +100,5 @@
       "note": "No live-provider quality ranking is claimed"
     }
   },
-  "signature": "Eu9szvG8skvHfdnhzSjWxvePQRn5F/Fjx6f274bxHv3mptIfMtXbhWTY8jg5ZPpezdpdUBSBf7eCYvbFV9KpCw=="
+  "signature": "qPYi12ZsqhrieHlRfPODMbwebz81TZA30DqlgMCLiN6BoywrWyWxGHiC2NYHAKnrnDXv6oDstBvoy2uXyGj/Bw=="
 }

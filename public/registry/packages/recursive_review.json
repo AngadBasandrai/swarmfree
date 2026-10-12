@@ -1,0 +1,128 @@
+{
+  "format": "swarm-json-v1",
+  "key_id": "swarmfree",
+  "payload": {
+    "id": "recursive_review",
+    "name": "Recursive critique and repair",
+    "version": "0.6.5",
+    "kind": "architecture",
+    "license": "MIT",
+    "permissions": [],
+    "architecture": {
+      "id": "recursive_review",
+      "name": "Recursive critique and repair",
+      "description": "Review a draft, recursively repair remaining defects, and finalize; stop at depth two or APPROVED.",
+      "category": "recursive",
+      "nodes": [
+        {
+          "id": "draft",
+          "name": "Drafter",
+          "role": "Create or repair the work",
+          "instructions": "Create the requested work, incorporating supplied defects and previous findings.",
+          "tools": null,
+          "requires": [],
+          "kind": "agent",
+          "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 0.0,
+          "y": 100.0
+        },
+        {
+          "id": "review",
+          "name": "Reviewer",
+          "role": "Specify remaining repairs",
+          "instructions": "Review the draft. If it meets the task, prefix APPROVED and include the deliverable. Otherwise describe a concrete repair task and include enough of the draft to repair it.",
+          "tools": null,
+          "requires": [],
+          "kind": "agent",
+          "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 280.0,
+          "y": 100.0
+        },
+        {
+          "id": "repair",
+          "name": "Recursive repairer",
+          "role": "Repair the reviewed work",
+          "instructions": "At the base case, perform the requested repair directly. If APPROVED, preserve the approved deliverable. Do not request another delegation.",
+          "tools": null,
+          "requires": [],
+          "kind": "recursive",
+          "subswarm_id": "self",
+          "max_depth": 2,
+          "task_source": "review",
+          "recursion_stop_contains": "APPROVED",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 560.0,
+          "y": 100.0
+        },
+        {
+          "id": "deliver",
+          "name": "Finisher",
+          "role": "Deliver the repaired result",
+          "instructions": "Deliver the repaired or approved work, preserving the original requirements.",
+          "tools": null,
+          "requires": [],
+          "kind": "agent",
+          "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 840.0,
+          "y": 100.0
+        }
+      ],
+      "edges": [
+        {
+          "source": "draft",
+          "target": "review"
+        },
+        {
+          "source": "review",
+          "target": "repair"
+        },
+        {
+          "source": "repair",
+          "target": "deliver"
+        }
+      ],
+      "builtin": true,
+      "max_rounds": 1,
+      "stop_when_contains": "",
+      "channels": [],
+      "input_schema": {},
+      "output_schema": {}
+    },
+    "examples": [
+      "Connect a provider, local model, or paired device before running this architecture"
+    ],
+    "evaluation": {
+      "status": "deterministic provider-fixture validation",
+      "note": "No live-provider quality ranking is claimed"
+    }
+  },
+  "signature": "86cyIe2j/fIDakTltWUvBt/BgzsJBlVBEUO7+WM4M5c7oh7GMs84Cy1FW7k+a/uSRmQC2JYJl5v0gKPhRmq4Cg=="
+}

@@ -4,7 +4,7 @@
   "payload": {
     "id": "blackboard",
     "name": "Shared blackboard",
-    "version": "0.6.4",
+    "version": "0.6.5",
     "kind": "architecture",
     "license": "MIT",
     "permissions": [],
@@ -12,6 +12,7 @@
       "id": "blackboard",
       "name": "Shared blackboard",
       "description": "Parallel specialists use permissioned project memory, then join.",
+      "category": "research",
       "nodes": [
         {
           "id": "investigator",
@@ -22,6 +23,9 @@
           "requires": [],
           "kind": "agent",
           "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
           "input_schema": {},
           "message_budget": 8,
           "run_if": {},
@@ -39,6 +43,9 @@
           "requires": [],
           "kind": "agent",
           "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
           "input_schema": {},
           "message_budget": 8,
           "run_if": {},
@@ -56,6 +63,9 @@
           "requires": [],
           "kind": "agent",
           "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
           "input_schema": {},
           "message_budget": 8,
           "run_if": {},
@@ -90,5 +100,5 @@
       "note": "No live-provider quality ranking is claimed"
     }
   },
-  "signature": "NndZgNbQvAIu4CPJ/4jPOUILCEQygt7xT1UfxIijSJgPYWqsGXcJrYpMXPNJvTkxYMGdsDRIM0HVFlZuo5bxBQ=="
+  "signature": "YoF5TE4hAKWN0vX0BGqvLCJaiMU1jjy4YphcXvmtYhVymBnStFkb+vQGVMIK9HYrnRwOrgP9b4rNrB6juHuMBg=="
 }

@@ -4,7 +4,7 @@
   "payload": {
     "id": "handoff",
     "name": "Specialist handoff",
-    "version": "0.6.4",
+    "version": "0.6.5",
     "kind": "architecture",
     "license": "MIT",
     "permissions": [],
@@ -12,6 +12,7 @@
       "id": "handoff",
       "name": "Specialist handoff",
       "description": "Triage, specialist work, and final handoff.",
+      "category": "general",
       "nodes": [
         {
           "id": "triage",
@@ -22,6 +23,9 @@
           "requires": [],
           "kind": "agent",
           "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
           "input_schema": {},
           "message_budget": 8,
           "run_if": {},
@@ -39,6 +43,9 @@
           "requires": [],
           "kind": "agent",
           "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
           "input_schema": {},
           "message_budget": 8,
           "run_if": {},
@@ -56,6 +63,9 @@
           "requires": [],
           "kind": "agent",
           "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
           "input_schema": {},
           "message_budget": 8,
           "run_if": {},
@@ -90,5 +100,5 @@
       "note": "No live-provider quality ranking is claimed"
     }
   },
-  "signature": "NS+QUg1V/kH+JAdqQcQmBVtx6NbdcT+L47n+R/V9EpzhxUMaCSmLMu7odsdrtZUDIBzGy5DYPVKONWDudOLFCA=="
+  "signature": "4Ge3mxTeblYUg8NCbqhsUUiyFyVR2nxZJwLDpEoqxbrCiMb54PcCt/WYH08TGfBDTa7KZqkQawLTI5KiXHzAAQ=="
 }

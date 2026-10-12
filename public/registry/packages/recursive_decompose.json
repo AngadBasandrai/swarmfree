@@ -1,0 +1,108 @@
+{
+  "format": "swarm-json-v1",
+  "key_id": "swarmfree",
+  "payload": {
+    "id": "recursive_decompose",
+    "name": "Recursive decomposition",
+    "version": "0.6.5",
+    "kind": "architecture",
+    "license": "MIT",
+    "permissions": [],
+    "architecture": {
+      "id": "recursive_decompose",
+      "name": "Recursive decomposition",
+      "description": "Scope a smaller task, call this team again, and synthesize; stop at depth two or BASE_CASE.",
+      "category": "recursive",
+      "nodes": [
+        {
+          "id": "scope",
+          "name": "Decomposer",
+          "role": "Scope the next smaller task",
+          "instructions": "Choose one concrete smaller task needed to solve this task. Output only that task. If it is already directly solvable, prefix BASE_CASE and describe what to solve.",
+          "tools": null,
+          "requires": [],
+          "kind": "agent",
+          "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 0.0,
+          "y": 100.0
+        },
+        {
+          "id": "recurse",
+          "name": "Recursive solver",
+          "role": "Solve the scoped task",
+          "instructions": "At the base case, solve the supplied task directly using available evidence and granted tools. Return useful work, not another delegation request.",
+          "tools": null,
+          "requires": [],
+          "kind": "recursive",
+          "subswarm_id": "self",
+          "max_depth": 2,
+          "task_source": "scope",
+          "recursion_stop_contains": "BASE_CASE",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 280.0,
+          "y": 100.0
+        },
+        {
+          "id": "combine",
+          "name": "Synthesizer",
+          "role": "Integrate the recursive result",
+          "instructions": "Use the scoped task and actual child result to answer this level's original task. State unresolved work.",
+          "tools": null,
+          "requires": [],
+          "kind": "agent",
+          "subswarm_id": "",
+          "max_depth": 2,
+          "task_source": "",
+          "recursion_stop_contains": "",
+          "input_schema": {},
+          "message_budget": 8,
+          "run_if": {},
+          "output_schema": {},
+          "validators": [],
+          "x": 560.0,
+          "y": 100.0
+        }
+      ],
+      "edges": [
+        {
+          "source": "scope",
+          "target": "recurse"
+        },
+        {
+          "source": "scope",
+          "target": "combine"
+        },
+        {
+          "source": "recurse",
+          "target": "combine"
+        }
+      ],
+      "builtin": true,
+      "max_rounds": 1,
+      "stop_when_contains": "",
+      "channels": [],
+      "input_schema": {},
+      "output_schema": {}
+    },
+    "examples": [
+      "Connect a provider, local model, or paired device before running this architecture"
+    ],
+    "evaluation": {
+      "status": "deterministic provider-fixture validation",
+      "note": "No live-provider quality ranking is claimed"
+    }
+  },
+  "signature": "gLQUPTbaOzHk3Y5dWQh7H6YajG/JpAAH4tk77enuTo/VBxX+i/BVFXKVdnD+iNShGv1mULWvNoffs0EW6uU/Bg=="
+}
